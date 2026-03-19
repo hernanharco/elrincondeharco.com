@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.svelte';
+import Hero from '../components/Hero.svelte';
+import About from '../components/About.svelte';
+import Stack from '../components/Stack.svelte';
+import Projects from '../components/Projects.svelte';
+import Passions from '../components/Passions.svelte';
+import Footer from '../components/Footer.svelte';
+---
+
+<Layout>
+	<main>
+		<Navbar client:load />
+		<Hero client:visible />
+		<About client:visible />
+		<Stack client:load />
+		<Projects client:visible />
+		<Passions client:visible />
+		<Footer client:visible />
+	</main>
+</Layout>
