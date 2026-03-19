@@ -5,7 +5,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     """Configuración de la aplicación usando Pydantic Settings v2."""
-    
+
     # Mapeo directo desde el archivo .env
     pg_host: str = Field(..., alias="PGHOST")
     pg_database: str = Field(..., alias="PGDATABASE")
@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # Application
     debug: bool = True
     secret_key: str = "your-secret-key-change-in-production"
+
+    # Cloudinary
+    cloudinary_cloud_name: str = Field(..., env="CLOUDINARY_CLOUD_NAME")
+    cloudinary_api_key: str = Field(..., env="CLOUDINARY_API_KEY")
+    cloudinary_api_secret: str = Field(..., env="CLOUDINARY_API_SECRET")
 
     @computed_field
     @property
@@ -36,7 +41,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
-        extra="ignore" # Ignora otras variables del .env que no necesitemos aquí
+        extra="ignore",  # Ignora otras variables del .env que no necesitemos aquí
     )
 
 
