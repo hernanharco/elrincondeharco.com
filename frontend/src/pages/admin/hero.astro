@@ -1,0 +1,13 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import HeroEditor from '../../components/admin/HeroEditor.svelte';
+
+const currentPath = Astro.url.pathname;
+---
+
+<AdminLayout title="Hero" currentPath={currentPath}>
+  <div class="max-w-2xl">
+    <h1 class="text-2xl font-bold text-zinc-100 mb-8">Editar Hero</h1>
+    <HeroEditor client:load />
+  </div>
+</AdminLayout>

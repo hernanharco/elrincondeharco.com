@@ -1,5 +1,21 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { ArrowRight, Download } from 'lucide-svelte';
+  import { fetchApi } from '$lib/config';
+  import type { HeroResponse } from '$lib/types';
+
+  let data: HeroResponse | null = null;
+  let loading = true;
+
+  onMount(async () => {
+    try {
+      data = await fetchApi<HeroResponse>('/api/v1/heroes/latest/');
+    } catch {
+      // mantener null — el template maneja el estado vacío
+    } finally {
+      loading = false;
+    }
+  });
 </script>
 
 <section
@@ -9,7 +25,8 @@
   <!-- Background Image with Overlay -->
   <div class="absolute inset-0 z-0">
     <img
-      src="https://images.unsplash.com/photo-1761599821310-da0d6356b4f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhYnN0cmFjdCUyMHRlY2hub2xvZ3klMjBiYWNrZ3JvdW5kJTIwY29kZSUyMGRhcmt8ZW58MXx8fHwxNzcwNDgwNjI4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+      src={data?.background_image ||
+        'https://images.unsplash.com/photo-1761599821310-da0d6356b4f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhYnN0cmFjdCUyMHRlY2hub2xvZ3klMjBiYWNrZ3JvdW5kJTIwY29kZSUyMGRhcmt8ZW58MXx8fHwxNzcwNDgwNjI4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'}
       alt="Background"
       class="w-full h-full object-cover opacity-20"
     />
@@ -25,9 +42,8 @@
         Hernan Arango Cortes
       </h1>
       <p class="max-w-2xl mx-auto text-xl text-gray-300 mb-10">
-        Transformando 14+ años de experiencia en liderazgo y análisis en soluciones tecnológicas
-        innovadoras. Mi familia es mi motor, la tecnología mi pasión, y el emprendimiento mi camino
-        hacia el futuro.
+        {data?.description ||
+          'Transformando 14+ años de experiencia en liderazgo y análisis en soluciones tecnológicas innovadoras. Mi familia es mi motor, la tecnología mi pasión, y el emprendimiento mi camino hacia el futuro.'}
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -35,13 +51,13 @@
           href="#contact"
           class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-black bg-amber-400 hover:bg-amber-500 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)]"
         >
-          Contactar
+          {data?.contact_button_text || 'Contactar'}
           <ArrowRight class="ml-2 h-5 w-5" />
         </a>
         <button
           class="inline-flex items-center px-8 py-3 border border-white/20 text-base font-medium rounded-full text-white hover:bg-white/10 transition-all backdrop-blur-sm"
         >
-          Descargar CV
+          {data?.cv_button_text || 'Descargar CV'}
           <Download class="ml-2 h-5 w-5" />
         </button>
       </div>

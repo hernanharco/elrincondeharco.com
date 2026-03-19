@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import {
     Zap,
     Rocket,
@@ -26,241 +27,27 @@
     Globe,
     Terminal,
   } from 'lucide-svelte';
+  import { fetchApi } from '$lib/config';
+  import type { StackResponse } from '$lib/types';
 
   let activeCategory = 'Todos';
+  let items: StackResponse[] = [];
+  let loading = true;
 
   const categories = ['Todos', 'Frontend', 'Backend', 'DevOps', 'Herramientas'];
 
-  const technologies = [
-    // Frontend
-    {
-      name: 'HTML5',
-      category: 'Frontend',
-      icon: 'Globe',
-      description: 'Estructura Web',
-      color: 'text-orange-500',
-      border: 'group-hover:border-orange-500/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.3)]',
-    },
-    {
-      name: 'CSS3',
-      category: 'Frontend',
-      icon: 'Palette',
-      description: 'Estilos Modernos',
-      color: 'text-blue-500',
-      border: 'group-hover:border-blue-500/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]',
-    },
-    {
-      name: 'Tailwind CSS',
-      category: 'Frontend',
-      icon: 'Palette',
-      description: 'Estilos Utilitarios',
-      color: 'text-cyan-400',
-      border: 'group-hover:border-cyan-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]',
-    },
-    {
-      name: 'JavaScript',
-      category: 'Frontend',
-      icon: 'FileCode2',
-      description: 'Interactividad',
-      color: 'text-yellow-400',
-      border: 'group-hover:border-yellow-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(250,204,21,0.3)]',
-    },
-    {
-      name: 'TypeScript',
-      category: 'Frontend',
-      icon: 'FileCode2',
-      description: 'JS Tipado',
-      color: 'text-blue-400',
-      border: 'group-hover:border-blue-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(96,165,250,0.3)]',
-    },
-    {
-      name: 'React',
-      category: 'Frontend',
-      icon: 'Atom',
-      description: 'Interfaces interactivas',
-      color: 'text-cyan-400',
-      border: 'group-hover:border-cyan-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]',
-    },
-    {
-      name: 'Astro',
-      category: 'Frontend',
-      icon: 'Rocket',
-      description: 'Webs ultra rápidas',
-      color: 'text-orange-400',
-      border: 'group-hover:border-orange-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(251,146,60,0.3)]',
-    },
-    {
-      name: 'Next.js',
-      category: 'Frontend',
-      icon: 'LayoutTemplate',
-      description: 'Framework de producción',
-      color: 'text-white',
-      border: 'group-hover:border-white/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)]',
-    },
-
-    // Backend
-    {
-      name: 'Python',
-      category: 'Backend',
-      icon: 'Terminal',
-      description: 'Lenguaje Versátil',
-      color: 'text-yellow-300',
-      border: 'group-hover:border-yellow-300/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(253,224,71,0.3)]',
-    },
-    {
-      name: 'FastAPI',
-      category: 'Backend',
-      icon: 'Zap',
-      description: 'APIs rápidas con Python',
-      color: 'text-teal-400',
-      border: 'group-hover:border-teal-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(45,212,191,0.3)]',
-    },
-    {
-      name: 'Django',
-      category: 'Backend',
-      icon: 'Layers',
-      description: 'Framework Web Robusto',
-      color: 'text-green-600',
-      border: 'group-hover:border-green-600/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(22,163,74,0.3)]',
-    },
-    {
-      name: 'API REST',
-      category: 'Backend',
-      icon: 'Server',
-      description: 'Arquitectura de APIs',
-      color: 'text-indigo-400',
-      border: 'group-hover:border-indigo-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(129,140,248,0.3)]',
-    },
-    {
-      name: 'JWT',
-      category: 'Backend',
-      icon: 'Lock',
-      description: 'Seguridad & Auth',
-      color: 'text-pink-500',
-      border: 'group-hover:border-pink-500/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(236,72,153,0.3)]',
-    },
-    {
-      name: 'MongoDB',
-      category: 'Backend',
-      icon: 'Database',
-      description: 'NoSQL escalable',
-      color: 'text-green-400',
-      border: 'group-hover:border-green-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(74,222,128,0.3)]',
-    },
-    {
-      name: 'NEON',
-      category: 'Backend',
-      icon: 'Server',
-      description: 'Postgres Serverless',
-      color: 'text-blue-400',
-      border: 'group-hover:border-blue-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(96,165,250,0.3)]',
-    },
-
-    // DevOps
-    {
-      name: 'Docker',
-      category: 'DevOps',
-      icon: 'Container',
-      description: 'Contenedorización',
-      color: 'text-blue-500',
-      border: 'group-hover:border-blue-500/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]',
-    },
-    {
-      name: 'Git',
-      category: 'DevOps',
-      icon: 'GitBranch',
-      description: 'Control de versiones',
-      color: 'text-red-500',
-      border: 'group-hover:border-red-500/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(239,68,68,0.3)]',
-    },
-    {
-      name: 'GitHub',
-      category: 'DevOps',
-      icon: 'Github',
-      description: 'Colaboración',
-      color: 'text-white',
-      border: 'group-hover:border-white/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)]',
-    },
-    {
-      name: 'Vercel',
-      category: 'DevOps',
-      icon: 'Triangle',
-      description: 'Deploy Frontend',
-      color: 'text-gray-200',
-      border: 'group-hover:border-gray-200/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(229,231,235,0.2)]',
-    },
-    {
-      name: 'Render',
-      category: 'DevOps',
-      icon: 'Cloud',
-      description: 'Cloud Hosting',
-      color: 'text-purple-400',
-      border: 'group-hover:border-purple-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(192,132,252,0.3)]',
-    },
-
-    // Herramientas
-    {
-      name: 'VS Code',
-      category: 'Herramientas',
-      icon: 'Code2',
-      description: 'Editor de Código',
-      color: 'text-blue-500',
-      border: 'group-hover:border-blue-500/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]',
-    },
-    {
-      name: 'Postman',
-      category: 'Herramientas',
-      icon: 'Send',
-      description: 'Testing de APIs',
-      color: 'text-orange-500',
-      border: 'group-hover:border-orange-500/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.3)]',
-    },
-    {
-      name: 'IA & LLMs',
-      category: 'Herramientas',
-      icon: 'BrainCircuit',
-      description: 'Inteligencia Artificial',
-      color: 'text-rose-400',
-      border: 'group-hover:border-rose-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(251,113,133,0.3)]',
-    },
-    {
-      name: 'Optimización',
-      category: 'Herramientas',
-      icon: 'Gauge',
-      description: 'Performance Web',
-      color: 'text-yellow-400',
-      border: 'group-hover:border-yellow-400/50',
-      glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(250,204,21,0.3)]',
-    },
-  ];
+  onMount(async () => {
+    try {
+      items = await fetchApi<StackResponse[]>('/api/v1/stacks/');
+    } catch {
+      items = [];
+    } finally {
+      loading = false;
+    }
+  });
 
   $: filteredTech =
-    activeCategory === 'Todos'
-      ? technologies
-      : technologies.filter((t) => t.category === activeCategory);
+    activeCategory === 'Todos' ? items : items.filter((t) => t.category === activeCategory);
 
   function getCategoryIcon(cat: string) {
     switch (cat) {
@@ -346,24 +133,37 @@
 
     <!-- Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-      {#each filteredTech as tech (tech.name)}
-        <div
-          class="group relative p-4 h-32 flex flex-col justify-between bg-zinc-900/50 rounded-xl border border-white/5 transition-all duration-300 hover:-translate-y-1 {tech.border} {tech.glow}"
-        >
-          <div class="flex justify-between items-start">
-            <div class="p-2 rounded-lg bg-white/5 {tech.color}">
-              <svelte:component this={getIcon(tech.icon)} size={24} />
-            </div>
-            <span class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
-              {tech.category}
-            </span>
+      {#if loading}
+        <!-- Loading skeleton -->
+        {#each Array(20) as _}
+          <div class="animate-pulse">
+            <div class="h-32 bg-zinc-800 rounded-xl"></div>
           </div>
-          <div>
-            <h3 class="font-bold text-white tracking-wide">{tech.name}</h3>
-            <p class="text-xs text-gray-400 mt-1 line-clamp-1">{tech.description}</p>
-          </div>
+        {/each}
+      {:else if filteredTech.length === 0}
+        <div class="col-span-full text-center py-8">
+          <p class="text-zinc-500">No hay tecnologías en esta categoría</p>
         </div>
-      {/each}
+      {:else}
+        {#each filteredTech as tech (tech.id)}
+          <div
+            class="group relative p-4 h-32 flex flex-col justify-between bg-zinc-900/50 rounded-xl border border-white/5 transition-all duration-300 hover:-translate-y-1 {tech.border} {tech.glow}"
+          >
+            <div class="flex justify-between items-start">
+              <div class="p-2 rounded-lg bg-white/5 {tech.color}">
+                <svelte:component this={getIcon(tech.icon)} size={24} />
+              </div>
+              <span class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                {tech.category}
+              </span>
+            </div>
+            <div>
+              <h3 class="font-bold text-white tracking-wide">{tech.name}</h3>
+              <p class="text-xs text-gray-400 mt-1 line-clamp-1">{tech.description}</p>
+            </div>
+          </div>
+        {/each}
+      {/if}
     </div>
 
     <div class="mt-12 text-center">

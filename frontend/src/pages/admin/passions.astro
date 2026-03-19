@@ -1,0 +1,13 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PassionsEditor from '../../components/admin/PassionsEditor.svelte';
+
+const currentPath = Astro.url.pathname;
+---
+
+<AdminLayout title="Pasiones" currentPath={currentPath}>
+  <div class="max-w-2xl">
+    <h1 class="text-2xl font-bold text-zinc-100 mb-8">Editar Pasiones</h1>
+    <PassionsEditor client:load />
+  </div>
+</AdminLayout>

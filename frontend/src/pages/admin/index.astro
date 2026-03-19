@@ -1,0 +1,15 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import DashboardCards from '../../components/admin/DashboardCards.svelte';
+
+const currentPath = Astro.url.pathname;
+---
+
+<AdminLayout title="Dashboard" currentPath={currentPath}>
+  <div>
+    <h1 class="text-2xl font-bold text-zinc-100 mb-2">Dashboard</h1>
+    <p class="text-zinc-400 mb-8">Gestiona el contenido de tu portfolio desde aquí.</p>
+
+    <DashboardCards client:load />
+  </div>
+</AdminLayout>

@@ -91,7 +91,8 @@ backend/
   "add": "poetry add",
   "add:dev": "poetry add --group dev",
   "update": "poetry update",
-  "export": "poetry export -f requirements.txt --output requirements.txt --without-hashes"
+  "export": "poetry export -f requirements.txt --output requirements.txt --without-hashes",
+  "seed": "poetry run python -m app.db.seed"
 }
 ```
 
@@ -114,6 +115,13 @@ backend/
 - **AsyncEngine** con psycopg 3
 - `pool_pre_ping=True` para conexiones estables
 - `AsyncSession` con `expire_on_commit=False`
+
+### Seed de Datos (`app/db/seed.py`)
+- **Script completo** para poblar todas las tablas
+- **Datos reales** extraídos del frontend
+- **DELETE + INSERT** para limpieza total
+- **6 dominios poblados**: heroes (1), abouts (1), passions (1), projects (3), stacks (24), footers (1)
+- **Comando disponible**: `pnpm seed`
 
 ### Modelos (`app/models/`)
 - **Base declarativa** con imports automáticos
@@ -192,13 +200,14 @@ CLOUDINARY_API_SECRET=your_api_secret
 - **Upload de imágenes funcionando**
 - **Schemas Pydantic completos**
 - **Modelos SQLAlchemy optimizados**
+- **Seed de datos inicial completado**
+- **6 dominios poblados con datos reales del frontend**
 
 ### ⚠️ Pendientes
 - Configurar variables `.env` con API keys de Cloudinary
 - Probar conexión con base de datos real
 - Implementar autenticación JWT
 - Tests unitarios completos
-- Migración de datos iniciales
 
 ## 🚀 Próximos Pasos
 
@@ -206,7 +215,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 2. **Ejecutar `pnpm dev`** para iniciar servidor
 3. **Verificar conexión** y creación de tablas
 4. **Probar endpoints** en `http://localhost:8000/docs`
-5. **Crear datos iniciales** para cada dominio
+5. **Ejecutar `pnpm seed`** para poblar datos iniciales
 6. **Integrar frontend** con los nuevos endpoints
 
 ## 📊 Endpoints Disponibles
@@ -269,3 +278,21 @@ CLOUDINARY_API_SECRET=your_api_secret
 - `GET /api/v1/example/` - Listar examples
 - `POST /api/v1/example/` - Crear example
 - `GET /api/v1/example/health` - Health check de ejemplo
+
+## 🔗 Mapa de imports — fuente de verdad
+| Qué importar       | Desde dónde                      |
+|--------------------|----------------------------------|
+| `get_db`           | `app.db.session`                 |
+| `AsyncSession`     | `sqlalchemy.ext.asyncio`         |
+| `Base`             | `app.models.base`                |
+| `upload_image`     | `app.core.cloudinary`            |
+| `settings`         | `app.core.config`                |
+
+## 📡 Endpoints registrados actualmente
+| Dominio  | Prefix           | GET latest |
+|----------|------------------|------------|
+| hero     | /api/v1/heroes   | sí         |
+| about    | /api/v1/abouts   | sí         |
+| stack    | /api/v1/stacks   | no         |
+| project  | /api/v1/projects | no         |
+| passion  | /api/v1/passions | no         |
