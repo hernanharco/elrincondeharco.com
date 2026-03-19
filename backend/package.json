@@ -19,6 +19,7 @@
     "add": "poetry add",
     "add:dev": "poetry add --group dev",
     "update": "poetry update",
-    "export": "poetry export -f requirements.txt --output requirements.txt --without-hashes"
+    "export": "poetry export -f requirements.txt --output requirements.txt --without-hashes",
+    "seed": "poetry run python -m app.db.seed"
   }
 }

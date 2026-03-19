@@ -1,4 +1,4 @@
-# Backend - Auth Core con FastAPI y Neon PostgreSQL
+# Backend - Portfolio API con FastAPI y Neon PostgreSQL
 
 ## 📁 Estructura del Proyecto
 
@@ -13,25 +13,44 @@ backend/
     ├── __init__.py
     ├── main.py                    # App FastAPI con lifespan y logs con emojis
     ├── core/
-    │   └── config.py             # Pydantic Settings v2 con computed_field
+    │   ├── config.py             # Pydantic Settings v2 con computed_field
+    │   └── cloudinary.py         # Configuración y función de upload a Cloudinary
     ├── db/
     │   └── session.py            # AsyncEngine con psycopg 3
     ├── models/
     │   ├── __init__.py
     │   ├── base.py               # Base declarativa con imports automáticos
-    │   └── example.py            # Modelo Example simple
+    │   ├── example.py            # Modelo Example simple
+    │   ├── hero.py               # Modelo para sección Hero
+    │   ├── about.py              # Modelo para sección About
+    │   ├── passions.py           # Modelo para sección Passions
+    │   ├── projects.py           # Modelo para sección Projects
+    │   ├── stack.py              # Modelo para sección Stack
+    │   └── footer.py             # Modelo para sección Footer
     ├── schemas/
     │   ├── __init__.py
     │   ├── user.py               # Schemas para usuarios
-    │   └── token.py              # Schemas para tokens
+    │   ├── token.py              # Schemas para tokens
+    │   ├── hero.py               # Schemas para Hero (Create/Update/Response)
+    │   ├── about.py              # Schemas para About (Create/Update/Response)
+    │   ├── passions.py           # Schemas para Passions (Create/Update/Response)
+    │   ├── projects.py           # Schemas para Projects (Create/Update/Response)
+    │   ├── stack.py              # Schemas para Stack (Create/Update/Response)
+    │   └── footer.py             # Schemas para Footer (Create/Update/Response)
     ├── api/
     │   ├── __init__.py
-    │   ├── route.py              # Router principal
+    │   ├── route.py              # Router principal con todos los dominios
     │   └── v1/
     │       ├── __init__.py
     │       └── endpoints/
     │           ├── __init__.py
-    │           └── example.py     # Endpoints funcionales
+    │           ├── example.py     # Endpoints funcionales
+    │           ├── hero.py        # Endpoints CRUD para Hero
+    │           ├── about.py       # Endpoints CRUD para About
+    │           ├── passions.py    # Endpoints CRUD para Passions
+    │           ├── projects.py     # Endpoints CRUD para Projects
+    │           ├── stack.py       # Endpoints CRUD para Stack
+    │           └── footer.py      # Endpoints CRUD para Footer
     └── tests/
         └── __init__.py
 ```
@@ -44,6 +63,7 @@ backend/
 - **SQLAlchemy[asyncio]**: ORM async
 - **pydantic-settings[email]**: Configuración con validación de email
 - **python-dotenv**: Variables de entorno
+- **cloudinary**: Upload de imágenes a Cloudinary
 
 ### Seguridad Neon PostgreSQL
 - `sslmode=require`: Conexión SSL obligatoria
@@ -82,6 +102,13 @@ backend/
 - Mapeo directo desde variables `.env`
 - URL de base de datos construida dinámicamente
 - Soporte para desarrollo y producción
+- Configuración de Cloudinary integrada
+
+### Cloudinary (`app/core/cloudinary.py`)
+- **Configuración automática** desde variables de entorno
+- **Función `upload_image()`** para subir imágenes
+- **Retorno de URLs seguras** (https) siempre
+- **Folder específico**: "elrincondelharco"
 
 ### Base de Datos (`app/db/session.py`)
 - **AsyncEngine** con psycopg 3
@@ -91,12 +118,28 @@ backend/
 ### Modelos (`app/models/`)
 - **Base declarativa** con imports automáticos
 - Modelo **Example** con timestamps
-- Estructura extensible para más modelos
+- **6 dominios de portfolio** implementados:
+  - **Hero**: Sección principal (title, subtitle, description, buttons)
+  - **About**: Información personal (experience, leadership, location)
+  - **Passions**: Pasiones personales (family, games, coding)
+  - **Projects**: Portafolio (tags, URLs, iconos)
+  - **Stack**: Tecnologías (estilos flexibles)
+  - **Footer**: Contacto y enlaces (social media, quick links)
+- **Tipos de datos optimizados**: String, Text, JSONB, etc.
 
 ### API (`app/api/`)
 - Router principal con **include_router**
-- Endpoints **v1** organizados
-- Ejemplo funcional con CRUD básico
+- Endpoints **v1** organizados por dominio
+- **Ejemplo funcional** con CRUD básico
+- **6 dominios completos** con CRUD completo:
+  - `GET /api/v1/{dominios}/` - Listar todos
+  - `GET /api/v1/{dominios}/{id}` - Obtener por ID
+  - `GET /api/v1/{dominios}/latest/` - Último registro (hero, about, passions, footer)
+  - `POST /api/v1/{dominios}/` - Crear (con upload de imagen)
+  - `PUT /api/v1/{dominios}/{id}` - Actualizar (con upload de imagen)
+  - `DELETE /api/v1/{dominios}/{id}` - Eliminar
+- **Upload de imágenes** integrado con Cloudinary
+- **Form data handling** para todos los endpoints
 
 ### Lifespan (`app/main.py`)
 - Logs con emojis informativos
@@ -118,6 +161,11 @@ PGCHANNELBINDING=require
 # Application Settings
 DEBUG=true
 SECRET_KEY=your-secret-key-here
+
+# Cloudinary Configuration
+CLOUDINARY_CLOUD_NAME=dxyk76jhu
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 ## 🐳 Docker
@@ -138,28 +186,86 @@ SECRET_KEY=your-secret-key-here
 - Endpoints API funcionales
 - Scripts de desarrollo
 - Configuración Docker
+- **Integración completa con Cloudinary**
+- **6 dominios de portfolio implementados**
+- **CRUD completo para todos los dominios**
+- **Upload de imágenes funcionando**
+- **Schemas Pydantic completos**
+- **Modelos SQLAlchemy optimizados**
 
 ### ⚠️ Pendientes
-- Crear archivo `.env` con credenciales Neon reales
+- Configurar variables `.env` con API keys de Cloudinary
 - Probar conexión con base de datos real
 - Implementar autenticación JWT
-- Agregar más modelos y endpoints
 - Tests unitarios completos
+- Migración de datos iniciales
 
 ## 🚀 Próximos Pasos
 
-1. **Configurar `.env`** con credenciales Neon
+1. **Configurar `.env`** con credenciales Neon y Cloudinary
 2. **Ejecutar `pnpm dev`** para iniciar servidor
 3. **Verificar conexión** y creación de tablas
 4. **Probar endpoints** en `http://localhost:8000/docs`
-5. **Extender funcionalidad** según necesidades
+5. **Crear datos iniciales** para cada dominio
+6. **Integrar frontend** con los nuevos endpoints
 
 ## 📊 Endpoints Disponibles
 
+### Generales
 - `GET /` - Mensaje de bienvenida
 - `GET /health` - Health check general
+- `GET /docs` - Documentación Swagger UI
+- `GET /redoc` - Documentación ReDoc
+
+### Dominios de Portfolio
+
+#### Hero (`/api/v1/heroes/`)
+- `GET /api/v1/heroes/` - Listar todos
+- `GET /api/v1/heroes/{id}` - Obtener por ID
+- `GET /api/v1/heroes/latest/` - Último registro
+- `POST /api/v1/heroes/` - Crear (con imagen)
+- `PUT /api/v1/heroes/{id}` - Actualizar (con imagen)
+- `DELETE /api/v1/heroes/{id}` - Eliminar
+
+#### About (`/api/v1/abouts/`)
+- `GET /api/v1/abouts/` - Listar todos
+- `GET /api/v1/abouts/{id}` - Obtener por ID
+- `GET /api/v1/abouts/latest/` - Último registro
+- `POST /api/v1/abouts/` - Crear (con imagen)
+- `PUT /api/v1/abouts/{id}` - Actualizar (con imagen)
+- `DELETE /api/v1/abouts/{id}` - Eliminar
+
+#### Passions (`/api/v1/passions/`)
+- `GET /api/v1/passions/` - Listar todos
+- `GET /api/v1/passions/{id}` - Obtener por ID
+- `GET /api/v1/passions/latest/` - Último registro
+- `POST /api/v1/passions/` - Crear (con imagen)
+- `PUT /api/v1/passions/{id}` - Actualizar (con imagen)
+- `DELETE /api/v1/passions/{id}` - Eliminar
+
+#### Projects (`/api/v1/projects/`)
+- `GET /api/v1/projects/` - Listar todos
+- `GET /api/v1/projects/{id}` - Obtener por ID
+- `POST /api/v1/projects/` - Crear (con imagen)
+- `PUT /api/v1/projects/{id}` - Actualizar (con imagen)
+- `DELETE /api/v1/projects/{id}` - Eliminar
+
+#### Stack (`/api/v1/stacks/`)
+- `GET /api/v1/stacks/` - Listar todos
+- `GET /api/v1/stacks/{id}` - Obtener por ID
+- `POST /api/v1/stacks/` - Crear
+- `PUT /api/v1/stacks/{id}` - Actualizar
+- `DELETE /api/v1/stacks/{id}` - Eliminar
+
+#### Footer (`/api/v1/footers/`)
+- `GET /api/v1/footers/` - Listar todos
+- `GET /api/v1/footers/{id}` - Obtener por ID
+- `GET /api/v1/footers/latest/` - Último registro
+- `POST /api/v1/footers/` - Crear
+- `PUT /api/v1/footers/{id}` - Actualizar
+- `DELETE /api/v1/footers/{id}` - Eliminar
+
+### Example (Legacy)
 - `GET /api/v1/example/` - Listar examples
 - `POST /api/v1/example/` - Crear example
 - `GET /api/v1/example/health` - Health check de ejemplo
-- `GET /docs` - Documentación Swagger UI
-- `GET /redoc` - Documentación ReDoc
