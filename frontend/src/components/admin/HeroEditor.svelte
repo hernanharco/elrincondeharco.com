@@ -102,8 +102,12 @@
 
     <!-- Campos del formulario -->
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Título </label>
+      <label 
+        for="title"
+        class="block text-sm font-medium text-zinc-300 mb-2"
+      > Título </label>
       <input
+        id="title"
         type="text"
         bind:value={title}
         required
@@ -116,8 +120,12 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Subtítulo </label>
+      <label 
+        for="subtitle"
+        class="block text-sm font-medium text-zinc-300 mb-2"
+      > Subtítulo </label>
       <textarea
+        id="subtitle"
         bind:value={subtitle}
         rows={3}
         class="w-full px-4 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700
@@ -129,8 +137,12 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Descripción </label>
+      <label 
+        for="description"
+        class="block text-sm font-medium text-zinc-300 mb-2"
+      > Descripción </label>
       <textarea
+        id="description"
         bind:value={description}
         rows={4}
         class="w-full px-4 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700
@@ -142,8 +154,12 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Imagen de fondo (URL) </label>
+      <label 
+        for="background_image"
+        class="block text-sm font-medium text-zinc-300 mb-2"
+      > Imagen de fondo (URL) </label>
       <input
+        id="background_image"
         type="text"
         bind:value={background_image}
         class="w-full px-4 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700
@@ -156,8 +172,12 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Texto botón contacto </label>
+        <label 
+          for="contact_button_text"
+          class="block text-sm font-medium text-zinc-300 mb-2"
+        > Texto botón contacto </label>
         <input
+          id="contact_button_text"
           type="text"
           bind:value={contact_button_text}
           required
@@ -170,8 +190,12 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Texto botón CV </label>
+        <label 
+          for="cv_button_text"
+          class="block text-sm font-medium text-zinc-300 mb-2"
+        > Texto botón CV </label>
         <input
+          id="cv_button_text"
           type="text"
           bind:value={cv_button_text}
           required

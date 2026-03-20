@@ -84,10 +84,12 @@
 </script>
 
 <div class="space-y-4">
-  <label class="block text-sm font-medium text-zinc-300 mb-2">{label}</label>
+  <label class="block text-sm font-medium text-zinc-300 mb-2" for="file-input">{label}</label>
   
   <!-- Upload Area -->
   <div
+    role="button"
+    tabindex="0"
     class="relative group"
     on:drop={handleDrop}
     on:dragover={handleDragOver}
@@ -128,8 +130,16 @@
     {:else}
       <!-- Drop Zone -->
       <div
+        role="button"
+        tabindex="0"
+        on:keydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openFileDialog();
+          }
+        }}
         class={`
-          relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer
+          relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer 
           ${isDragging 
             ? 'border-amber-400 bg-amber-400/10 scale-[1.02]' 
             : 'border-zinc-700 hover:border-amber-400/50 hover:bg-zinc-800/50'

@@ -1,15 +1,18 @@
 // Sistema de eventos para sincronizar cambios entre admin y componentes públicos
 
+// Tipos de datos válidos para eventos
+type DataType = 'hero' | 'about' | 'stack' | 'projects' | 'passions' | 'footer' | 'site-settings';
+
 type DataChangeEvent = CustomEvent<{
-  type: 'hero' | 'about' | 'stack' | 'projects' | 'passions' | 'footer';
+  type: DataType;
   action: 'create' | 'update' | 'delete';
   data?: any;
 }>;
 
 // Función para disparar eventos desde el admin
 export function dispatchDataChange(
-  type: DataChangeEvent['detail']['type'],
-  action: DataChangeEvent['detail']['action'],
+  type: DataType,
+  action: 'create' | 'update' | 'delete',
   data?: any
 ) {
   const event = new CustomEvent('dataChange', {
@@ -20,19 +23,19 @@ export function dispatchDataChange(
 
 // Hook para que los componentes escuchen cambios
 export function listenForDataChange(
-  type: DataChangeEvent['detail']['type'],
-  callback: () => void | Promise<void>
+  type: DataType,
+  callback: (event?: CustomEvent) => Promise<void> | void
 ) {
   const handler = async (e: Event) => {
-    const event = e as DataChangeEvent;
-    if (event.detail.type === type) {
-      await callback();
+    const customEvent = e as CustomEvent;
+    if (customEvent.detail.type === type) {
+      await callback(customEvent);
     }
   };
-  
+
   document.addEventListener('dataChange', handler);
-  
-  // Retorna función de limpieza
+
+  // Return cleanup function
   return () => {
     document.removeEventListener('dataChange', handler);
   };

@@ -8,6 +8,7 @@
     FolderKanban,
     Heart,
     Mail,
+    Settings,
     ChevronLeft,
     ChevronRight,
     ExternalLink,
@@ -36,6 +37,7 @@
     { href: '/admin/projects', label: 'Proyectos', icon: FolderKanban },
     { href: '/admin/passions', label: 'Pasiones', icon: Heart },
     { href: '/admin/footer', label: 'Footer', icon: Mail },
+    { href: '/admin/site-settings', label: 'Configuración', icon: Settings },
   ];
 
   function isActive(href: string): boolean {

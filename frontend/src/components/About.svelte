@@ -74,18 +74,7 @@
         </h2>
 
         <div class="space-y-4 text-gray-300 leading-relaxed">
-          <p>
-            Mi nombre es Hernan Arango Cortes. Hace aproximadamente 5 años que resido en
-            <span class="text-white font-medium"> {data?.location || 'Avilés, Asturias'}</span>...
-          </p>
-
-          <p>
-            ...el <span class="text-amber-400 font-bold"> "{data?.team_name || 'Equipo de Oro'}"</span>.
-          </p>
-
-          <p>
-            Nos caracterizábamos por presentar soluciones rápidas y efectivas...
-          </p>
+          <p>{data?.description || ''}</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
