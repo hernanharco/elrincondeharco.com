@@ -70,3 +70,22 @@ export interface FooterResponse {
   twitter_url: string | null;
   quick_links: { text: string; href: string }[];
 }
+
+// Site Settings
+export interface SocialNetworks {
+  github: string | null;
+  linkedin: string | null;
+  twitter: string | null;
+}
+
+export interface SiteSettingsResponse {
+  id: number;
+  brand_name: string;
+  site_url: string;
+  legal_name: string;
+  slogan: string | null;
+  copyright_notice: string;
+  contact_email: string;
+  social_networks: SocialNetworks | null;
+  is_active: boolean;
+}

@@ -26,7 +26,8 @@ backend/
     │   ├── passions.py           # Modelo para sección Passions
     │   ├── projects.py           # Modelo para sección Projects
     │   ├── stack.py              # Modelo para sección Stack
-    │   └── footer.py             # Modelo para sección Footer
+    │   ├── footer.py             # Modelo para sección Footer
+    │   └── site_settings.py      # Modelo para configuración del sitio
     ├── schemas/
     │   ├── __init__.py
     │   ├── user.py               # Schemas para usuarios
@@ -36,7 +37,8 @@ backend/
     │   ├── passions.py           # Schemas para Passions (Create/Update/Response)
     │   ├── projects.py           # Schemas para Projects (Create/Update/Response)
     │   ├── stack.py              # Schemas para Stack (Create/Update/Response)
-    │   └── footer.py             # Schemas para Footer (Create/Update/Response)
+    │   ├── footer.py             # Schemas para Footer (Create/Update/Response)
+    │   └── site_settings.py      # Schemas para SiteSettings (Create/Update/Response)
     ├── api/
     │   ├── __init__.py
     │   ├── route.py              # Router principal con todos los dominios
@@ -50,7 +52,8 @@ backend/
     │           ├── passions.py    # Endpoints CRUD para Passions
     │           ├── projects.py     # Endpoints CRUD para Projects
     │           ├── stack.py       # Endpoints CRUD para Stack
-    │           └── footer.py      # Endpoints CRUD para Footer
+    │           ├── footer.py      # Endpoints CRUD para Footer
+    │           └── site_settings.py # Endpoints CRUD para SiteSettings
     └── tests/
         └── __init__.py
 ```
@@ -136,23 +139,24 @@ backend/
 ### Modelos (`app/models/`)
 - **Base declarativa** con imports automáticos
 - Modelo **Example** con timestamps
-- **6 dominios de portfolio** implementados:
+- **7 dominios de portfolio** implementados:
   - **Hero**: Sección principal (title, subtitle, description, buttons, image_url)
   - **About**: Información personal (experience, leadership, location, image_url)
   - **Passions**: Pasiones personales (family, games, coding, image_url)
   - **Projects**: Portafolio (tags, URLs, iconos, image_url)
   - **Stack**: Tecnologías (estilos flexibles, iconos, colores)
   - **Footer**: Contacto y enlaces (social media, quick_links JSONB)
-- **Tipos de datos optimizados**: String, Text, JSONB, etc.
+  - **SiteSettings**: Configuración del sitio (brand, legal, social networks JSONB)
+- **Tipos de datos optimizados**: String, Text, JSONB, Boolean
 
 ### API (`app/api/`)
 - Router principal con **include_router**
 - Endpoints **v1** organizados por dominio
 - **Ejemplo funcional** con CRUD básico
-- **6 dominios completos** con CRUD completo:
+- **7 dominios completos** con CRUD completo:
   - `GET /api/v1/{dominios}/` - Listar todos
   - `GET /api/v1/{dominios}/{id}` - Obtener por ID
-  - `GET /api/v1/{dominios}/latest/` - Último registro (hero, about, passions, footer)
+  - `GET /api/v1/{dominios}/latest/` - Último registro (hero, about, passions, footer, site-settings)
   - `POST /api/v1/{dominios}/` - Crear (con upload de imagen)
   - `PUT /api/v1/{dominios}/{id}` - Actualizar (con upload de imagen)
   - `DELETE /api/v1/{dominios}/{id}` - Eliminar
@@ -212,16 +216,17 @@ FRONTEND_URL=http://localhost:4321
 - Scripts de desarrollo
 - Configuración Docker
 - **Integración completa con Cloudinary**
-- **6 dominios de portfolio implementados**
+- **7 dominios de portfolio implementados**
 - **CRUD completo para todos los dominios**
 - **Upload de imágenes funcionando**
 - **Schemas Pydantic completos**
 - **Modelos SQLAlchemy optimizados**
 - **Seed de datos inicial completado**
-- **6 dominios poblados con datos reales del frontend**
+- **7 dominios poblados con datos reales del frontend**
 - **CORS middleware configurado**
 - **Panel admin frontend integrado**
 - **Sistema de sincronización implementado**
+- **SiteSettings para configuración de marca**
 
 ### ✅ Panel Admin Integration
 - **Frontend completo** con 6 editores
@@ -303,6 +308,14 @@ FRONTEND_URL=http://localhost:4321
 - `PUT /api/v1/footers/{id}` - Actualizar (FormData)
 - `DELETE /api/v1/footers/{id}` - Eliminar
 
+#### SiteSettings (`/api/v1/site-settings/`)
+- `GET /api/v1/site-settings/` - Listar todos
+- `GET /api/v1/site-settings/{id}` - Obtener por ID
+- `GET /api/v1/site-settings/latest/` - Último registro activo
+- `POST /api/v1/site-settings/` - Crear (FormData)
+- `PUT /api/v1/site-settings/{id}` - Actualizar (FormData)
+- `DELETE /api/v1/site-settings/{id}` - Eliminar
+
 ### Example (Legacy)
 - `GET /api/v1/example/` - Listar examples
 - `POST /api/v1/example/` - Crear example
@@ -318,14 +331,15 @@ FRONTEND_URL=http://localhost:4321
 | `settings`         | `app.core.config`                |
 
 ## 📡 Endpoints registrados actualmente
-| Dominio  | Prefix           | GET latest | FormData |
-|----------|------------------|------------|-----------|
-| hero     | /api/v1/heroes   | sí         | sí        |
-| about    | /api/v1/abouts   | sí         | sí        |
-| stack    | /api/v1/stacks   | no         | no        |
-| project  | /api/v1/projects | no         | sí        |
-| passion  | /api/v1/passions | sí         | sí        |
-| footer   | /api/v1/footers  | sí         | sí        |
+| Dominio      | Prefix               | GET latest | FormData |
+|--------------|----------------------|------------|-----------|
+| hero         | /api/v1/heroes       | sí         | sí        |
+| about        | /api/v1/abouts       | sí         | sí        |
+| stack        | /api/v1/stacks       | no         | no        |
+| project      | /api/v1/projects     | no         | sí        |
+| passion      | /api/v1/passions     | sí         | sí        |
+| footer       | /api/v1/footers      | sí         | sí        |
+| site-settings| /api/v1/site-settings| sí         | sí        |
 
 ---
 
@@ -356,4 +370,4 @@ Eventos → Componentes Públicos → Recarga Automática
 
 **Status**: 🟢 **PRODUCCIÓN LISTA**  
 **Última Actualización**: Marzo 2026  
-**Versión**: 2.0.0 (con Panel Admin y Sincronización)
+**Versión**: 2.1.0 (con Panel Admin, Sincronización y SiteSettings)
