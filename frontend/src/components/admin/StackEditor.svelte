@@ -143,10 +143,14 @@
       <form on:submit|preventDefault={handleSubmit} class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2">
+            <label 
+              for="name"
+              class="block text-sm font-medium text-zinc-300 mb-2"
+            >
               Nombre
             </label>
             <input
+              id="name"
               type="text"
               bind:value={name}
               required
@@ -159,10 +163,14 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2">
+            <label 
+              for="category"
+              class="block text-sm font-medium text-zinc-300 mb-2"
+            >
               Categoría
             </label>
             <select
+              id="category"
               bind:value={category}
               required
               class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
@@ -179,10 +187,14 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2">
+          <label 
+            for="icon"
+            class="block text-sm font-medium text-zinc-300 mb-2"
+          >
             Icono
           </label>
           <select
+            id="icon"
             bind:value={icon}
             required
             class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
@@ -198,10 +210,14 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2">
+          <label 
+            for="description"
+            class="block text-sm font-medium text-zinc-300 mb-2"
+          >
             Descripción
           </label>
           <input
+            id="description"
             type="text"
             bind:value={description}
             required
@@ -215,10 +231,14 @@
 
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2">
+            <label 
+              for="color"
+              class="block text-sm font-medium text-zinc-300 mb-2"
+            >
               Color
             </label>
             <input
+              id="color"
               type="text"
               bind:value={color}
               required
@@ -231,10 +251,14 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2">
+            <label 
+              for="border"
+              class="block text-sm font-medium text-zinc-300 mb-2"
+            >
               Border
             </label>
             <input
+              id="border"
               type="text"
               bind:value={border}
               required
@@ -247,10 +271,14 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2">
+            <label 
+              for="glow"
+              class="block text-sm font-medium text-zinc-300 mb-2"
+            >
               Glow
             </label>
             <input
+              id="glow"
               type="text"
               bind:value={glow}
               required

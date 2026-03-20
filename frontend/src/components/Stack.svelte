@@ -29,6 +29,7 @@
   } from 'lucide-svelte';
   import { fetchApi } from '$lib/config';
   import type { StackResponse } from '$lib/types';
+  import { listenForDataChange } from '$lib/dataEvents';
 
   let activeCategory = 'Todos';
   let items: StackResponse[] = [];
@@ -36,7 +37,7 @@
 
   const categories = ['Todos', 'Frontend', 'Backend', 'DevOps', 'Herramientas'];
 
-  onMount(async () => {
+  async function loadData() {
     try {
       items = await fetchApi<StackResponse[]>('/api/v1/stacks/');
     } catch {
@@ -44,6 +45,18 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(async () => {
+    await loadData();
+
+    // Escuchar cambios desde el admin
+    const cleanup = listenForDataChange('stack', async () => {
+      loading = true;
+      await loadData();
+    });
+
+    return cleanup;
   });
 
   $: filteredTech =

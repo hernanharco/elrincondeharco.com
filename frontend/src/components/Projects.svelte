@@ -3,11 +3,12 @@
   import { ExternalLink, Github, Layers, Lock, Calendar } from 'lucide-svelte';
   import { fetchApi } from '$lib/config';
   import type { ProjectResponse } from '$lib/types';
+  import { listenForDataChange } from '$lib/dataEvents';
 
   let items: ProjectResponse[] = [];
   let loading = true;
 
-  onMount(async () => {
+  async function loadData() {
     try {
       items = await fetchApi<ProjectResponse[]>('/api/v1/projects/');
     } catch {
@@ -15,6 +16,18 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(async () => {
+    await loadData();
+
+    // Escuchar cambios desde el admin
+    const cleanup = listenForDataChange('projects', async () => {
+      loading = true;
+      await loadData();
+    });
+
+    return cleanup;
   });
 
   function getIcon(iconName: string, size: number = 20) {

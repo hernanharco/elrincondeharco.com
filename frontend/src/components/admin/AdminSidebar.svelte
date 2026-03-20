@@ -7,6 +7,7 @@
     Code2,
     FolderKanban,
     Heart,
+    Mail,
     ChevronLeft,
     ChevronRight,
     ExternalLink,
@@ -28,12 +29,13 @@
   }
 
   const navItems = [
-    { href: '/admin',          label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/hero',     label: 'Hero',      icon: Sparkles        },
-    { href: '/admin/about',    label: 'About',     icon: User            },
-    { href: '/admin/stack',    label: 'Stack',     icon: Code2           },
-    { href: '/admin/projects', label: 'Proyectos', icon: FolderKanban    },
-    { href: '/admin/passions', label: 'Pasiones',  icon: Heart           },
+    { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/hero', label: 'Hero', icon: Sparkles },
+    { href: '/admin/about', label: 'About', icon: User },
+    { href: '/admin/stack', label: 'Stack', icon: Code2 },
+    { href: '/admin/projects', label: 'Proyectos', icon: FolderKanban },
+    { href: '/admin/passions', label: 'Pasiones', icon: Heart },
+    { href: '/admin/footer', label: 'Footer', icon: Mail },
   ];
 
   function isActive(href: string): boolean {
@@ -81,9 +83,7 @@
     </div>
     {#if !collapsed}
       <div class="overflow-hidden">
-        <p class="text-sm font-semibold text-zinc-100 truncate">
-          El Rincón de Harco
-        </p>
+        <p class="text-sm font-semibold text-zinc-100 truncate">El Rincón de Harco</p>
         <p class="text-xs text-zinc-500">Panel admin</p>
       </div>
     {/if}
@@ -100,8 +100,8 @@
             flex items-center gap-3 px-2 py-2.5 rounded-lg
             transition-all duration-200 border-l-2
             {active
-              ? 'bg-zinc-800 text-amber-400 border-amber-400'
-              : 'text-zinc-400 hover:bg-zinc-800 hover:text-amber-400 border-transparent'}
+            ? 'bg-zinc-800 text-amber-400 border-amber-400'
+            : 'text-zinc-400 hover:bg-zinc-800 hover:text-amber-400 border-transparent'}
             {collapsed ? 'justify-center' : ''}
           "
         >

@@ -3,6 +3,7 @@
   import { fetchApi } from '$lib/config';
   import type { HeroResponse } from '$lib/types';
   import ImageUpload from './ImageUpload.svelte';
+  import { dispatchDataChange } from '$lib/dataEvents';
 
   const API = import.meta.env.PUBLIC_API_URL;
 
@@ -68,6 +69,9 @@
       data = await res.json();
       message = 'Guardado correctamente';
       messageType = 'success';
+
+      // Disparar evento para actualizar componentes públicos
+      dispatchDataChange('hero', 'update', data);
     } catch {
       message = 'Error al guardar los cambios';
       messageType = 'error';

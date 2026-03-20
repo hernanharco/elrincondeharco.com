@@ -1,13 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ArrowRight, Download } from 'lucide-svelte';
+  import { Github, Download, ArrowRight } from 'lucide-svelte';
   import { fetchApi } from '$lib/config';
   import type { HeroResponse } from '$lib/types';
+  import { listenForDataChange } from '$lib/dataEvents';
 
   let data: HeroResponse | null = null;
   let loading = true;
 
-  onMount(async () => {
+  async function loadData() {
     try {
       data = await fetchApi<HeroResponse>('/api/v1/heroes/latest/');
     } catch {
@@ -15,6 +16,18 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(async () => {
+    await loadData();
+
+    // Escuchar cambios desde el admin
+    const cleanup = listenForDataChange('hero', async () => {
+      loading = true;
+      await loadData();
+    });
+
+    return cleanup;
   });
 </script>
 

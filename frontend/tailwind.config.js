@@ -1,15 +1,38 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  // 1. Rastreo de archivos (incluyendo .sss por tu configuración previa)
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,sss,svelte,ts,tsx,vue}'],
+
+  // 2. Safelist: Aquí protegemos las clases que vienen de la Base de Datos
+  safelist: [
+    // Colores de texto (ej: text-orange-500)
+    {
+      pattern: /^text-(orange|blue|cyan|yellow|teal|green|indigo|pink|red|purple|gray|rose|white)-(300|400|500|600)$/,
+    },
+    // Bordes con opacidad (ej: group-hover:border-orange-500/50)
+    // Nota: El patrón NO lleva el prefijo 'group-hover:', se define en 'variants'
+    {
+      pattern: /^border-(orange|blue|cyan|yellow|teal|green|indigo|pink|red|purple|gray|rose|white)-(300|400|500|600)\/50$/,
+      variants: ['group-hover'],
+    },
+    // Brillos/Glow (Valores arbitrarios de tu JSON)
+    // Usamos un patrón más flexible para capturar las sombras dinámicas
+    {
+      pattern: /shadow-\[0_0_30px_-5px_rgba\(.*\)]/,
+      variants: ['group-hover'],
+    }
+  ],
+
   theme: {
     extend: {
       colors: {
-        // Aquí defines "background" para que Tailwind genere "bg-background"
+        // Variables CSS para compatibilidad con temas o Shadcn (opcional)
         background: 'var(--background)', 
         foreground: 'var(--foreground)',
         border: 'var(--border)',
         ring: 'var(--ring)',
-        // Colores brand del portfolio
+
+        // Tus colores brand personalizados
         amber: {
           400: '#fbbf24',
           500: '#f59e0b',
@@ -26,9 +49,13 @@ export default {
         }
       },
       fontFamily: {
+        // Fuente principal del proyecto
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },
-  plugins: [],
+
+  plugins: [
+    // Aquí podrías añadir plugins como @tailwindcss/typography si los necesitas
+  ],
 };

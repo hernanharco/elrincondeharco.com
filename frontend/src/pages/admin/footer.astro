@@ -1,0 +1,10 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import FooterEditor from '../../components/admin/FooterEditor.svelte';
+
+const currentPath = Astro.url.pathname;
+---
+
+<AdminLayout title="Footer" currentPath={currentPath}>
+  <FooterEditor client:load />
+</AdminLayout>

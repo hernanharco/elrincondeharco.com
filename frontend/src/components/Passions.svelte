@@ -3,11 +3,12 @@
   import { Gamepad2, Heart, Code } from 'lucide-svelte';
   import { fetchApi } from '$lib/config';
   import type { PassionResponse } from '$lib/types';
+  import { listenForDataChange } from '$lib/dataEvents';
 
   let data: PassionResponse | null = null;
   let loading = true;
 
-  onMount(async () => {
+  async function loadData() {
     try {
       data = await fetchApi<PassionResponse>('/api/v1/passions/latest/');
     } catch {
@@ -15,6 +16,18 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(async () => {
+    await loadData();
+
+    // Escuchar cambios desde el admin
+    const cleanup = listenForDataChange('passions', async () => {
+      loading = true;
+      await loadData();
+    });
+
+    return cleanup;
   });
 </script>
 
