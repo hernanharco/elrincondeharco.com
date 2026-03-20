@@ -13,27 +13,50 @@
 ```
 frontend/
 ├── src/
-│   ├── components/          # 7 componentes Svelte migrados
+│   ├── components/          # Componentes públicos + admin
 │   │   ├── Navbar.svelte    # Navegación con menú móvil
 │   │   ├── Hero.svelte      # Sección principal con CTA
 │   │   ├── About.svelte     # Sección sobre mí
 │   │   ├── Stack.svelte     # Tecnologías con filtros interactivos
 │   │   ├── Projects.svelte  # Galería de proyectos
 │   │   ├── Passions.svelte  # Sección pasiones
-│   │   └── Footer.svelte    # Pie de página con contacto
+│   │   ├── Footer.svelte    # Pie de página con contacto
+│   │   └── admin/           # Panel de administración completo
+│   │       ├── AdminSidebar.svelte      # Sidebar navegación admin
+│   │       ├── DashboardCards.svelte    # Cards dashboard
+│   │       ├── ImageUpload.svelte       # Upload mejorado con drag&drop
+│   │       ├── HeroEditor.svelte       # Editor Hero
+│   │       ├── AboutEditor.svelte      # Editor About
+│   │       ├── StackEditor.svelte      # Editor Stack
+│   │       ├── ProjectsEditor.svelte   # Editor Projects
+│   │       ├── PassionsEditor.svelte   # Editor Passions
+│   │       └── FooterEditor.svelte     # Editor Footer
 │   ├── layouts/
-│   │   └── Layout.astro     # Layout principal con fuentes
+│   │   ├── Layout.astro       # Layout principal con fuentes
+│   │   └── AdminLayout.astro   # Layout panel admin
 │   ├── pages/
-│   │   └── index.astro     # Página principal
+│   │   ├── index.astro       # Página principal
+│   │   └── admin/            # Rutas admin
+│   │       ├── index.astro   # Dashboard admin
+│   │       ├── hero.astro    # Admin Hero
+│   │       ├── about.astro   # Admin About
+│   │       ├── stack.astro   # Admin Stack
+│   │       ├── projects.astro # Admin Projects
+│   │       ├── passions.astro # Admin Passions
+│   │       └── footer.astro  # Admin Footer
+│   ├── lib/
+│   │   ├── config.ts         # fetchApi utility + PUBLIC_API_URL
+│   │   ├── types.ts          # TypeScript interfaces
+│   │   └── dataEvents.ts     # Sistema de sincronización eventos
 │   └── styles/
-│       └── global.css       # Estilos globales + variables CSS
-├── public/                  # Assets estáticos
-├── astro.config.mjs         # Configuración Astro
-├── tailwind.config.js       # Configuración Tailwind
-├── postcss.config.cjs       # Configuración PostCSS
-├── tsconfig.json           # Configuración TypeScript
-├── svelte.config.js        # Configuración Svelte
-└── package.json             # Dependencias
+│       └── global.css         # Estilos globales + variables CSS
+├── public/                    # Assets estáticos
+├── astro.config.mjs           # Configuración Astro
+├── tailwind.config.js         # Configuración Tailwind
+├── postcss.config.cjs         # Configuración PostCSS
+├── tsconfig.json             # Configuración TypeScript
+├── svelte.config.js          # Configuración Svelte
+└── package.json              # Dependencias
 ```
 
 ## 🎨 **Características del Diseño**
@@ -53,6 +76,9 @@ frontend/
 - ✅ **Stack**: Filtrado por categorías (Frontend/Backend/DevOps/Herramientas)
 - ✅ **Projects**: Galería con hover effects
 - ✅ **Smooth Scrolling**: Navegación entre secciones
+- ✅ **Panel Admin**: Sistema completo de gestión
+- ✅ **ImageUpload**: Drag & drop con preview
+- ✅ **Sincronización**: Actualización en tiempo real
 
 ## ⚡ **Configuración Técnica**
 
@@ -81,6 +107,14 @@ colors: {
 <Footer client:visible />
 ```
 
+### **Panel Admin**
+```astro
+<!-- Layout admin con estilos Tailwind -->
+<AdminLayout title="Dashboard" currentPath={currentPath}>
+  <HeroEditor client:load />
+</AdminLayout>
+```
+
 ## 🚀 **Comandos Disponibles**
 
 ```bash
@@ -105,6 +139,13 @@ pnpm remove <package>  # Remover dependencia
 - ✅ **Mejor rendimiento** (Astro SSR + Svelte 5)
 - ✅ **SEO optimizado** (renderizado del lado del servidor)
 
+### **Panel Admin Completo**
+- ✅ **6 editores** para todas las secciones
+- ✅ **Upload de imágenes** con drag & drop
+- ✅ **Sincronización automática** con componentes públicos
+- ✅ **Formularios validados** con feedback visual
+- ✅ **Sidebar responsive** con navegación intuitiva
+
 ### **Características Preservadas**
 - 🎨 **Gradientes** amber/orange
 - 🖼️ **Imágenes** Unsplash optimizadas
@@ -112,6 +153,7 @@ pnpm remove <package>  # Remover dependencia
 - ⚡ **Animaciones** y transiciones suaves
 - 🔗 **Anclas** smooth scrolling
 - 🎯 **Interactividad** completa
+- 🔄 **Sincronización** en tiempo real
 
 ## 🔧 **Estado Actual**
 
@@ -122,6 +164,9 @@ pnpm remove <package>  # Remover dependencia
 - **Performance**: ✅ Optimizado con Astro
 - **Backend API**: ✅ Disponible con datos poblados
 - **Endpoints**: ✅ 6 dominios listos para consumo
+- **Panel Admin**: ✅ 100% funcional con sincronización
+- **ImageUpload**: ✅ Componente reutilizable mejorado
+- **Data Events**: ✅ Sistema de sincronización implementado
 
 ## 📈 **Próximos Pasos**
 
@@ -131,6 +176,8 @@ pnpm remove <package>  # Remover dependencia
 4. **Forms**: Backend para contacto ✅ *COMPLETADO*
 5. **Blog**: Sección de artículos técnicos
 6. **Integración API**: Conectar componentes con backend ✅ *DISPONIBLE*
+7. **Panel Admin**: Sistema completo de gestión ✅ *COMPLETADO*
+8. **Sincronización**: Actualización en tiempo real ✅ *COMPLETADO*
 
 ---
 
@@ -148,14 +195,26 @@ pnpm remove <package>  # Remover dependencia
 
 ### **Ejemplo de Integración**
 ```javascript
-// En componente Svelte
+// En componente Svelte con sincronización automática
 import { onMount } from 'svelte';
+import { listenForDataChange } from '$lib/dataEvents';
 
 let heroData = null;
 
-onMount(async () => {
-  const response = await fetch('http://localhost:8000/api/v1/heroes/latest/');
+async function loadData() {
+  const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/api/v1/heroes/latest/`);
   heroData = await response.json();
+}
+
+onMount(async () => {
+  await loadData();
+  
+  // Escuchar cambios desde el admin
+  const cleanup = listenForDataChange('hero', async () => {
+    await loadData();
+  });
+  
+  return cleanup;
 });
 ```
 
@@ -173,6 +232,31 @@ onMount(async () => {
 
 ---
 
+## 🎯 **Panel Admin - Características Avanzadas**
+
+### **ImageUpload.svelte**
+- ✅ **Drag & Drop**: Arrastrar y soltar archivos
+- ✅ **Preview Inmediato**: Vista previa de imágenes
+- ✅ **Validaciones**: Tamaño máximo y tipo de archivo
+- ✅ **Estados Visuales**: Loading, success, error con animaciones
+- ✅ **Reutilizable**: Componente genérico para todos los editores
+
+### **Sistema de Sincronización**
+- ✅ **Eventos Personalizados**: `dispatchDataChange()` y `listenForDataChange()`
+- ✅ **Actualización en Tiempo Real**: Cambios del admin se reflejan instantáneamente
+- ✅ **Limpieza Automática**: Sin memory leaks en componentes
+- ✅ **Tipo Seguro**: TypeScript interfaces para todos los eventos
+
+### **Editores Admin**
+- ✅ **HeroEditor**: Título, subtítulo, descripción, botones, imagen
+- ✅ **AboutEditor**: Info personal, experiencia, liderazgo, imagen
+- ✅ **StackEditor**: Tecnologías con categorías, iconos, estilos
+- ✅ **ProjectsEditor**: Galería con tags, URLs, imágenes
+- ✅ **PassionsEditor**: Secciones familiares, juegos, coding
+- ✅ **FooterEditor**: Contacto, redes sociales, enlaces rápidos
+
+---
+
 **Status**: 🟢 **PRODUCCIÓN LISTA**  
 **Última Actualización**: Marzo 2026  
-**Versión**: 1.0.0
+**Versión**: 2.0.0 (con Panel Admin y Sincronización)
