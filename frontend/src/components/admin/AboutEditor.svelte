@@ -85,6 +85,12 @@
   }
 </script>
 
+<div class="p-6 md:p-10">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-zinc-100 mb-2">Editar About</h1>      
+    </div>
+
 {#if loading}
   <div class="flex items-center gap-2 text-zinc-400">
     <span
@@ -281,3 +287,5 @@
     </div>
   </form>
 {/if}
+</div>
+</div>

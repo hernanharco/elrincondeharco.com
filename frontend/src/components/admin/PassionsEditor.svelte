@@ -82,6 +82,13 @@
   }
 </script>
 
+
+<div class="p-6 md:p-10">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-zinc-100 mb-2">Editar Pasiones</h1>      
+    </div>
+      
 {#if loading}
   <div class="flex items-center gap-2 text-zinc-400">
     <span
@@ -155,24 +162,7 @@
                    focus:ring-amber-400 transition-colors"
             placeholder="Mi Familia"
           />
-        </div>
-
-        <div>
-          <label 
-            for="games_title"
-            class="block text-sm font-medium text-zinc-300 mb-2"> Título videojuegos </label>
-          <input
-            id="games_title"
-            type="text"
-            bind:value={games_title}
-            required
-            class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
-                   text-zinc-100 placeholder-zinc-500
-                   focus:outline-none focus:border-amber-400 focus:ring-1
-                   focus:ring-amber-400 transition-colors"
-            placeholder="Videojuegos"
-          />
-        </div>
+        </div>        
       </div>
 
       <div class="mt-4">
@@ -197,6 +187,23 @@
       <h3 class="text-amber-400 font-medium mb-3">Sección Videojuegos</h3>
 
       <div>
+          <label 
+            for="games_title"
+            class="block text-sm font-medium text-zinc-300 mb-2"> Título videojuegos </label>
+          <input
+            id="games_title"
+            type="text"
+            bind:value={games_title}
+            required
+            class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
+                   text-zinc-100 placeholder-zinc-500
+                   focus:outline-none focus:border-amber-400 focus:ring-1
+                   focus:ring-amber-400 transition-colors"
+            placeholder="Videojuegos"
+          />
+        </div>
+
+      <div class="mt-4">
         <label 
           for="games_desc"
           class="block text-sm font-medium text-zinc-300 mb-2">
@@ -279,3 +286,6 @@
     </div>
   </form>
 {/if}
+
+  </div>
+</div>

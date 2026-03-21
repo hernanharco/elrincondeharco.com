@@ -6,8 +6,5 @@ const currentPath = Astro.url.pathname;
 ---
 
 <AdminLayout title="About" currentPath={currentPath}>
-  <div class="max-w-2xl">
-    <h1 class="text-2xl font-bold text-zinc-100 mb-8">Editar About</h1>
-    <AboutEditor client:load />
-  </div>
+  <AboutEditor client:load />
 </AdminLayout>
