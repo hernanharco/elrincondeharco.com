@@ -15,9 +15,11 @@
 
   const dispatch = createEventDispatcher();
 
+  $: preview = currentImage;
+
   function handleFileSelect(selectedFile: File) {
     error = '';
-    
+
     // Validar tamaño
     const maxSize = maxSizeMB * 1024 * 1024;
     if (selectedFile.size > maxSize) {
@@ -32,7 +34,7 @@
     }
 
     file = selectedFile;
-    
+
     // Crear preview
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -46,7 +48,7 @@
   function handleDrop(e: DragEvent) {
     e.preventDefault();
     isDragging = false;
-    
+
     const droppedFile = e.dataTransfer?.files[0];
     if (droppedFile) {
       handleFileSelect(droppedFile);
@@ -85,7 +87,7 @@
 
 <div class="space-y-4">
   <label class="block text-sm font-medium text-zinc-300 mb-2" for="file-input">{label}</label>
-  
+
   <!-- Upload Area -->
   <div
     role="button"
@@ -94,18 +96,22 @@
     on:drop={handleDrop}
     on:dragover={handleDragOver}
     on:dragleave={handleDragLeave}
+    on:keydown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openFileDialog();
+      }
+    }}
   >
     {#if preview}
       <!-- Image Preview -->
       <div class="relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800">
-        <img
-          src={preview}
-          alt="Preview"
-          class="w-full h-64 object-cover"
-        />
-        
+        <img src={preview} alt="Preview" class="w-full h-64 object-cover" />
+
         <!-- Overlay with actions -->
-        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+        <div
+          class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4"
+        >
           <button
             type="button"
             on:click={openFileDialog}
@@ -140,33 +146,34 @@
         }}
         class={`
           relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer 
-          ${isDragging 
-            ? 'border-amber-400 bg-amber-400/10 scale-[1.02]' 
-            : 'border-zinc-700 hover:border-amber-400/50 hover:bg-zinc-800/50'
+          ${
+            isDragging
+              ? 'border-amber-400 bg-amber-400/10 scale-[1.02]'
+              : 'border-zinc-700 hover:border-amber-400/50 hover:bg-zinc-800/50'
           }
         `}
         on:click={openFileDialog}
       >
-        <input
-          id="file-input"
-          type="file"
-          accept={accept}
-          on:change={handleInputChange}
-          class="hidden"
-        />
-        
+        <input id="file-input" type="file" {accept} on:change={handleInputChange} class="hidden" />
+
         <div class="space-y-4">
-          <div class="mx-auto w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
+          <div
+            class="mx-auto w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg"
+          >
             {#if isUploading}
-              <div class="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full"></div>
+              <div
+                class="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full"
+              ></div>
             {:else}
               <ImageIcon size={32} />
             {/if}
           </div>
-          
+
           <div class="space-y-2">
             <p class="text-white font-medium">
-              {isDragging ? 'Suelta la imagen aquí' : 'Arrastra una imagen o haz clic para seleccionar'}
+              {isDragging
+                ? 'Suelta la imagen aquí'
+                : 'Arrastra una imagen o haz clic para seleccionar'}
             </p>
             <p class="text-zinc-500 text-sm">
               PNG, JPG, GIF hasta {maxSizeMB}MB
@@ -179,7 +186,9 @@
 
   <!-- Error Message -->
   {#if error}
-    <div class="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
+    <div
+      class="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-red-400 text-sm"
+    >
       <X size={16} />
       <span>{error}</span>
     </div>

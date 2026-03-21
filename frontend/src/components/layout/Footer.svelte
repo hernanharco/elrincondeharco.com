@@ -25,13 +25,15 @@
     }
   }
 
-  onMount(async () => {
-    await loadAllData();
+  onMount(() => {
+    // 1. Llamamos a la carga inicial (loadAllData ya es async)
+    loadAllData();
 
-    // Suscripción a cambios en ambos dominios
+    // 2. Suscripción a cambios en ambos dominios
     const cleanupFooter = listenForDataChange('footer', loadAllData);
     const cleanupSettings = listenForDataChange('site-settings', loadAllData);
 
+    // 3. El retorno es una función síncrona, como espera TypeScript
     return () => {
       cleanupFooter();
       cleanupSettings();

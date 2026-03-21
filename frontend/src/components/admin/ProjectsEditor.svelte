@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { fetchApi } from '$lib/config';
   import type { ProjectResponse } from '$lib/types';
-  import ImageUpload from './ImageUpload.svelte';
+  import ImageUpload from '../ui/ImageUpload.svelte';
 
   const API = import.meta.env.PUBLIC_API_URL;
 
@@ -151,8 +151,11 @@
 
       <form on:submit|preventDefault={handleSubmit} class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2"> Título </label>
+          <label 
+            for="title"
+            class="block text-sm font-medium text-zinc-300 mb-2"> Título </label>
           <input
+            id="title"
             type="text"
             bind:value={title}
             required
@@ -165,8 +168,11 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2"> Descripción </label>
+          <label 
+            for="description"
+            class="block text-sm font-medium text-zinc-300 mb-2"> Descripción </label>
           <textarea
+            id="description"
             bind:value={description}
             rows={3}
             required
@@ -179,10 +185,13 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2">
+          <label 
+            for="tags"
+            class="block text-sm font-medium text-zinc-300 mb-2">
             Tags (separados por coma)
           </label>
           <input
+            id="tags"
             type="text"
             bind:value={tags}
             required
@@ -196,8 +205,11 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2"> Icono </label>
+            <label 
+              for="icon_name"
+              class="block text-sm font-medium text-zinc-300 mb-2"> Icono </label>
             <select
+              id="icon_name"
               bind:value={icon_name}
               required
               class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
@@ -213,8 +225,11 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2"> Color gradiente </label>
+            <label 
+              for="color"
+              class="block text-sm font-medium text-zinc-300 mb-2"> Color gradiente </label>
             <input
+              id="color"
               type="text"
               bind:value={color}
               required
@@ -229,10 +244,13 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2">
+            <label 
+              for="demo_url"
+              class="block text-sm font-medium text-zinc-300 mb-2">
               URL Demo (opcional)
             </label>
             <input
+              id="demo_url"
               type="url"
               bind:value={demo_url}
               class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
@@ -244,10 +262,13 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-zinc-300 mb-2">
+            <label 
+              for="github_url"
+              class="block text-sm font-medium text-zinc-300 mb-2">
               URL GitHub (opcional)
             </label>
             <input
+              id="github_url"
               type="url"
               bind:value={github_url}
               class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700

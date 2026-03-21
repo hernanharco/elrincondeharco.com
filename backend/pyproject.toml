@@ -17,6 +17,7 @@ pydantic = {extras = ["email"], version = "^2.12.5"}
 email-validator = "^2.3.0"
 cloudinary = "^1.44.1"
 python-multipart = "^0.0.22"
+alembic = "^1.18.4"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.11.0"

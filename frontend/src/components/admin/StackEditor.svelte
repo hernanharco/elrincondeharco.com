@@ -23,10 +23,30 @@
 
   const categories = ['Frontend', 'Backend', 'DevOps', 'Herramientas'];
   const iconOptions = [
-    'Globe', 'Palette', 'FileCode2', 'Atom', 'Rocket', 'LayoutTemplate',
-    'Terminal', 'Zap', 'Layers', 'Server', 'Lock', 'Database', 'Container',
-    'GitBranch', 'Github', 'Triangle', 'Cloud', 'Code2', 'Send', 'BrainCircuit',
-    'Gauge', 'Monitor', 'HardDrive', 'Settings'
+    'Globe',
+    'Palette',
+    'FileCode2',
+    'Atom',
+    'Rocket',
+    'LayoutTemplate',
+    'Terminal',
+    'Zap',
+    'Layers',
+    'Server',
+    'Lock',
+    'Database',
+    'Container',
+    'GitBranch',
+    'Github',
+    'Triangle',
+    'Cloud',
+    'Code2',
+    'Send',
+    'BrainCircuit',
+    'Gauge',
+    'Monitor',
+    'HardDrive',
+    'Settings',
   ];
 
   onMount(async () => {
@@ -77,13 +97,11 @@
         description,
         color,
         border,
-        glow
+        glow,
       };
 
-      const url = editingId 
-        ? `${API}/api/v1/stacks/${editingId}`
-        : `${API}/api/v1/stacks/`;
-      
+      const url = editingId ? `${API}/api/v1/stacks/${editingId}` : `${API}/api/v1/stacks/`;
+
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -115,7 +133,7 @@
       });
 
       if (!res.ok) throw new Error();
-      
+
       message = 'Eliminado correctamente';
       messageType = 'success';
       await loadItems();
@@ -128,8 +146,10 @@
 
 {#if loading}
   <div class="flex items-center gap-2 text-zinc-400">
-    <span class="animate-spin inline-block w-4 h-4 border-2
-                 border-zinc-600 border-t-amber-400 rounded-full"></span>
+    <span
+      class="animate-spin inline-block w-4 h-4 border-2
+                 border-zinc-600 border-t-amber-400 rounded-full"
+    ></span>
     <span class="text-sm">Cargando...</span>
   </div>
 {:else}
@@ -139,16 +159,11 @@
       <h2 class="text-lg font-semibold text-zinc-100 mb-4">
         {editingId ? 'Editar Tecnología' : 'Nueva Tecnología'}
       </h2>
-      
+
       <form on:submit|preventDefault={handleSubmit} class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label 
-              for="name"
-              class="block text-sm font-medium text-zinc-300 mb-2"
-            >
-              Nombre
-            </label>
+            <label for="name" class="block text-sm font-medium text-zinc-300 mb-2"> Nombre </label>
             <input
               id="name"
               type="text"
@@ -163,10 +178,7 @@
           </div>
 
           <div>
-            <label 
-              for="category"
-              class="block text-sm font-medium text-zinc-300 mb-2"
-            >
+            <label for="category" class="block text-sm font-medium text-zinc-300 mb-2">
               Categoría
             </label>
             <select
@@ -187,12 +199,7 @@
         </div>
 
         <div>
-          <label 
-            for="icon"
-            class="block text-sm font-medium text-zinc-300 mb-2"
-          >
-            Icono
-          </label>
+          <label for="icon" class="block text-sm font-medium text-zinc-300 mb-2"> Icono </label>
           <select
             id="icon"
             bind:value={icon}
@@ -210,10 +217,7 @@
         </div>
 
         <div>
-          <label 
-            for="description"
-            class="block text-sm font-medium text-zinc-300 mb-2"
-          >
+          <label for="description" class="block text-sm font-medium text-zinc-300 mb-2">
             Descripción
           </label>
           <input
@@ -231,12 +235,7 @@
 
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <label 
-              for="color"
-              class="block text-sm font-medium text-zinc-300 mb-2"
-            >
-              Color
-            </label>
+            <label for="color" class="block text-sm font-medium text-zinc-300 mb-2"> Color </label>
             <input
               id="color"
               type="text"
@@ -251,10 +250,7 @@
           </div>
 
           <div>
-            <label 
-              for="border"
-              class="block text-sm font-medium text-zinc-300 mb-2"
-            >
+            <label for="border" class="block text-sm font-medium text-zinc-300 mb-2">
               Border
             </label>
             <input
@@ -271,12 +267,7 @@
           </div>
 
           <div>
-            <label 
-              for="glow"
-              class="block text-sm font-medium text-zinc-300 mb-2"
-            >
-              Glow
-            </label>
+            <label for="glow" class="block text-sm font-medium text-zinc-300 mb-2"> Glow </label>
             <input
               id="glow"
               type="text"
@@ -301,7 +292,7 @@
                    disabled:opacity-50 disabled:cursor-not-allowed
                    transition-all duration-200"
           >
-            {saving ? 'Guardando...' : (editingId ? 'Actualizar' : 'Agregar')}
+            {saving ? 'Guardando...' : editingId ? 'Actualizar' : 'Agregar'}
           </button>
 
           {#if editingId}
@@ -317,11 +308,7 @@
           {/if}
 
           {#if message}
-            <span
-              class="text-sm {messageType === 'success'
-                ? 'text-emerald-400'
-                : 'text-red-400'}"
-            >
+            <span class="text-sm {messageType === 'success' ? 'text-emerald-400' : 'text-red-400'}">
               {message}
             </span>
           {/if}
@@ -334,15 +321,15 @@
       <h2 class="text-lg font-semibold text-zinc-100 mb-4">
         Tecnologías ({items.length})
       </h2>
-      
+
       {#if items.length === 0}
-        <p class="text-zinc-500 text-center py-8">
-          No hay tecnologías registradas
-        </p>
+        <p class="text-zinc-500 text-center py-8">No hay tecnologías registradas</p>
       {:else}
         <div class="space-y-2">
           {#each items as item}
-            <div class="bg-zinc-900 rounded-lg p-4 border border-zinc-800 flex items-center justify-between">
+            <div
+              class="bg-zinc-900 rounded-lg p-4 border border-zinc-800 flex items-center justify-between"
+            >
               <div class="flex-1">
                 <div class="flex items-center gap-3">
                   <span class="text-amber-400 font-medium">{item.name}</span>
@@ -352,7 +339,7 @@
                 </div>
                 <p class="text-sm text-zinc-500 mt-1">{item.description}</p>
               </div>
-              
+
               <div class="flex items-center gap-2">
                 <button
                   on:click={() => editItem(item)}

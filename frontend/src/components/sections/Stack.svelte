@@ -56,7 +56,9 @@
       await loadData();
     });
 
-    return cleanup;
+    return () => {
+      cleanup();
+    };
   });
 
   $: filteredTech =

@@ -7,6 +7,7 @@ export interface HeroResponse {
   contact_button_text: string;
   cv_button_text: string;
   image_url: string | null;
+  cv_url: string | null;
 }
 
 export interface AboutResponse {

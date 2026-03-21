@@ -1,5 +1,7 @@
 <script lang="ts">
   import { Menu, X } from 'lucide-svelte';
+
+  // Estado para controlar el menú móvil
   let isOpen = false;
 
   const links = [
@@ -46,8 +48,10 @@
       <div class="-mr-2 flex md:hidden">
         <button
           on:click={toggleMenu}
+          type="button"
           class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
         >
+          <span class="sr-only">Abrir menú</span>
           {#if isOpen}
             <X size={24} />
           {:else}
@@ -59,13 +63,13 @@
   </div>
 
   {#if isOpen}
-    <div class="md:hidden bg-black/95 backdrop-blur-xl">
+    <div class="md:hidden bg-black/95 backdrop-blur-xl border-b border-white/10">
       <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
         {#each links as link}
           <a
             href={link.href}
             on:click={closeMenu}
-            class="text-gray-300 hover:text-amber-400 block px-3 py-2 rounded-md text-base font-medium"
+            class="text-gray-300 hover:text-amber-400 block px-3 py-2 rounded-md text-base font-medium transition-colors"
           >
             {link.name}
           </a>

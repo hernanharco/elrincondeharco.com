@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { fetchApi } from '$lib/config';
   import type { PassionResponse } from '$lib/types';
-  import ImageUpload from './ImageUpload.svelte';
+  import ImageUpload from '../ui/ImageUpload.svelte';
 
   const API = import.meta.env.PUBLIC_API_URL;
 
@@ -103,8 +103,11 @@
 
     <!-- Campos principales -->
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Título principal </label>
+      <label 
+        for="title"
+        class="block text-sm font-medium text-zinc-300 mb-2"> Título principal </label>
       <input
+        id="title"
         type="text"
         bind:value={title}
         required
@@ -117,8 +120,11 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Descripción principal </label>
+      <label 
+        for="description"
+        class="block text-sm font-medium text-zinc-300 mb-2"> Descripción principal </label>
       <textarea
+        id="description"
         bind:value={description}
         rows={3}
         class="w-full px-4 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700
@@ -135,8 +141,11 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2"> Título familia </label>
+          <label 
+            for="family_title"
+            class="block text-sm font-medium text-zinc-300 mb-2"> Título familia </label>
           <input
+            id="family_title"
             type="text"
             bind:value={family_title}
             required
@@ -149,8 +158,11 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2"> Título videojuegos </label>
+          <label 
+            for="games_title"
+            class="block text-sm font-medium text-zinc-300 mb-2"> Título videojuegos </label>
           <input
+            id="games_title"
             type="text"
             bind:value={games_title}
             required
@@ -164,8 +176,11 @@
       </div>
 
       <div class="mt-4">
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Descripción familia </label>
+        <label 
+          for="family_desc"
+          class="block text-sm font-medium text-zinc-300 mb-2"> Descripción familia </label>
         <textarea
+          id="family_desc"
           bind:value={family_desc}
           rows={3}
           class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
@@ -182,10 +197,13 @@
       <h3 class="text-amber-400 font-medium mb-3">Sección Videojuegos</h3>
 
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2">
+        <label 
+          for="games_desc"
+          class="block text-sm font-medium text-zinc-300 mb-2">
           Descripción videojuegos
         </label>
         <textarea
+          id="games_desc"
           bind:value={games_desc}
           rows={3}
           class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
@@ -203,8 +221,11 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-zinc-300 mb-2"> Título programación </label>
+          <label 
+            for="coding_title"
+            class="block text-sm font-medium text-zinc-300 mb-2"> Título programación </label>
           <input
+            id="coding_title"
             type="text"
             bind:value={coding_title}
             required
@@ -218,10 +239,13 @@
       </div>
 
       <div class="mt-4">
-        <label class="block text-sm font-medium text-zinc-300 mb-2">
+        <label 
+          for="coding_desc"
+          class="block text-sm font-medium text-zinc-300 mb-2">
           Descripción programación
         </label>
         <textarea
+          id="coding_desc"
           bind:value={coding_desc}
           rows={3}
           class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700

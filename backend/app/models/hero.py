@@ -12,3 +12,4 @@ class Hero(Base):
     contact_button_text = Column(String, nullable=False)
     cv_button_text = Column(String, nullable=False)
     image_url = Column(String, nullable=True)
+    cv_url = Column(String, nullable=True)

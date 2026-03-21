@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { fetchApi } from '$lib/config';
   import type { AboutResponse } from '$lib/types';
-  import ImageUpload from './ImageUpload.svelte';
+  import ImageUpload from '../ui/ImageUpload.svelte';
 
   const API = import.meta.env.PUBLIC_API_URL;
 
@@ -106,8 +106,9 @@
 
     <!-- Campos del formulario -->
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Título </label>
+      <label for="title" class="block text-sm font-medium text-zinc-300 mb-2"> Título </label>
       <input
+        id="title"
         type="text"
         bind:value={title}
         required
@@ -120,8 +121,11 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Descripción </label>
+      <label for="description" class="block text-sm font-medium text-zinc-300 mb-2">
+        Descripción
+      </label>
       <textarea
+        id="description"
         bind:value={description}
         rows={4}
         class="w-full px-4 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700
@@ -134,8 +138,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Ubicación </label>
+        <label for="location" class="block text-sm font-medium text-zinc-300 mb-2">
+          Ubicación
+        </label>
         <input
+          id="location"
           type="text"
           bind:value={location}
           required
@@ -148,8 +155,11 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Años de experiencia </label>
+        <label for="years_experience" class="block text-sm font-medium text-zinc-300 mb-2">
+          Años de experiencia
+        </label>
         <input
+          id="years_experience"
           type="text"
           bind:value={years_experience}
           required
@@ -163,8 +173,11 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-zinc-300 mb-2"> Nombre del equipo </label>
+      <label for="team_name" class="block text-sm font-medium text-zinc-300 mb-2">
+        Nombre del equipo
+      </label>
       <input
+        id="team_name"
         type="text"
         bind:value={team_name}
         required
@@ -178,8 +191,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Título liderazgo </label>
+        <label for="leadership_title" class="block text-sm font-medium text-zinc-300 mb-2">
+          Título liderazgo
+        </label>
         <input
+          id="leadership_title"
           type="text"
           bind:value={leadership_title}
           required
@@ -192,8 +208,11 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Título experiencia </label>
+        <label for="experience_title" class="block text-sm font-medium text-zinc-300 mb-2">
+          Título experiencia
+        </label>
         <input
+          id="experience_title"
           type="text"
           bind:value={experience_title}
           required
@@ -208,8 +227,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2"> Descripción liderazgo </label>
+        <label for="leadership_desc" class="block text-sm font-medium text-zinc-300 mb-2">
+          Descripción liderazgo
+        </label>
         <textarea
+          id="leadership_desc"
           bind:value={leadership_desc}
           rows={3}
           class="w-full px-4 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700
@@ -221,10 +243,11 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-zinc-300 mb-2">
+        <label for="experience_desc" class="block text-sm font-medium text-zinc-300 mb-2">
           Descripción experiencia
         </label>
         <textarea
+          id="experience_desc"
           bind:value={experience_desc}
           rows={3}
           class="w-full px-4 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700

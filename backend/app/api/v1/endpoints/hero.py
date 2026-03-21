@@ -85,15 +85,26 @@ async def update(
     id: int,
     form_data: HeroUpdate = Depends(get_hero_update_form),
     image: Optional[UploadFile] = File(None),
+    cv_file: Optional[UploadFile] = File(None), # <-- Nuevo parámetro
     db: AsyncSession = Depends(get_db)
 ):
     obj = await db.get(Hero, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Hero no encontrado")
+    
     for key, value in form_data.dict(exclude_none=True).items():
         setattr(obj, key, value)
+    
+    # Manejo de Imagen
     if image and image.filename:
         obj.image_url = await upload_image(image)
+        
+    # Manejo de CV (PDF)
+    if cv_file and cv_file.filename:
+        # La función upload_image ya debería funcionar, 
+        # pero asegúrate que en cloudinary.py uses resource_type="auto"
+        obj.cv_url = await upload_image(cv_file)
+        
     await db.commit()
     await db.refresh(obj)
     return obj
