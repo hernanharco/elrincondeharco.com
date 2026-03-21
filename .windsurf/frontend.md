@@ -1,8 +1,8 @@
 # 📁 Frontend - Portfolio Hernan Arango Cortes
 
 ## 🏗️ **Stack Tecnológico**
-- **Framework**: Astro v6.0.6
-- **UI Library**: Svelte 5.54.0
+- **Framework**: Astro v6.0.8
+- **UI Library**: Svelte 5.54.0 (runes desactivados por compatibilidad)
 - **Styling**: Tailwind CSS v3.4.17 + PostCSS
 - **TypeScript**: v5.9.3
 - **Icons**: Lucide Svelte v0.577.0
@@ -13,18 +13,21 @@
 ```
 frontend/
 ├── src/
-│   ├── components/          # Componentes públicos + admin
-│   │   ├── Navbar.svelte    # Navegación con menú móvil
-│   │   ├── Hero.svelte      # Sección principal con CTA
-│   │   ├── About.svelte     # Sección sobre mí
-│   │   ├── Stack.svelte     # Tecnologías con filtros interactivos
-│   │   ├── Projects.svelte  # Galería de proyectos
-│   │   ├── Passions.svelte  # Sección pasiones
-│   │   ├── Footer.svelte    # Pie de página con contacto
-│   │   └── admin/           # Panel de administración completo
-│   │       ├── AdminSidebar.svelte      # Sidebar navegación admin
+│   ├── components/          # Componentes organizados por tipo
+│   │   ├── layout/           # Componentes estructurales
+│   │   │   ├── Navbar.svelte    # Navegación con menú móvil
+│   │   │   ├── Footer.svelte    # Pie de página dinámico
+│   │   │   └── AdminSidebar.svelte # Sidebar admin
+│   │   ├── sections/         # Secciones públicas
+│   │   │   ├── Hero.svelte      # Sección principal con CTA
+│   │   │   ├── About.svelte     # Sección sobre mí
+│   │   │   ├── Stack.svelte     # Tecnologías con filtros
+│   │   │   ├── Projects.svelte  # Galería de proyectos
+│   │   │   └── Passions.svelte  # Sección pasiones
+│   │   ├── ui/               # Componentes reutilizables
+│   │   │   └── ImageUpload.svelte # Upload mejorado
+│   │   └── admin/           # Panel de administración
 │   │       ├── DashboardCards.svelte    # Cards dashboard
-│   │       ├── ImageUpload.svelte       # Upload mejorado con drag&drop
 │   │       ├── HeroEditor.svelte       # Editor Hero
 │   │       ├── AboutEditor.svelte      # Editor About
 │   │       ├── StackEditor.svelte      # Editor Stack
@@ -55,7 +58,7 @@ frontend/
 ├── tailwind.config.js         # Configuración Tailwind
 ├── postcss.config.cjs         # Configuración PostCSS
 ├── tsconfig.json             # Configuración TypeScript
-├── svelte.config.js          # Configuración Svelte
+├── svelte.config.js          # Configuración Svelte (runes: false)
 └── package.json              # Dependencias
 ```
 
@@ -72,13 +75,15 @@ frontend/
 - **System Fallback**: system-ui, sans-serif
 
 ### **Componentes Interactivos**
-- ✅ **Navbar**: Menú móvil responsive
+- ✅ **Navbar**: Menú móvil responsive con navegación suave
 - ✅ **Stack**: Filtrado por categorías (Frontend/Backend/DevOps/Herramientas)
-- ✅ **Projects**: Galería con hover effects
+- ✅ **Projects**: Galería con hover effects y tags
+- ✅ **Footer**: Pie de página dinámico con datos del backend
 - ✅ **Smooth Scrolling**: Navegación entre secciones
 - ✅ **Panel Admin**: Sistema completo de gestión
-- ✅ **ImageUpload**: Drag & drop con preview
+- ✅ **ImageUpload**: Drag & drop con preview y validación
 - ✅ **Sincronización**: Actualización en tiempo real
+- ✅ **PDF Download**: Descarga automática de CV con nombres limpios
 
 ## ⚡ **Configuración Técnica**
 
@@ -98,13 +103,13 @@ colors: {
 <!-- Componentes interactivos -->
 <Navbar client:load />
 <Stack client:load />
+<Footer client:load />
 
 <!-- Componentes visuales -->
 <Hero client:visible />
 <About client:visible />
 <Projects client:visible />
 <Passions client:visible />
-<Footer client:visible />
 ```
 
 ### **Panel Admin**
@@ -138,13 +143,15 @@ pnpm remove <package>  # Remover dependencia
 - ✅ **Mismo diseño** y UX
 - ✅ **Mejor rendimiento** (Astro SSR + Svelte 5)
 - ✅ **SEO optimizado** (renderizado del lado del servidor)
+- ✅ **Svelte 4 syntax** (runes desactivados por lucide-svelte)
 
 ### **Panel Admin Completo**
 - ✅ **6 editores** para todas las secciones
-- ✅ **Upload de imágenes** con drag & drop
+- ✅ **Upload de imágenes y PDFs** con drag & drop
 - ✅ **Sincronización automática** con componentes públicos
 - ✅ **Formularios validados** con feedback visual
 - ✅ **Sidebar responsive** con navegación intuitiva
+- ✅ **Accesibilidad** mejorada con labels asociados
 
 ### **Características Preservadas**
 - 🎨 **Gradientes** amber/orange
@@ -158,15 +165,19 @@ pnpm remove <package>  # Remover dependencia
 ## 🔧 **Estado Actual**
 
 - **Servidor**: ✅ Funcionando sin errores
-- **Componentes**: ✅ Todos compilados
+- **Componentes**: ✅ Todos compilados con Svelte 4 syntax
 - **Estilos**: ✅ Tailwind aplicado correctamente
 - **Build**: ✅ Listo para producción
 - **Performance**: ✅ Optimizado con Astro
 - **Backend API**: ✅ Disponible con datos poblados
-- **Endpoints**: ✅ 6 dominios listos para consumo
+- **Endpoints**: ✅ 7 dominios listos para consumo
 - **Panel Admin**: ✅ 100% funcional con sincronización
 - **ImageUpload**: ✅ Componente reutilizable mejorado
 - **Data Events**: ✅ Sistema de sincronización implementado
+- **Footer Component**: ✅ Dinámico con backend integration
+- **PDF Support**: ✅ Upload y descarga automática
+- **Lucide Compatibility**: ✅ Funcional con Svelte 4 syntax
+- **Component Organization**: ✅ Estructura optimizada por tipo
 
 ## 📈 **Próximos Pasos**
 
@@ -184,14 +195,14 @@ pnpm remove <package>  # Remover dependencia
 ## 🔗 **Integración con Backend API**
 
 ### **Endpoints Disponibles**
-| Componente | Endpoint | Método | Response |
-|-------------|------------|----------|-----------|
-| Hero.svelte | `GET /api/v1/heroes/latest/` | fetch onMount | HeroResponse |
-| About.svelte | `GET /api/v1/abouts/latest/` | fetch onMount | AboutResponse |
-| Passions.svelte | `GET /api/v1/passions/latest/` | fetch onMount | PassionResponse |
-| Projects.svelte | `GET /api/v1/projects/` | fetch onMount | ProjectResponse[] |
-| Stack.svelte | `GET /api/v1/stacks/` | fetch onMount | StackResponse[] |
-| Footer.svelte | `GET /api/v1/footers/latest/` | fetch onMount | FooterResponse |
+| Componente | Endpoint | Método | Response | Características |
+|-------------|------------|----------|-----------|---------------|
+| Hero.svelte | `GET /api/v1/heroes/latest/` | fetch onMount | HeroResponse | CV download automático |
+| About.svelte | `GET /api/v1/abouts/latest/` | fetch onMount | AboutResponse | - |
+| Passions.svelte | `GET /api/v1/passions/latest/` | fetch onMount | PassionResponse | - |
+| Projects.svelte | `GET /api/v1/projects/` | fetch onMount | ProjectResponse[] | - |
+| Stack.svelte | `GET /api/v1/stacks/` | fetch onMount | StackResponse[] | - |
+| Footer.svelte | `GET /api/v1/footers/latest/` | fetch onMount | FooterResponse | Datos dinámicos |
 
 ### **Ejemplo de Integración**
 ```javascript
@@ -219,9 +230,11 @@ onMount(async () => {
 ```
 
 ### **Datos Poblados**
-- ✅ **6 dominios** con datos reales del frontend
-- ✅ **31 registros** totales en la base de datos
+- ✅ **7 dominios** con datos reales del frontend
+- ✅ **31+ registros** totales en la base de datos
 - ✅ **Endpoints funcionando** en `http://localhost:8000/docs`
+- ✅ **PDF uploads** con descarga automática
+- ✅ **Footer dinámico** con quick_links JSONB
 
 ## 📡 API del backend — cómo consumirla
 - Base URL: `import.meta.env.PUBLIC_API_URL` (ej: http://localhost:8000)
@@ -240,6 +253,8 @@ onMount(async () => {
 - ✅ **Validaciones**: Tamaño máximo y tipo de archivo
 - ✅ **Estados Visuales**: Loading, success, error con animaciones
 - ✅ **Reutilizable**: Componente genérico para todos los editores
+- ✅ **Svelte 4 Syntax**: Compatible con lucide-svelte
+- ✅ **Event Handling**: `on:event` syntax para consistencia
 
 ### **Sistema de Sincronización**
 - ✅ **Eventos Personalizados**: `dispatchDataChange()` y `listenForDataChange()`
@@ -248,15 +263,16 @@ onMount(async () => {
 - ✅ **Tipo Seguro**: TypeScript interfaces para todos los eventos
 
 ### **Editores Admin**
-- ✅ **HeroEditor**: Título, subtítulo, descripción, botones, imagen
+- ✅ **HeroEditor**: Título, subtítulo, descripción, botones, imagen, CV PDF
 - ✅ **AboutEditor**: Info personal, experiencia, liderazgo, imagen
 - ✅ **StackEditor**: Tecnologías con categorías, iconos, estilos
 - ✅ **ProjectsEditor**: Galería con tags, URLs, imágenes
 - ✅ **PassionsEditor**: Secciones familiares, juegos, coding
 - ✅ **FooterEditor**: Contacto, redes sociales, enlaces rápidos
+- ✅ **Accessibility**: Labels asociados con inputs (A11y)
 
 ---
 
 **Status**: 🟢 **PRODUCCIÓN LISTA**  
 **Última Actualización**: Marzo 2026  
-**Versión**: 2.0.0 (con Panel Admin y Sincronización)
+**Versión**: 2.2.0 (con Panel Admin, Sincronización, PDF Upload y Component Organization)

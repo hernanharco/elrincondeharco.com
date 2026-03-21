@@ -22,7 +22,6 @@
     Code2,
     FileCode2,
     Palette,
-    Hash,
     Lock,
     Globe,
     Terminal,
@@ -47,8 +46,8 @@
     }
   }
 
-  onMount(async () => {
-    await loadData();
+  onMount(() => {
+    loadData();
 
     // Escuchar cambios desde el admin
     const cleanup = listenForDataChange('stack', async () => {
@@ -182,7 +181,9 @@
     </div>
 
     <div class="mt-12 text-center">
-      <p class="text-zinc-500 text-sm">Optimizado para rendimiento y experiencia de usuario.</p>
+      <p class="text-zinc-500 text-sm">
+        transformando arquitecturas complejas en experiencias digitales impecables y escalables.
+      </p>
     </div>
   </div>
 </section>

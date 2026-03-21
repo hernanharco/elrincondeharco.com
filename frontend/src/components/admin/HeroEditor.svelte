@@ -108,6 +108,13 @@
   };
 </script>
 
+<div class="p-6 md:p-10">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-zinc-100 mb-2">Editar Hero</h1>      
+    </div>
+
+
 {#if loading}
   <div class="flex items-center justify-center p-12 text-zinc-400 gap-3">
     <Loader2 class="animate-spin w-5 h-5 text-amber-500" />
@@ -275,3 +282,5 @@
     </div>
   </form>
 {/if}
+</div>
+</div>

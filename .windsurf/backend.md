@@ -117,10 +117,13 @@ backend/
 
 ### Cloudinary (`app/core/cloudinary.py`)
 - **Configuración automática** desde variables de entorno
-- **Función `upload_image()`** para subir imágenes
+- **Función `upload_image()`** para subir imágenes y PDFs
 - **Retorno de URLs seguras** (https) siempre
 - **Folder específico**: "elrincondelharco"
-- **Validación de tipos**: Solo imágenes aceptadas
+- **Validación de tipos**: Imágenes y PDFs aceptados
+- **Nombres de archivo limpios**: Remueve caracteres especiales para URLs amigables
+- **Forzado de descarga para PDFs**: URLs con `fl_attachment` para descarga automática
+- **Manejo de archivos vacíos**: Validación y errores descriptivos
 
 ### Base de Datos (`app/db/session.py`)
 - **AsyncEngine** con psycopg 3
@@ -140,7 +143,7 @@ backend/
 - **Base declarativa** con imports automáticos
 - Modelo **Example** con timestamps
 - **7 dominios de portfolio** implementados:
-  - **Hero**: Sección principal (title, subtitle, description, buttons, image_url)
+  - **Hero**: Sección principal (title, subtitle, description, buttons, image_url, cv_url)
   - **About**: Información personal (experience, leadership, location, image_url)
   - **Passions**: Pasiones personales (family, games, coding, image_url)
   - **Projects**: Portafolio (tags, URLs, iconos, image_url)
@@ -157,10 +160,10 @@ backend/
   - `GET /api/v1/{dominios}/` - Listar todos
   - `GET /api/v1/{dominios}/{id}` - Obtener por ID
   - `GET /api/v1/{dominios}/latest/` - Último registro (hero, about, passions, footer, site-settings)
-  - `POST /api/v1/{dominios}/` - Crear (con upload de imagen)
-  - `PUT /api/v1/{dominios}/{id}` - Actualizar (con upload de imagen)
+  - `POST /api/v1/{dominios}/` - Crear (con upload de imagen/PDF)
+  - `PUT /api/v1/{dominios}/{id}` - Actualizar (con upload de imagen/PDF)
   - `DELETE /api/v1/{dominios}/{id}` - Eliminar
-- **Upload de imágenes** integrado con Cloudinary
+- **Upload de imágenes y PDFs** integrado con Cloudinary
 - **Form data handling** para todos los endpoints
 - **CORS middleware** configurado para frontend
 
@@ -229,17 +232,20 @@ FRONTEND_URL=http://localhost:4321
 - **SiteSettings para configuración de marca**
 
 ### ✅ Panel Admin Integration
-- **Frontend completo** con 6 editores
+- **Frontend completo** con 6 editores + Footer component
 - **Sincronización en tiempo real** entre admin y público
-- **Upload de imágenes mejorado** con drag & drop
+- **Upload de imágenes y PDFs** mejorado con drag & drop
 - **Form data handling** optimizado
 - **Eventos personalizados** para actualización automática
+- **PDF download automático** con nombres limpios
+- **Footer component** con datos dinámicos desde backend
 
 ### ⚠️ Pendientes
 - Configurar variables `.env` con API keys de Cloudinary
 - Implementar autenticación JWT (opcional para portfolio)
 - Tests unitarios completos
 - Optimización de queries para producción
+- Migrar componentes a Svelte 5 cuando lucide-svelte sea compatible
 
 ## 🚀 Próximos Pasos
 
@@ -266,8 +272,8 @@ FRONTEND_URL=http://localhost:4321
 - `GET /api/v1/heroes/` - Listar todos
 - `GET /api/v1/heroes/{id}` - Obtener por ID
 - `GET /api/v1/heroes/latest/` - Último registro
-- `POST /api/v1/heroes/` - Crear (con imagen)
-- `PUT /api/v1/heroes/{id}` - Actualizar (con imagen)
+- `POST /api/v1/heroes/` - Crear (con imagen y PDF)
+- `PUT /api/v1/heroes/{id}` - Actualizar (con imagen y PDF)
 - `DELETE /api/v1/heroes/{id}` - Eliminar
 
 #### About (`/api/v1/abouts/`)
@@ -361,7 +367,8 @@ Eventos → Componentes Públicos → Recarga Automática
 
 ### **Características Técnicas**
 - **FormData handling**: Todos los endpoints usan multipart/form-data
-- **Image upload**: Integración directa con Cloudinary
+- **Upload de imágenes y PDFs**: Integración directa con Cloudinary
+- **PDF download automático**: URLs con `fl_attachment` para descarga forzada
 - **JSON fields**: Footer usa JSONB para quick_links
 - **CORS**: Configurado para localhost:4321
 - **Async operations**: Todas las operaciones son asíncronas
@@ -370,4 +377,4 @@ Eventos → Componentes Públicos → Recarga Automática
 
 **Status**: 🟢 **PRODUCCIÓN LISTA**  
 **Última Actualización**: Marzo 2026  
-**Versión**: 2.1.0 (con Panel Admin, Sincronización y SiteSettings)
+**Versión**: 2.2.0 (con Panel Admin, Sincronización, SiteSettings y PDF Upload)

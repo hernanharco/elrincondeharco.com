@@ -44,7 +44,7 @@ Este archivo sirve como orquestador central para guiar las interacciones con el 
 1. Revisar `.windsurf/backend.md` para estructura actual
 2. Modificar archivos en `/backend/app/`
 3. Actualizar documentación si hay cambios estructurales
-4. Considerar impacto en frontend si se modifican endpoints
+4. Verificar compatibilidad con endpoints del backend
 
 ### Desarrollo Frontend  
 1. Revisar `.windsurf/frontend.md` para componentes existentes
@@ -59,6 +59,17 @@ Este archivo sirve como orquestador central para guiar las interacciones con el 
 4. **Finalmente**: Actualizar ambas documentaciones
 
 ## 📋 Checklist Antes de Modificar
+
+### 4. Despliegue y Docker
+- [ ] He leído `.windsurf/backend.md`
+- [ ] Conozco la estructura actual de la API
+- [ ] Verifico impacto en frontend si se modifican endpoints
+- [ ] Actualizo la documentación si es necesario
+- [ ] **Docker**: Crear Dockerfile para frontend y backend
+- [ ] **Docker Compose**: Configurar servicios orquestados
+- [ ] **Setup Script**: Crear script automatizado para despliegue
+- [ ] **Variables de Entorno**: Configurar `.env` con todas las credenciales
+- [ ] **Producción**: Desplegar en Vercel/Netlify/Railway
 
 ### Para Backend
 - [ ] He leído `.windsurf/backend.md`
@@ -111,18 +122,77 @@ Este archivo sirve como orquestador central para guiar las interacciones con el 
 ### Backend
 ```bash
 cd backend
-pnpm dev          # Iniciar servidor de desarrollo
-pnpm test         # Ejecutar tests
-pnpm lint         # Formatear y lintear código
+poetry install          # Instalar dependencias
+poetry run uvicorn app.main:app --reload --host 0.0.0.0  # Desarrollo
+poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000    # Producción
 ```
 
 ### Frontend
 ```bash
 cd frontend  
-npm run dev       # Iniciar servidor de desarrollo
-npm run build     # Construir para producción
-npm run test      # Ejecutar tests
+pnpm install         # Instalar dependencias
+pnpm run dev       # Iniciar servidor de desarrollo
+pnpm run build     # Construir para producción
 ```
+
+### Docker (Nuevo)
+```bash
+# Hacer ejecutable el script
+chmod +x setup.sh
+
+# Desarrollo
+./setup.sh dev
+
+# Producción
+./setup.sh prod
+
+# Otros comandos
+./setup.sh build    # Construir imágenes
+./setup.sh stop      # Detener servicios
+./setup.sh clean     # Limpiar recursos
+./setup.sh logs      # Ver logs
+./setup.sh status    # Ver estado
+```
+
+### Instrucciones de Despliegue
+
+1. **Configurar Variables de Entorno**
+   ```bash
+   cp .env.example .env
+   # Editar .env con tus credenciales reales de Neon y Cloudinary
+   ```
+
+2. **Iniciar Desarrollo con Docker**
+   ```bash
+   ./setup.sh dev
+   ```
+
+3. **Verificar Funcionamiento**
+   - Frontend: http://localhost:4321
+   - Backend API: http://localhost:8000/docs
+   - Admin Panel: http://localhost:4321/admin
+   - Health Checks: http://localhost:4321 y http://localhost:8000/health
+
+4. **Desplegar en Producción**
+   ```bash
+   ./setup.sh prod
+   ```
+
+5. **Monitoreo y Logs**
+   ```bash
+   ./setup.sh logs      # Ver logs de todos los servicios
+   ./setup.sh status    # Ver estado de contenedores
+   ./setup.sh clean     # Limpiar recursos Docker
+   ```
+
+6. **Acceder a Contenedores** (si es necesario)
+   ```bash
+   # Entrar al contenedor del backend
+   docker exec -it backend bash
+   
+   # Entrar al contenedor del frontend  
+   docker exec -it frontend sh
+   ```
 
 ---
 
