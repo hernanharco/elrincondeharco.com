@@ -1,4 +1,25 @@
 services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    # Carga variables desde backend/.env
+    env_file:
+      - ./backend/.env
+    environment:
+      # Mapea las variables PG* a POSTGRES_* que usa el contenedor
+      POSTGRES_DB: ${PGDATABASE:-neondb}
+      POSTGRES_USER: ${PGUSER:-neondb_owner}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-localpassword}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-neondb_owner} -d ${PGDATABASE:-neondb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   frontend:
     build:
       context: ./frontend
@@ -22,3 +43,9 @@ services:
       - ENVIRONMENT=production
     env_file:
       - ./backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
