@@ -1,5 +1,5 @@
 {
-  "name": "auth-core-backend",
+  "name": "elrincondeharco-backend",
   "version": "1.0.0",
   "scripts": {
     "dev": "poetry run uvicorn app.main:app --reload --host 0.0.0.0",
@@ -9,8 +9,8 @@
     "lint": "poetry run black app/ && poetry run isort app/ && poetry run flake8 app/",
     "format": "poetry run black app/ && poetry run isort app/",
     "type-check": "poetry run mypy app/",
-    "docker:build": "docker build -t auth-core-backend .",
-    "docker:run": "docker run -p 8000:8000 --env-file .env auth-core-backend",
+    "docker:build": "docker build -t elrincondeharco-backend .",
+    "docker:run": "docker run -p 8000:8000 --env-file .env elrincondeharco-backend",
     "setup:dev": "bash poetry-setup.sh development",
     "setup:prod": "bash poetry-setup.sh production",
     "shell": "poetry shell",
