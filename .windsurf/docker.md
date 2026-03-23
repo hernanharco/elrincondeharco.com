@@ -22,14 +22,23 @@ Dockerizar la aplicación portfolio completa (frontend + backend) para producci�
 - **Base**: Python 3.12 Slim
 - **Gestión**: Poetry para dependencias
 - **Servidor**: Uvicorn
-- **Base de datos**: Neon PostgreSQL
+- **Base de datos**: PostgreSQL 16 Alpine (local) + Neon (producción)
+
+#### **Base de Datos (PostgreSQL)**
+- **Imagen**: `postgres:16-alpine`
+- **Puerto**: 5432
+- **Usuario**: neondb_owner
+- **Base de datos**: neondb
+- **Persistencia**: Volumen Docker `postgres_data`
+- **Health check**: `pg_isready` integrado
 
 ### 📁 **Estructura de Archivos Actual**
 
 ```
 Portfolio/
-├── docker-compose.yml          # Orquestación de servicios
-├── setup.sh                    # Script de gestión completo (198 líneas)
+├── docker-compose.yml          # Orquestación de 3 servicios (db + frontend + backend)
+├── setup.sh                    # Script de gestión mejorado (198 líneas)
+├── seed-db.sh                  # Script especializado para seed de BD (136 líneas)
 ├── frontend/
 │   ├── Dockerfile             # Multi-stage: Node.js builder + Nginx production
 │   ├── nginx.conf             # Configuración Nginx personalizada
@@ -38,10 +47,12 @@ Portfolio/
 │   ├── .env                  # Variables entorno frontend
 │   └── .dockerignore         # Excluir node_modules y .astro
 ├── backend/
-│   ├── Dockerfile             # Python 3.12 + Poetry sin virtualenv
+│   ├── Dockerfile             # Python 3.12 + Poetry + migraciones Alembic
 │   ├── pyproject.toml        # FastAPI 0.104.1 + dependencias
 │   ├── poetry.lock           # Lockfile de Poetry
-│   ├── .env                  # Variables entorno backend
+│   ├── .env.local            # Configuración BD local (Docker)
+│   ├── .env.production       # Configuración BD Neon (producción)
+│   ├── app/db/seed.py        # Script de seed mejorado
 │   └── .dockerignore         # Excluir .venv y __pycache__
 └── .windsurf/
     └── docker.md            # Este archivo
@@ -72,7 +83,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-#### **Backend Dockerfile:**
+#### **Backend Dockerfile (Actualizado):**
 ```dockerfile
 FROM python:3.12-slim
 RUN apt-get update && apt-get install -y build-essential curl && rm -rf /var/lib/apt/lists/*
@@ -82,12 +93,32 @@ RUN pip install poetry && \
     poetry config virtualenvs.create false && \
     poetry install --only main --no-root
 COPY app/ ./app/
+# Copiar migraciones y configuración de Alembic
+COPY migrations/ ./migrations/
+COPY alembic.ini ./alembic.ini
+RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
+USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD ["curl", "-f", "http://localhost:8000/docs"]
-RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
-USER app
 CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+#### **Base de Datos Dockerfile:**
+```dockerfile
+# Imagen oficial postgres:16-alpine
+env_file:
+  - ./backend/.env
+environment:
+  POSTGRES_DB: ${PGDATABASE:-neondb}
+  POSTGRES_USER: ${PGUSER:-neondb_owner}
+  POSTGRES_PASSWORD: ${PGPASSWORD:-localpassword}
+ports:
+  - "5432:5432"
+volumes:
+  - postgres_data:/var/lib/postgresql/data
+healthcheck:
+  test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-neondb_owner} -d ${PGDATABASE:-neondb}"]
 ```
 
 #### **Nginx Config:**
@@ -98,16 +129,27 @@ CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "
 
 ### 🚀 **Comandos de Uso**
 
-#### **Script Principal (setup.sh - 198 líneas):**
+#### **Script Principal (setup.sh - Actualizado):**
 ```bash
-./setup.sh prod      # Construir y iniciar producción (detached)
-./setup.sh dev       # Modo desarrollo (interactivo)
-./setup.sh build     # Solo construir imágenes
-./setup.sh stop      # Detener servicios
-./setup.sh logs      # Ver logs en tiempo real
-./setup.sh status    # Ver estado de contenedores
-./setup.sh clean     # Limpiar contenedores, volúmenes y sistema
-./setup.sh help      # Mostrar ayuda completa
+./setup.sh dev        # Desarrollo con Postgres local (Docker)
+./setup.sh prod       # Producción simulada con Postgres local (Docker)
+./setup.sh prod-neon  # Producción real con base de datos Neon
+./setup.sh db-info    # Mostrar datos de conexión para DBeaver
+./setup.sh stop       # Detener todos los servicios
+./setup.sh clean      # Limpiar contenedores y volúmenes
+./setup.sh logs       # Mostrar logs de los servicios
+./setup.sh status     # Ver estado de los servicios
+./setup.sh help       # Mostrar esta ayuda
+```
+
+#### **Script de Seed (seed-db.sh - 136 líneas):**
+```bash
+./seed-db.sh          # Ejecutar seed de base de datos
+# Características:
+# - Carga variables desde .env automáticamente
+# - Espera a que PostgreSQL esté listo
+# - Ejecuta seed dentro del contenedor backend
+# - Manejo de errores y reintentos
 ```
 
 #### **Docker Compose Directo:**
@@ -124,10 +166,22 @@ docker-compose ps                # Estado de servicios
 #### **Producción Local:**
 - **Frontend**: http://localhost:4321/
 - **Backend API**: http://localhost:8000/docs
-- **Health Checks**: Configurados para ambos servicios
+- **Base de Datos**: localhost:5432 (PostgreSQL local)
+- **Health Checks**: Configurados para los 3 servicios
+
+#### **Conexión a Base de Datos (DBeaver):**
+```
+Host: localhost
+Port: 5432
+Database: neondb
+Username: neondb_owner
+Password: localpassword
+SSL: desactivado
+URL: postgresql://neondb_owner:localpassword@localhost:5432/neondb
+```
 
 #### **Despliegue:**
-- **Render**: Backend (FastAPI)
+- **Render**: Backend (FastAPI) con Neon PostgreSQL
 - **Vercel**: Frontend (Static Site)
 - **Docker Hub**: Imágenes listas para push
 
@@ -140,7 +194,23 @@ FRONTEND_URL=http://localhost:4321
 PUBLIC_API_URL=http://localhost:8000
 ```
 
-#### **Backend (.env) - Actual:**
+#### **Backend (.env.local) - Base de Datos Local:**
+```bash
+PGHOST=db
+PGDATABASE=neondb
+PGUSER=neondb_owner
+PGPASSWORD=localpassword
+PGSSLMODE=disable
+PGCHANNELBINDING=disable
+DATABASE_URL=postgresql+psycopg://neondb_owner:localpassword@db/neondb
+SECRET_KEY=portfolio-secret-key-2024
+CLOUDINARY_CLOUD_NAME=dxyk76jhu
+CLOUDINARY_API_KEY=897545319274682
+CLOUDINARY_API_SECRET=eWQ_l3-fJG6G5eV8TfNfz_15Tws
+FRONTEND_URL=http://localhost:4321
+```
+
+#### **Backend (.env.production) - Base de Datos Neon:**
 ```bash
 PGHOST="your-neon-host"
 PGDATABASE="neondb"
@@ -156,26 +226,33 @@ CLOUDINARY_API_SECRET="your-api-secret-change-me"
 FRONTEND_URL="http://localhost:4321"
 ```
 
-#### **Automatización .env:**
-El script `setup.sh` crea automáticamente los archivos `.env` si no existen con valores por defecto seguros.
+#### **Gestión Automática:**
+- El script `setup.sh` selecciona automáticamente el archivo .env adecuado
+- `dev` y `prod` usan `.env.local` (PostgreSQL local)
+- `prod-neon` usa `.env.production` (Neon cloud)
 
 ### 📊 **Estado Actual del Proyecto**
 
 #### **✅ Funcionalidades Implementadas:**
 - [x] **Frontend**: Astro 6.0.6 + Svelte 5.54.0 con @iconify/svelte
-- [x] **Backend**: FastAPI 0.104.1 + PostgreSQL (Neon)
-- [x] **Docker**: Multi-stage build optimizado
+- [x] **Backend**: FastAPI 0.104.1 + PostgreSQL (local + Neon)
+- [x] **Base de Datos**: PostgreSQL 16 Alpine con persistencia
+- [x] **Docker**: Multi-stage build optimizado para 3 servicios
 - [x] **Nginx**: Configuración personalizada con gzip y caché
-- [x] **Health Checks**: Para ambos servicios
+- [x] **Health Checks**: Para los 3 servicios (frontend, backend, db)
 - [x] **Script setup.sh**: 198 líneas con gestión completa
-- [x] **Variables de entorno**: Separadas por servicio
+- [x] **Script seed-db.sh**: 136 líneas especializado en seed
+- [x] **Variables de entorno**: Separadas por entorno (local/prod)
 - [x] **Poetry**: Gestión de dependencias Python
 - [x] **pnpm**: Gestión de dependencias Node.js
+- [x] **Alembic**: Migraciones de base de datos integradas
 - [x] **Usuario no-root**: Seguridad en contenedor backend
+- [x] **Seed de datos**: Script mejorado con fix Cloudinary PDF
 
 #### **🔧 Versiones Actuales:**
 - **Node.js**: 22.12.0+ (requerido por Astro)
 - **Python**: 3.12
+- **PostgreSQL**: 16 Alpine
 - **Astro**: 6.0.6
 - **Svelte**: 5.54.0
 - **FastAPI**: 0.104.1
@@ -185,10 +262,12 @@ El script `setup.sh` crea automáticamente los archivos `.env` si no existen con
 #### **🌐 Características Técnicas:**
 - **Frontend**: Sitio estático optimizado con Nginx
 - **Backend**: API REST con documentación Swagger
-- **Base de datos**: Neon PostgreSQL (cloud)
+- **Base de datos**: Dual (PostgreSQL local + Neon cloud)
 - **Storage**: Cloudinary integrado
 - **Security**: Usuario no-root, variables de entorno separadas
 - **Performance**: Compresión gzip, caché de 1 año para assets
+- **Development**: Flujo completo local con Docker
+- **Production**: Deploy ready con múltiples opciones
 
 ### 🎯 **Roadmap de Mejoras**
 
@@ -208,16 +287,20 @@ El script `setup.sh` crea automáticamente los archivos `.env` si no existen con
 
 ### 🏆 **Resumen de Implementación**
 
-**Dockerización completada exitosamente** con arquitectura moderna:
+**Dockerización completada con arquitectura enterprise-ready:**
 - ✅ **Frontend**: Astro 6 + Svelte 5 + Nginx (multi-stage)
-- ✅ **Backend**: FastAPI + Python 3.12 + Poetry
-- ✅ **Base de datos**: Neon PostgreSQL cloud-native
+- ✅ **Backend**: FastAPI + Python 3.12 + Poetry + Alembic
+- ✅ **Base de datos**: PostgreSQL 16 local + Neon cloud
 - ✅ **Storage**: Cloudinary para media
-- ✅ **Scripting**: setup.sh con 198 líneas de automatización
-- ✅ **Security**: Best practices implementadas
-- ✅ **Performance**: Optimizado para producción
+- ✅ **Scripting**: setup.sh (198 líneas) + seed-db.sh (136 líneas)
+- ✅ **Security**: Best practices, usuario no-root, .env separados
+- ✅ **Performance**: Nginx optimizado, gzip, caché
+- ✅ **Development**: Flujo completo local con Docker
+- ✅ **Production**: Multi-environment ready
+- ✅ **Data**: Seed automático con manejo de errores
+- ✅ **Monitoring**: Health checks para todos los servicios
 - ✅ **Listo para deploy** 🚀
 
 ---
 
-*Documentación actualizada: Marzo 2026 - Estado: Producción Ready*
+*Documentación actualizada: Marzo 2026 - Estado: Enterprise Production Ready*
