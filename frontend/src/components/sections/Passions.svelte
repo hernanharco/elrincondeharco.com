@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Gamepad2, Heart, Code } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
   import { fetchApi } from '$lib/config';
   import type { PassionResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
@@ -47,7 +47,7 @@
         <div class="space-y-6">
           <div class="flex items-start gap-4">
             <div class="p-3 bg-red-500/10 rounded-lg text-red-400">
-              <Heart size={28} />
+              <Icon icon="lucide:heart" width={28} height={28} />
             </div>
             <div>
               <h3 class="text-xl font-semibold text-white mb-1">
@@ -62,7 +62,7 @@
 
           <div class="flex items-start gap-4">
             <div class="p-3 bg-indigo-500/10 rounded-lg text-indigo-400">
-              <Gamepad2 size={28} />
+              <Icon icon="lucide:gamepad-2" width={28} height={28} />
             </div>
             <div>
               <h3 class="text-xl font-semibold text-white mb-1">
@@ -77,7 +77,7 @@
 
           <div class="flex items-start gap-4">
             <div class="p-3 bg-amber-500/10 rounded-lg text-amber-400">
-              <Code size={28} />
+              <Icon icon="lucide:code" width={28} height={28} />
             </div>
             <div>
               <h3 class="text-xl font-semibold text-white mb-1">

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ExternalLink, Github, Layers, Lock, Calendar } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
   import { fetchApi } from '$lib/config';
   import type { ProjectResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
@@ -18,8 +18,8 @@
     }
   }
 
-  onMount(async () => {
-    await loadData();
+  onMount(() => {
+    loadData();
 
     // Escuchar cambios desde el admin
     const cleanup = listenForDataChange('projects', async () => {
@@ -30,16 +30,27 @@
     return cleanup;
   });
 
-  function getIcon(iconName: string, size: number = 20) {
-    const iconMap: Record<string, any> = {
-      Layers,
-      Lock,
-      Calendar,
-      ExternalLink,
-      Github,
-    };
-    return iconMap[iconName];
-  }
+  function getIcon(iconName: string): string {
+  if (!iconName) return 'lucide:layers';
+
+  // Convertir PascalCase → kebab-case: "ExternalLink" → "external-link"
+  const kebab = iconName
+    .replace(/([A-Z])/g, (match, letter, offset) =>
+      offset > 0 ? '-' + letter.toLowerCase() : letter.toLowerCase()
+    )
+    .replace(/(\d+)/g, '-$1')
+    .replace(/--+/g, '-')
+    .replace(/-+$/, '');
+
+  // Renombrados de Lucide v0.468+
+  const renames: Record<string, string> = {
+    'globe': 'earth',
+    'globe-icon': 'earth',
+  };
+
+  const resolved = renames[kebab] || kebab;
+  return `lucide:${resolved}`;
+}
 </script>
 
 <section id="proyectos" class="py-24 bg-zinc-900 text-white">
@@ -90,7 +101,7 @@
               <div
                 class="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-md p-2 rounded-lg border border-white/10 text-white"
               >
-                <svelte:component this={getIcon(project.icon_name)} size={20} />
+                <Icon icon={getIcon(project.icon_name)} width={20} height={20} />
               </div>
             </div>
 
@@ -124,7 +135,7 @@
                     target="_blank"
                     class="flex items-center gap-2 text-sm font-medium text-white hover:text-amber-400 transition-colors"
                   >
-                    <ExternalLink size={16} /> Ver Demo
+                    <Icon icon="lucide:external-link" width={16} height={16} /> Ver Demo
                   </a>
                 {/if}
                 {#if project.github_url}
@@ -133,7 +144,7 @@
                     target="_blank"
                     class="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors"
                   >
-                    <Github size={16} /> Código
+                    <Icon icon="lucide:github" width={16} height={16} /> Código
                   </a>
                 {/if}
               </div>

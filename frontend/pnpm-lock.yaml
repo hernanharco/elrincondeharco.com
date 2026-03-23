@@ -11,12 +11,15 @@ importers:
       '@astrojs/svelte':
         specifier: ^8.0.2
         version: 8.0.3(astro@6.0.8(jiti@1.21.7)(rollup@4.60.0)(typescript@5.9.3)(yaml@2.8.3))(jiti@1.21.7)(svelte@5.54.1)(typescript@5.9.3)(yaml@2.8.3)
+      '@iconify-json/lucide':
+        specifier: ^1.2.98
+        version: 1.2.98
+      '@iconify/svelte':
+        specifier: 4.2.0
+        version: 4.2.0(svelte@5.54.1)
       astro:
         specifier: ^6.0.6
         version: 6.0.8(jiti@1.21.7)(rollup@4.60.0)(typescript@5.9.3)(yaml@2.8.3)
-      lucide-svelte:
-        specifier: ^0.577.0
-        version: 0.577.0(svelte@5.54.1)
       svelte:
         specifier: ^5.54.0
         version: 5.54.1
@@ -253,6 +256,17 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@iconify-json/lucide@1.2.98':
+    resolution: {integrity: sha512-Lx2464W8Tty/QEnZ2UPb73nPdML/HpGCj0J0w37jP3/jx3l4fniZBjDxe1TgHiIL5XW9QO3vlx53ZQZ5JsNpzQ==}
+
+  '@iconify/svelte@4.2.0':
+    resolution: {integrity: sha512-fEl0T7SAPonK7xk6xUlRPDmFDZVDe2Z7ZstlqeDS/sS8ve2uyU+Qa8rTWbIqzZJlRvONkK5kVXiUf9nIc+6OOQ==}
+    peerDependencies:
+      svelte: '>4.0.0'
+
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1071,11 +1085,6 @@ packages:
   lru-cache@11.2.7:
     resolution: {integrity: sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==}
     engines: {node: 20 || >=22}
-
-  lucide-svelte@0.577.0:
-    resolution: {integrity: sha512-0i88o57KsaHWnc80J57fY99CWzlZsSdtH5kKjLUJa7z8dum/9/AbINNLzJ7NiRFUdOgMnfAmJt8jFbW2zeC5qQ==}
-    peerDependencies:
-      svelte: ^3 || ^4 || ^5.0.0-next.42
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -1967,6 +1976,17 @@ snapshots:
   '@esbuild/win32-x64@0.27.4':
     optional: true
 
+  '@iconify-json/lucide@1.2.98':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify/svelte@4.2.0(svelte@5.54.1)':
+    dependencies:
+      '@iconify/types': 2.0.0
+      svelte: 5.54.1
+
+  '@iconify/types@2.0.0': {}
+
   '@img/colour@1.1.0':
     optional: true
 
@@ -2804,10 +2824,6 @@ snapshots:
   longest-streak@3.1.0: {}
 
   lru-cache@11.2.7: {}
-
-  lucide-svelte@0.577.0(svelte@5.54.1):
-    dependencies:
-      svelte: 5.54.1
 
   magic-string@0.30.21:
     dependencies:

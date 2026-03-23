@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Menu, X } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
 
   // Estado para controlar el menú móvil
   let isOpen = false;
@@ -53,9 +53,9 @@
         >
           <span class="sr-only">Abrir menú</span>
           {#if isOpen}
-            <X size={24} />
+            <Icon icon="lucide:x" width={24} height={24} />
           {:else}
-            <Menu size={24} />
+            <Icon icon="lucide:menu" width={24} height={24} />
           {/if}
         </button>
       </div>

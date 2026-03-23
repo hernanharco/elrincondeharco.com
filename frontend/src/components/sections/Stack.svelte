@@ -1,31 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import {
-    Zap,
-    Rocket,
-    Database,
-    Server,
-    Atom,
-    LayoutTemplate,
-    GitBranch,
-    Github,
-    Triangle,
-    Cloud,
-    Send,
-    BrainCircuit,
-    Gauge,
-    Layers,
-    Monitor,
-    HardDrive,
-    Settings,
-    Container,
-    Code2,
-    FileCode2,
-    Palette,
-    Lock,
-    Globe,
-    Terminal,
-  } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
   import { fetchApi } from '$lib/config';
   import type { StackResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
@@ -66,47 +41,54 @@
   function getCategoryIcon(cat: string) {
     switch (cat) {
       case 'Frontend':
-        return Monitor;
+        return 'lucide:monitor';
       case 'Backend':
-        return HardDrive;
+        return 'lucide:hard-drive';
       case 'DevOps':
-        return Layers;
+        return 'lucide:layers';
       case 'Herramientas':
-        return Settings;
+        return 'lucide:settings';
       default:
-        return Layers;
+        return 'lucide:layers';
     }
   }
 
-  function getIcon(iconName: string, size: number = 24) {
-    const iconMap: Record<string, any> = {
-      Globe,
-      Palette,
-      FileCode2,
-      Atom,
-      Rocket,
-      LayoutTemplate,
-      Terminal,
-      Zap,
-      Layers,
-      Server,
-      Lock,
-      Database,
-      Container,
-      GitBranch,
-      Github,
-      Triangle,
-      Cloud,
-      Code2,
-      Send,
-      BrainCircuit,
-      Gauge,
-      Monitor,
-      HardDrive,
-      Settings,
-    };
-    return iconMap[iconName];
-  }
+  function getIcon(iconName: string) {
+  // Convertir PascalCase → kebab-case: "FileCode2" → "file-code-2"
+  const kebab = iconName
+    .replace(/([A-Z])/g, (match, letter, offset) => 
+      offset > 0 ? '-' + letter.toLowerCase() : letter.toLowerCase()
+    )
+    .replace(/(\d+)/g, '-$1')
+    .replace(/--+/g, '-')
+    .replace(/-+$/, '');
+
+  const iconMap: Record<string, string> = {
+    'globe': 'lucide:earth',
+    'palette': 'lucide:palette',
+    'file-code-2': 'lucide:file-code-2',
+    'atom': 'lucide:atom',
+    'rocket': 'lucide:rocket',
+    'layout-template': 'lucide:layout-template',
+    'terminal': 'lucide:terminal',
+    'zap': 'lucide:zap',
+    'layers': 'lucide:layers',
+    'server': 'lucide:server',
+    'lock': 'lucide:lock',
+    'database': 'lucide:database',
+    'container': 'lucide:container',
+    'git-branch': 'lucide:git-branch',
+    'github': 'lucide:github',
+    'triangle': 'lucide:triangle',
+    'cloud': 'lucide:cloud',
+    'code-2': 'lucide:code-2',
+    'send': 'lucide:send',
+    'brain-circuit': 'lucide:brain-circuit',
+    'gauge': 'lucide:gauge',
+  };
+
+  return iconMap[kebab] || `lucide:${kebab}`;
+}
 
   function setCategory(cat: string) {
     activeCategory = cat;
@@ -137,7 +119,7 @@
               : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30 hover:text-white'}"
           >
             {#if cat !== 'Todos'}
-              <svelte:component this={getCategoryIcon(cat)} size={16} />
+              <Icon icon={getCategoryIcon(cat)} width={16} height={16} />
             {/if}
             {cat}
           </button>
@@ -165,7 +147,7 @@
           >
             <div class="flex justify-between items-start">
               <div class="p-2 rounded-lg bg-white/5 {tech.color}">
-                <svelte:component this={getIcon(tech.icon)} size={24} />
+                <Icon icon={getIcon(tech.icon)} width={24} height={24} />
               </div>
               <span class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
                 {tech.category}

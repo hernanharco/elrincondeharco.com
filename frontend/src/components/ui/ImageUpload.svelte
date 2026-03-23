@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { Upload, Image as ImageIcon, X, Check } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
 
   export let currentImage: string | null = null;
   export let label = 'Subir imagen';
@@ -117,20 +117,20 @@
             on:click={openFileDialog}
             class="p-3 bg-amber-500/90 text-white rounded-full hover:bg-amber-500 transition-colors shadow-lg"
           >
-            <Upload size={20} />
+            <Icon icon="lucide:upload" width={20} height={20} />
           </button>
           <button
             type="button"
             on:click={removeImage}
             class="p-3 bg-red-500/90 text-white rounded-full hover:bg-red-500 transition-colors shadow-lg"
           >
-            <X size={20} />
+            <Icon icon="lucide:x" width={20} height={20} />
           </button>
         </div>
 
         <!-- Success indicator -->
         <div class="absolute top-4 right-4 p-2 bg-emerald-500/90 text-white rounded-full">
-          <Check size={16} />
+          <Icon icon="lucide:check" width={16} height={16} />
         </div>
       </div>
     {:else}
@@ -165,7 +165,7 @@
                 class="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full"
               ></div>
             {:else}
-              <ImageIcon size={32} />
+              <Icon icon="lucide:image" width={32} height={32} />
             {/if}
           </div>
 
@@ -189,7 +189,7 @@
     <div
       class="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-red-400 text-sm"
     >
-      <X size={16} />
+      <Icon icon="lucide:x" width={16} height={16} />
       <span>{error}</span>
     </div>
   {/if}
@@ -197,7 +197,7 @@
   <!-- Current Image Info -->
   {#if currentImage && !preview}
     <div class="flex items-center gap-3 p-3 bg-zinc-800/50 border border-zinc-700 rounded-lg">
-      <ImageIcon size={16} class="text-zinc-400" />
+      <Icon icon="lucide:image" width={16} height={16} class="text-zinc-400" />
       <span class="text-zinc-400 text-sm">Imagen actual guardada</span>
     </div>
   {/if}

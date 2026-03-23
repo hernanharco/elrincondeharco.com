@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Github, Download, ArrowRight, Loader2 } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
   import { fetchApi } from '$lib/config';
   import type { HeroResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
@@ -69,7 +69,7 @@
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     {#if loading && !data}
       <div class="flex flex-col items-center gap-4 animate-pulse">
-        <Loader2 class="w-8 h-8 text-amber-500 animate-spin" />
+        <Icon icon="lucide:loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
         <p class="text-zinc-500 text-sm font-medium uppercase tracking-widest">
           Sincronizando Experiencia...
         </p>
@@ -93,7 +93,7 @@
             class="inline-flex items-center px-8 py-3 border border-transparent text-base font-bold rounded-full text-black bg-amber-400 hover:bg-amber-500 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:scale-105 active:scale-95"
           >
             {data?.contact_button_text || 'Contactar'}
-            <ArrowRight class="ml-2 h-5 w-5" />
+            <Icon icon="lucide:arrow-right" class="ml-2 h-5 w-5" />
           </a>
 
           {#if data?.cv_url}
@@ -105,7 +105,10 @@
               class="inline-flex items-center px-8 py-3 border border-white/20 text-base font-medium rounded-full text-white hover:bg-white/10 transition-all backdrop-blur-sm hover:border-amber-400/50 group"
             >
               {data?.cv_button_text || 'Descargar CV'}
-              <Download class="ml-2 h-5 w-5 group-hover:translate-y-0.5 transition-transform" />
+              <Icon
+                icon="lucide:download"
+                class="ml-2 h-5 w-5 group-hover:translate-y-0.5 transition-transform"
+              />
             </a>
           {/if}
         </div>

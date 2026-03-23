@@ -1,18 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import {
-    LayoutDashboard,
-    Sparkles,
-    User,
-    Code2,
-    FolderKanban,
-    Heart,
-    Mail,
-    Settings,
-    ChevronLeft,
-    ChevronRight,
-    ExternalLink,
-  } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
 
   export let currentPath: string = '';
 
@@ -30,14 +18,14 @@
   }
 
   const navItems = [
-    { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/hero', label: 'Hero', icon: Sparkles },
-    { href: '/admin/about', label: 'About', icon: User },
-    { href: '/admin/stack', label: 'Stack', icon: Code2 },
-    { href: '/admin/projects', label: 'Proyectos', icon: FolderKanban },
-    { href: '/admin/passions', label: 'Pasiones', icon: Heart },
-    { href: '/admin/footer', label: 'Footer', icon: Mail },
-    { href: '/admin/site-settings', label: 'Configuración', icon: Settings },
+    { href: '/admin', label: 'Dashboard', icon: 'lucide:layout-dashboard' },
+    { href: '/admin/hero', label: 'Hero', icon: 'lucide:sparkles' },
+    { href: '/admin/about', label: 'About', icon: 'lucide:user' },
+    { href: '/admin/stack', label: 'Stack', icon: 'lucide:code-2' },
+    { href: '/admin/projects', label: 'Proyectos', icon: 'lucide:folder-kanban' },
+    { href: '/admin/passions', label: 'Pasiones', icon: 'lucide:heart' },
+    { href: '/admin/footer', label: 'Footer', icon: 'lucide:mail' },
+    { href: '/admin/site-settings', label: 'Configuración', icon: 'lucide:settings' },
   ];
 
   function isActive(href: string): boolean {
@@ -65,9 +53,9 @@
     aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
   >
     {#if collapsed}
-      <ChevronRight size={14} />
+      <Icon icon="lucide:chevron-right" width={14} height={14} />
     {:else}
-      <ChevronLeft size={14} />
+      <Icon icon="lucide:chevron-left" width={14} height={14} />
     {/if}
   </button>
 
@@ -107,7 +95,7 @@
             {collapsed ? 'justify-center' : ''}
           "
         >
-          <svelte:component this={item.icon} size={18} class="flex-shrink-0" />
+          <Icon icon={item.icon} width={18} height={18} class="flex-shrink-0" />
           {#if !collapsed}
             <span class="text-sm font-medium truncate">{item.label}</span>
           {/if}
@@ -141,7 +129,7 @@
           {collapsed ? 'justify-center' : ''}
         "
       >
-        <ExternalLink size={18} class="flex-shrink-0" />
+        <Icon icon="lucide:external-link" width={18} height={18} class="flex-shrink-0" />
         {#if !collapsed}
           <span class="text-sm font-medium">Volver al sitio</span>
         {/if}

@@ -48,17 +48,17 @@ check_dependencies() {
     # Verificar archivos .env en cada carpeta
     if [ ! -f frontend/.env ]; then
         warning "Archivo frontend/.env no encontrado. Creando uno con valores por defecto..."
-        cat > frontend/.env << 'EOF'
+        cat > frontend/.env << 'ENVEOF'
 # Frontend Environment Variables
 NODE_ENV=production
 FRONTEND_URL=http://localhost:4321
 PUBLIC_API_URL=http://localhost:8000
-EOF
+ENVEOF
     fi
     
     if [ ! -f backend/.env ]; then
         warning "Archivo backend/.env no encontrado. Creando uno con valores por defecto..."
-        cat > backend/.env << 'EOF'
+        cat > backend/.env << 'ENVEOF'
 # Backend Environment Variables
 PGHOST="your-neon-host"
 PGDATABASE="neondb"
@@ -72,8 +72,14 @@ CLOUDINARY_CLOUD_NAME="dxyk76jhu"
 CLOUDINARY_API_KEY="your-api-key-change-me"
 CLOUDINARY_API_SECRET="your-api-secret-change-me"
 FRONTEND_URL="http://localhost:4321"
-EOF
+ENVEOF
     fi
+
+    # Copiar frontend/.env a la raíz para que docker-compose pueda
+    # interpoler ${PUBLIC_API_URL} en el build args del frontend
+    log "Sincronizando .env raíz desde frontend/.env..."
+    cp frontend/.env .env
+    success ".env raíz sincronizado correctamente"
 }
 
 build_images() {
