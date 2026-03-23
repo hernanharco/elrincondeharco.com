@@ -1,50 +1,41 @@
-# Use node 22 alpine as base
+# ── Build stage ──────────────────────────────────────────────
 FROM node:22-alpine AS builder
 
-# Set working directory
+# Declare build-time variable (passed from docker-compose build args)
+ARG PUBLIC_API_URL
+ENV PUBLIC_API_URL=$PUBLIC_API_URL
+
+# Install pnpm
+RUN npm install -g pnpm
+
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy lockfile and package manifest
+COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN npm install --no-optional
+# Install ALL dependencies including optional (rollup needs platform-specific binaries)
+RUN pnpm install --frozen-lockfile
 
-# Copy source code
 COPY . .
 
-# Remove problematic files and directories
-RUN rm -rf src/routes/admin src/components/admin src/pages/admin
-RUN rm -f src/components/sections/Stack.svelte
-RUN rm -f src/components/layout/AdminSidebar.svelte
+RUN pnpm run build
 
-# Build the application
-RUN npm run build || true
+# ── Production stage ──────────────────────────────────────────
+FROM nginx:alpine AS production
 
-# If build fails, create a simple static site
-RUN if [ ! -d "dist" ]; then \
-    mkdir -p dist && \
-    echo '<!DOCTYPE html><html><head><title>Portfolio</title></head><body><h1>Portfolio Site</h1><p>Site under construction</p></body></html>' > dist/index.html; \
-    fi
+# Elimina la config por defecto de nginx
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Production stage
-FROM node:22-alpine AS production
+# Copia nuestra config personalizada
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Set working directory
-WORKDIR /app
+# Copia el build de Astro
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy built application
-COPY --from=builder /app/dist ./dist
-
-# Add user without root privileges for security
-RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
-USER nextjs
-
-# Expose port
 EXPOSE 4321
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD ["node", "-e", "require('http').get('http://localhost:4321/', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD ["wget", "-qO-", "http://localhost:4321/"]
 
-# Start a simple static server
-CMD ["npx", "serve", "-s", "dist", "-l", "4321"]
+CMD ["nginx", "-g", "daemon off;"]

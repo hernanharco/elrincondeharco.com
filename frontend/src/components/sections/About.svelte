@@ -1,15 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   // 1. IMPORTANTE: Agregamos los iconos que faltaban
-  import {
-    Github,
-    Linkedin,
-    Mail,
-    Twitter,
-    MapPin, // <--- Faltaba
-    Award, // <--- Faltaba
-    Briefcase, // <--- Faltaba
-  } from 'lucide-svelte';
+  import Icon from '@iconify/svelte';
 
   import { fetchApi } from '$lib/config';
   import type { AboutResponse } from '$lib/types';
@@ -61,7 +53,7 @@
           ></div>
           <div class="absolute bottom-6 left-6 text-white">
             <p class="flex items-center gap-2 text-amber-400 font-medium">
-              <MapPin size={18} />
+              <Icon icon="lucide:map-pin" width={18} height={18} />
               {data?.location || 'Avilés, Asturias, España'}
             </p>
           </div>
@@ -85,7 +77,7 @@
           <div
             class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-amber-500/50 transition-colors"
           >
-            <Award class="text-amber-400 mb-2" size={24} />
+            <Icon icon="lucide:award" class="text-amber-400 mb-2" width={24} height={24} />
             <h3 class="font-semibold text-white">{data?.leadership_title || 'Liderazgo'}</h3>
             <p class="text-sm text-gray-400">
               {data?.leadership_desc || 'Formación de equipos...'}
@@ -95,7 +87,7 @@
           <div
             class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-amber-500/50 transition-colors"
           >
-            <Briefcase class="text-amber-400 mb-2" size={24} />
+            <Icon icon="lucide:briefcase" class="text-amber-400 mb-2" width={24} height={24} />
             <h3 class="font-semibold text-white">{data?.experience_title || 'Experiencia'}</h3>
             <p class="text-sm text-gray-400">{data?.experience_desc || 'Más de una década...'}</p>
           </div>
