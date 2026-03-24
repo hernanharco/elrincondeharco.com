@@ -10,7 +10,6 @@ from app.db.session import engine
 from app.models.base import Base
 from app.api.route import api_router
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 Starting FastAPI app in development mode")
@@ -63,7 +62,7 @@ app.include_router(api_router, prefix="/api/v1")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4321"],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

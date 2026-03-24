@@ -37,6 +37,13 @@ class Settings(BaseSettings):
             f"channel_binding={self.pg_channel_binding}"
         )
 
+    # CORS Configuration
+    # Por defecto permitimos localhost si no hay nada en el .env
+    cors_origins: list[str] = Field(
+        default=["http://localhost:4321"],
+        alias="CORS_ORIGINS"
+    )
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
