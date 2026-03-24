@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
-    # Carga variables desde backend/.env
+    # Al estar dentro de /backend, el .env está en la misma carpeta
     env_file:
-      - ./backend/.env
+      - .env
     environment:
       # Mapea las variables PG* a POSTGRES_* que usa el contenedor
       POSTGRES_DB: ${PGDATABASE:-neondb}
@@ -20,29 +20,16 @@ services:
       timeout: 5s
       retries: 5
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - PUBLIC_API_URL=${PUBLIC_API_URL}
-    ports:
-      - "4321:4321"
-    environment:
-      - NODE_ENV=production
-    env_file:
-      - ./frontend/.env
-
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
       - ENVIRONMENT=production
     env_file:
-      - ./backend/.env
+      - .env
     depends_on:
       db:
         condition: service_healthy
