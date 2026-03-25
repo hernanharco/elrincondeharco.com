@@ -11,7 +11,13 @@
     "preview": "astro preview",
     "astro": "astro",
     "clean": "rm -rf node_modules dist .astro",
-    "fresh": "rm -rf node_modules dist .astro pnpm-lock.yaml && pnpm install"
+    "fresh": "rm -rf node_modules dist .astro pnpm-lock.yaml && pnpm install",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@astrojs/svelte": "^8.0.2",
@@ -23,8 +29,16 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
+    "@playwright/test": "^1.40.0",
+    "@sveltejs/testing-library": "^0.1.0",
+    "@testing-library/jest-dom": "^6.1.0",
+    "@testing-library/user-event": "^14.5.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
     "autoprefixer": "^10.4.27",
+    "jsdom": "^23.0.0",
     "postcss": "^8.5.8",
-    "tailwindcss": "3.4.17"
+    "tailwindcss": "3.4.17",
+    "vitest": "^1.0.0"
   }
 }
