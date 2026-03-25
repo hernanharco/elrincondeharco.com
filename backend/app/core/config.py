@@ -1,12 +1,12 @@
-from pydantic import Field, computed_field
+import json
+from typing import Any, Optional, Union
+from pydantic import Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Optional
-
 
 class Settings(BaseSettings):
     """Configuración de la aplicación usando Pydantic Settings v2."""
 
-    # Mapeo directo desde el archivo .env
+    # Mapeo directo desde el archivo .env (Neon PostgreSQL)
     pg_host: str = Field(..., alias="PGHOST")
     pg_database: str = Field(..., alias="PGDATABASE")
     pg_user: str = Field(..., alias="PGUSER")
@@ -18,18 +18,15 @@ class Settings(BaseSettings):
     debug: bool = True
     secret_key: str = "your-secret-key-change-in-production"
 
-    # Cloudinary
-    cloudinary_cloud_name: str = Field(..., env="CLOUDINARY_CLOUD_NAME")
-    cloudinary_api_key: str = Field(..., env="CLOUDINARY_API_KEY")
-    cloudinary_api_secret: str = Field(..., env="CLOUDINARY_API_SECRET")
+    # Cloudinary (Simplificado para usar alias del .env igual que PG)
+    cloudinary_cloud_name: str = Field(..., alias="CLOUDINARY_CLOUD_NAME")
+    cloudinary_api_key: str = Field(..., alias="CLOUDINARY_API_KEY")
+    cloudinary_api_secret: str = Field(..., alias="CLOUDINARY_API_SECRET")
 
     @computed_field
     @property
     def database_url(self) -> str:
-        """
-        Construye la URL de conexión para Neon PostgreSQL (Psycopg 3).
-        Siguiendo el principio de 'Menos infraestructura, más valor'.
-        """
+        """Construye la URL de conexión para Neon PostgreSQL."""
         return (
             f"postgresql+psycopg://{self.pg_user}:{self.pg_password}@"
             f"{self.pg_host}/{self.pg_database}?"
@@ -38,19 +35,26 @@ class Settings(BaseSettings):
         )
 
     # CORS Configuration
-    # Por defecto permitimos localhost si no hay nada en el .env
-    cors_origins: list[str] = Field(
-        default=["http://localhost:4321"],
-        alias="CORS_ORIGINS"
-    )
+    cors_origins: list[str] = []
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Any) -> list[str]:
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str) and v.startswith("["):
+            return json.loads(v)
+        if isinstance(v, str):
+            # Esto permite: https://web.com, http://localhost
+            return [i.strip() for i in v.split(",")]
+        return v
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
-        extra="ignore",  # Ignora otras variables del .env que no necesitemos aquí
+        extra="ignore",
     )
-
 
 # Instancia única para toda la app
 settings = Settings()
