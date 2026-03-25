@@ -32,18 +32,19 @@ Dockerizar la aplicación portfolio completa (frontend + backend) para producci�
 - **Persistencia**: Volumen Docker `postgres_data`
 - **Health check**: `pg_isready` integrado
 
-### 📁 **Estructura de Archivos Actual**
+### 📁 **Estructura de Archivos Docker Actual**
 
 ```
 Portfolio/
 ├── backend/
-│   ├── docker-compose.yml       # Orquestación backend + db (solo backend)
-│   ├── setup.sh                 # Script de gestión backend (49 líneas)
-│   ├── seed-db.sh               # Script especializado para seed (41 líneas)
-│   ├── Dockerfile               # Python 3.12 + Poetry + migraciones Alembic
-│   ├── pyproject.toml          # FastAPI 0.104.1 + dependencias
+│   ├── docker-compose.yml       # Orquestación backend (conecta a Neon)
+│   ├── scripts/setup.sh          # Script de gestión backend (49 líneas)
+│   ├── scripts/seed-db.sh        # Script especializado para seed (41 líneas)
+│   ├── scripts/entrypoint.sh     # Entrypoint para migraciones y schema
+│   ├── Dockerfile               # Python 3.12 + Poetry + libpq-dev + entrypoint
+│   ├── pyproject.toml          # FastAPI + dependencias
 │   ├── poetry.lock             # Lockfile de Poetry
-│   ├── .env                    # Configuración BD local (Docker)
+│   ├── .env                    # Configuración Neon PostgreSQL
 │   ├── app/db/seed.py          # Script de seed mejorado
 │   └── .dockerignore           # Excluir .venv y __pycache__
 ├── frontend/
@@ -86,39 +87,61 @@ CMD ["nginx", "-g", "daemon off;"]
 #### **Backend Dockerfile (Actualizado):**
 ```dockerfile
 FROM python:3.12-slim
-RUN apt-get update && apt-get install -y build-essential curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY pyproject.toml poetry.lock* ./
-RUN pip install poetry && \
+RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
     poetry install --only main --no-root
 COPY app/ ./app/
-# Copiar migraciones y configuración de Alembic
 COPY migrations/ ./migrations/
 COPY alembic.ini ./alembic.ini
-RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
+COPY scripts/entrypoint.sh ./scripts/entrypoint.sh
+RUN chmod +x ./scripts/entrypoint.sh
+RUN sed -i 's/\r$//' ./scripts/entrypoint.sh
+RUN useradd --create-home --shell /bin/bash app && \
+    chown -R app:app /app
 USER app
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD ["curl", "-f", "http://localhost:8000/docs"]
+ENTRYPOINT ["./scripts/entrypoint.sh"]
 CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-#### **Base de Datos Dockerfile:**
-```dockerfile
-# Imagen oficial postgres:16-alpine
-env_file:
-  - ./backend/.env
-environment:
-  POSTGRES_DB: ${PGDATABASE:-neondb}
-  POSTGRES_USER: ${PGUSER:-neondb_owner}
-  POSTGRES_PASSWORD: ${PGPASSWORD:-localpassword}
-ports:
-  - "5432:5432"
-volumes:
-  - postgres_data:/var/lib/postgresql/data
-healthcheck:
-  test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-neondb_owner} -d ${PGDATABASE:-neondb}"]
+#### **Docker Compose (Backend Only):**
+```yaml
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: elrincon-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - PGHOST=${PGHOST}
+      - PGPORT=${PGPORT}
+      - PGDATABASE=${PGDATABASE}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGSCHEMA=${PGSCHEMA}
+      - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - .env
+    networks:
+      - harco_network
+
+networks:
+  harco_network:
+    name: harco_network
+    external: true
 ```
 
 #### **Nginx Config:**
@@ -132,12 +155,12 @@ healthcheck:
 #### **Backend Scripts:**
 ```bash
 cd backend/
-./setup.sh prod        # Iniciar backend + db en modo producción
-./setup.sh stop        # Detener servicios backend
-./setup.sh logs        # Ver logs de servicios backend
-./setup.sh status      # Ver estado de servicios backend
+./scripts/setup.sh prod        # Iniciar backend en modo producción
+./scripts/setup.sh stop        # Detener servicios backend
+./scripts/setup.sh logs        # Ver logs de servicios backend
+./scripts/setup.sh status      # Ver estado de servicios backend
 
-./seed-db.sh           # Ejecutar seed de base de datos
+./scripts/seed-db.sh           # Ejecutar seed de base de datos
 # Características:
 # - Carga variables desde .env automáticamente
 # - Espera a que PostgreSQL esté listo
@@ -157,8 +180,8 @@ cd frontend/
 #### **Docker Compose Directo:**
 ```bash
 cd backend/
-docker-compose up --build -d    # Construir e iniciar backend + db
-docker-compose down              # Detener y remover contenedores
+docker-compose up --build -d    # Construir e iniciar backend
+docker-compose down              # Detener y remover contenedor
 docker-compose logs -f           # Logs en tiempo real
 docker-compose ps                # Estado de servicios
 ```
@@ -168,18 +191,18 @@ docker-compose ps                # Estado de servicios
 #### **Producción Local:**
 - **Frontend**: http://localhost:4321/
 - **Backend API**: http://localhost:8000/docs
-- **Base de Datos**: localhost:5432 (PostgreSQL local)
-- **Health Checks**: Configurados para los 3 servicios
+- **Base de Datos**: Neon PostgreSQL (nube)
+- **Health Checks**: Configurados para frontend y backend
 
-#### **Conexión a Base de Datos (DBeaver):**
+#### **Conexión a Base de Datos (Neon):**
 ```
-Host: localhost
+Host: tu-neon-host.neon.tech
 Port: 5432
 Database: neondb
 Username: neondb_owner
-Password: localpassword
-SSL: desactivado
-URL: postgresql://neondb_owner:localpassword@localhost:5432/neondb
+Password: tu-password
+SSL: requerido
+URL: postgresql+psycopg://neondb_owner:tu-password@tu-neon-host.neon.tech/neondb?sslmode=require
 ```
 
 #### **Despliegue:**
@@ -196,15 +219,15 @@ FRONTEND_URL=http://localhost:4321
 PUBLIC_API_URL=http://localhost:8000
 ```
 
-#### **Backend (.env) - Base de Datos Local:**
+#### **Backend (.env) - Neon PostgreSQL:**
 ```bash
-PGHOST=db
+PGHOST=tu-neon-host.neon.tech
 PGDATABASE=neondb
 PGUSER=neondb_owner
-PGPASSWORD=localpassword
-PGSSLMODE=disable
-PGCHANNELBINDING=disable
-DATABASE_URL=postgresql+psycopg://neondb_owner:localpassword@db/neondb
+PGPASSWORD=tu-password
+PGSSLMODE=require
+PGCHANNELBINDING=require
+DATABASE_URL=postgresql+psycopg://neondb_owner:tu-password@tu-neon-host.neon.tech/neondb?sslmode=require&channel_binding=require
 SECRET_KEY=portfolio-secret-key-2024
 CLOUDINARY_CLOUD_NAME=dxyk76jhu
 CLOUDINARY_API_KEY=897545319274682
@@ -214,41 +237,42 @@ FRONTEND_URL=http://localhost:4321
 
 ### 📊 **Estado Actual del Proyecto**
 
-#### **✅ Funcionalidades Implementadas:**
+#### **✅ Funcionalidades Docker Implementadas:**
 - [x] **Frontend**: Astro 6.0.6 + Svelte 5.54.0 con @iconify/svelte
-- [x] **Backend**: FastAPI 0.104.1 + PostgreSQL local
-- [x] **Base de Datos**: PostgreSQL 16 Alpine con persistencia
+- [x] **Backend**: FastAPI + Python 3.12 + Poetry
+- [x] **Base de Datos**: Neon PostgreSQL (nube) con Docker compose
 - [x] **Docker**: Multi-stage build optimizado para frontend y backend
 - [x] **Nginx**: Configuración personalizada con gzip y caché
-- [x] **Health Checks**: Para todos los servicios (frontend, backend, db)
-- [x] **Scripts separados**: Backend (49 líneas) + Frontend (54 líneas)
+- [x] **Health Checks**: Para frontend y backend
+- [x] **Scripts separados**: Backend (scripts/setup.sh) + Frontend (setup.sh)
 - [x] **Script seed-db.sh**: 41 líneas especializado en seed
-- [x] **Variables de entorno**: Configuración para desarrollo local
+- [x] **Variables de entorno**: Configuración para Neon PostgreSQL
 - [x] **Poetry**: Gestión de dependencias Python
 - [x] **pnpm**: Gestión de dependencias Node.js
 - [x] **Alembic**: Migraciones de base de datos integradas
+- [x] **Entrypoint**: Script para preparación de base de datos
 - [x] **Usuario no-root**: Seguridad en contenedor backend
 - [x] **Seed de datos**: Script mejorado con fix Cloudinary PDF
 
 #### **🔧 Versiones Actuales:**
 - **Node.js**: 22.12.0+ (requerido por Astro)
 - **Python**: 3.12
-- **PostgreSQL**: 16 Alpine
+- **PostgreSQL**: Neon PostgreSQL (nube)
 - **Astro**: 6.0.6
 - **Svelte**: 5.54.0
-- **FastAPI**: 0.104.1
+- **FastAPI**: Latest
 - **Poetry**: Latest
 - **pnpm**: Latest
 
-#### **🌐 Características Técnicas:**
+#### **🌐 Características Docker:**
 - **Frontend**: Sitio estático optimizado con Nginx
 - **Backend**: API REST con documentación Swagger
-- **Base de datos**: PostgreSQL local con Docker
+- **Base de datos**: Neon PostgreSQL (nube) con Docker compose
 - **Storage**: Cloudinary integrado
 - **Security**: Usuario no-root, variables de entorno
 - **Performance**: Compresión gzip, caché de 1 año para assets
 - **Development**: Flujo completo local con Docker separado
-- **Production**: Deploy ready con contenedores independientes con múltiples opciones
+- **Production**: Deploy ready con contenedores independientes
 
 ### 🎯 **Roadmap de Mejoras**
 
@@ -270,16 +294,16 @@ FRONTEND_URL=http://localhost:4321
 
 **Dockerización completada con arquitectura separada:**
 - ✅ **Frontend**: Astro 6 + Svelte 5 + Nginx (multi-stage)
-- ✅ **Backend**: FastAPI + Python 3.12 + Poetry + Alembic
-- ✅ **Base de datos**: PostgreSQL 16 local con Docker
+- ✅ **Backend**: FastAPI + Python 3.12 + Poetry + Alembic + Entrypoint
+- ✅ **Base de datos**: Neon PostgreSQL (nube) con Docker compose
 - ✅ **Storage**: Cloudinary para media
-- ✅ **Scripting**: Backend setup.sh (49 líneas) + Frontend setup.sh (54 líneas) + seed-db.sh (41 líneas)
+- ✅ **Scripting**: Backend scripts/setup.sh + Frontend setup.sh + scripts/seed-db.sh
 - ✅ **Security**: Best practices, usuario no-root, variables de entorno
 - ✅ **Performance**: Nginx optimizado, gzip, caché
 - ✅ **Development**: Flujo completo local con Docker separado
 - ✅ **Production**: Contenedores independientes ready
 - ✅ **Data**: Seed automático con manejo de errores
-- ✅ **Monitoring**: Health checks para todos los servicios
+- ✅ **Monitoring**: Health checks para frontend y backend
 - ✅ **Arquitectura modular**: Frontend y backend independientes 🚀
 
 ---

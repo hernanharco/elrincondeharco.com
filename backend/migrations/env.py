@@ -1,50 +1,38 @@
 import os
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, text
 from alembic import context
-from dotenv import load_dotenv
 
-# Importa tu Base y modelos
+# Importar configuración y metadatos
+from app.core.config import settings
 from app.models.base import Base 
-# Importante: Importar los modelos asegura que Base.metadata los conozca
-from app.models.hero import Hero
-from app.models.about import About
-from app.models.passions import Passion
-from app.models.projects import Project
-from app.models.stack import Stack
-from app.models.footer import Footer
 
-# Cargar variables de entorno del .env
-load_dotenv()
-
+# Cargar configuración de logs de alembic.ini
 config = context.config
-
-# Configurar logs
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Asignar el metadata de tus modelos
 target_metadata = Base.metadata
-
-def get_url():
-    # Prioridad: Variable de entorno DATABASE_URL
-    return os.getenv("DATABASE_URL")
+SCHEMA_NAME = settings.pg_schema
 
 def run_migrations_offline() -> None:
-    url = get_url()
+    """Migraciones en modo offline."""
+    url = settings.database_url
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        version_table_schema=SCHEMA_NAME,
     )
+
     with context.begin_transaction():
         context.run_migrations()
 
 def run_migrations_online() -> None:
-    # Sobrescribimos la configuración del .ini con la URL real del entorno
+    """Migraciones en modo online."""
     configuration = config.get_section(config.config_ini_section, {})
-    configuration["sqlalchemy.url"] = get_url()
+    configuration["sqlalchemy.url"] = settings.database_url
 
     connectable = engine_from_config(
         configuration,
@@ -53,10 +41,21 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        # 1. Asegurar existencia del Mundo (Schema)
+        connection.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA_NAME}"))
+        connection.execute(text(f"SET search_path TO {SCHEMA_NAME}"))
+        connection.commit()
+
         context.configure(
             connection=connection, 
-            target_metadata=target_metadata
+            target_metadata=target_metadata,
+            version_table_schema=SCHEMA_NAME,
+            include_schemas=True,
+            # Filtro: Solo migrar objetos del esquema actual
+            include_name=lambda name, type_, parent_names: 
+                not (type_ == "schema" and name != SCHEMA_NAME)
         )
+
         with context.begin_transaction():
             context.run_migrations()
 

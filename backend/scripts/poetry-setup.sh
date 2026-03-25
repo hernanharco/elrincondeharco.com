@@ -36,22 +36,27 @@ fi
 if [ ! -f .env ]; then
     echo "📝 Creating .env template..."
     cat > .env << EOF
-# Neon PostgreSQL Configuration
-PGHOST=your-neon-host
+# PostgreSQL Local Configuration
+PGHOST=localhost
+PGPORT=5432
 PGDATABASE=neondb
 PGUSER=neondb_owner
 PGPASSWORD=your-password
-PGSSLMODE=require
-PGCHANNELBINDING=require
+PGSSLMODE=disable
+PGCHANNELBINDING=disable
 
 # Database URL (auto-generated)
-DATABASE_URL=postgresql+psycopg://\${PGUSER}:\${PGPASSWORD}@\${PGHOST}/\${PGDATABASE}?sslmode=require&channel_binding=require
+DATABASE_URL=postgresql+psycopg://\${PGUSER}:\${PGPASSWORD}@\${PGHOST}:\${PGPORT}/\${PGDATABASE}
 
 # Application Settings
 DEBUG=true
 SECRET_KEY=your-secret-key-here
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+FRONTEND_URL=http://localhost:4321
 EOF
-    echo "✅ .env template created. Please update with your Neon credentials."
+    echo "✅ .env template created. Please update with your local PostgreSQL credentials."
 else
     echo "✅ .env file already exists."
 fi
@@ -75,17 +80,18 @@ echo ""
 echo "🎉 Setup complete!"
 echo ""
 echo "Next steps:"
-echo "1. Update .env with your Neon credentials"
+echo "1. Update .env with your local PostgreSQL credentials"
 echo "2. Run 'poetry shell' to activate virtual environment"
-echo "3. Run 'pnpm dev' to start the development server"
+echo "3. Run 'poetry run uvicorn app.main:app --reload' to start the development server"
 echo ""
 if [ "$ENVIRONMENT" = "production" ]; then
     echo "Production commands:"
-    echo "- pnpm start: Start production server"
-    echo "- pnpm docker:build: Build Docker image"
+    echo "- poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000: Start production server"
+    echo "- docker build -t backend . : Build Docker image"
 else
     echo "Development commands:"
-    echo "- pnpm dev: Start development server with reload"
-    echo "- pnpm test: Run tests"
-    echo "- pnpm lint: Run code formatting and linting"
+    echo "- poetry run uvicorn app.main:app --reload: Start development server"
+    echo "- poetry run pytest: Run tests"
+    echo "- poetry run black . : Format code"
+    echo "- poetry run isort . : Sort imports"
 fi
