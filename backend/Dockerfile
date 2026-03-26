@@ -1,42 +1,46 @@
-# 1. Usamos una imagen base ligera de Python 3.12
+# 1. Imagen base
 FROM python:3.12-slim
 
-# 2. Variables de entorno para optimizar Python en Docker
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    POETRY_NO_INTERACTION=1 \
+# 2. Variables de entorno para Python y Poetry
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    POETRY_VERSION=2.0.1 \
+    POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_CACHE_DIR='/tmp/poetry_cache'
 
-# 3. Instalamos dependencias del sistema necesarias (libpq-dev para PostgreSQL)
+# 3. Instalación de dependencias del sistema
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 4. Establecemos el directorio de trabajo
+# 4. Directorio de trabajo
 WORKDIR /app
 
-# 5. Copiamos los archivos de dependencias primero (mejor aprovechamiento de caché)
+# 5. Instalamos Poetry
+RUN pip install --no-cache-dir poetry==$POETRY_VERSION
+
+# 6. Copiamos archivos de dependencias
 COPY pyproject.toml poetry.lock* ./
 
-# 6. Instalamos Poetry, sincronizamos el lock si hubo cambios y bajamos dependencias
-# El comando 'poetry lock --no-update' es el que evita el error que tenías
-RUN pip install --no-cache-dir poetry==2.0.1 && \
-    poetry lock --no-update && \
+# 7. Instalamos dependencias de Python
+RUN poetry lock && \
     poetry install --only main --no-root && \
     rm -rf $POETRY_CACHE_DIR
 
-# 7. Copiamos el resto del código del proyecto
+# 8. Copiamos el resto del código
 COPY . .
 
-# 8. Instalamos el proyecto (si fuera necesario para el path)
-RUN poetry install --only main
+# 9. IMPORTANTE: Aseguramos permisos para los scripts
+# Esto garantiza que Docker pueda ejecutar el entrypoint
+RUN chmod +x scripts/*.sh
 
-# 9. Exponemos el puerto del backend (FastAPI suele usar 8000 o 8080)
+# 10. Exponemos el puerto de FastAPI
 EXPOSE 8000
 
-# 10. Comando para ejecutar la aplicación con Uvicorn
-# Ajusta 'main:app' según el nombre de tu archivo de entrada
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 11. EL CAMBIO MAESTRO: ENTRYPOINT
+# Esto obliga a Docker a ejecutar primero el script que crea el Schema
+# y después (gracias al 'exec' al final del script) lanza Uvicorn.
+ENTRYPOINT ["/bin/bash", "/app/scripts/entrypoint.sh"]
