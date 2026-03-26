@@ -13,9 +13,17 @@ WORKDIR /app
 
 # Copy requirements and install
 COPY pyproject.toml poetry.lock* ./
+
+# --- MEJORA DE AUTOCURACIÓN ---
+# 1. Instalamos poetry
+# 2. Desactivamos venv (usamos el global de la imagen)
+# 3. Sincronizamos el lock al vuelo para evitar el error de "changed significantly"
+# 4. Instalamos solo lo necesario para producción
 RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
+    poetry lock --no-update && \
     poetry install --only main --no-root
+# ------------------------------
 
 # Copy application code
 COPY app/ ./app/
@@ -23,13 +31,8 @@ COPY migrations/ ./migrations/
 COPY alembic.ini ./alembic.ini
 
 # --- CONFIGURACIÓN DEL ENTRYPOINT ---
-# 1. Copiamos el script (asegúrate de que esté en la misma carpeta que el Dockerfile)
 COPY scripts/entrypoint.sh ./scripts/entrypoint.sh
-
-# 2. Damos permisos de ejecución como root
 RUN chmod +x ./scripts/entrypoint.sh
-
-# 3. Limpieza de finales de línea (por si lo editaste en Windows)
 RUN sed -i 's/\r$//' ./scripts/entrypoint.sh
 # ------------------------------------
 
@@ -47,7 +50,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD ["curl", "-f", "http://localhost:8000/docs"]
 
-# USAR EL ENTRYPOINT PARA PREPARAR LA DB (Crear Schema + Migraciones)
+# USAR EL ENTRYPOINT PARA PREPARAR LA DB
 ENTRYPOINT ["./scripts/entrypoint.sh"]
 
 # Start the application
