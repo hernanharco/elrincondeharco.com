@@ -26,33 +26,47 @@ while True:
         time.sleep(1)
 "
 
-# 2. Asegurar el Schema
-echo "🛠️ Asegurando que el mundo '${PGSCHEMA}' exista..."
+# 2. Asegurar el Schema (Versión Robusta)
+echo "🛠️ Asegurando que el esquema '${PGSCHEMA}' exista..."
 python -c "
-from sqlalchemy import create_engine, text
 import os
-url = os.getenv('DATABASE_URL')
+from sqlalchemy import create_engine, text
+
+# Extraemos las piezas del .env
+user = os.getenv('PGUSER')
+password = os.getenv('PGPASSWORD')
+host = os.getenv('PGHOST')
+port = os.getenv('PGPORT', '5432')
+db = os.getenv('PGDATABASE')
 schema = os.getenv('PGSCHEMA')
-if not url or not schema:
-    print('❌ Error: DATABASE_URL o PGSCHEMA no definidos.')
+
+if not all([user, password, host, db, schema]):
+    print(f'❌ Error: Faltan variables de entorno. Schema: {schema}')
     exit(1)
 
-engine = create_engine(url)
-with engine.connect() as conn:
-    conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS {schema}'))
-    conn.commit()
-    print(f'✅ Schema {schema} verificado.')
+# Construimos la URL de conexión base
+url = f'postgresql+psycopg://{user}:{password}@{host}:{port}/{db}?sslmode=disable'
+
+try:
+    engine = create_engine(url)
+    with engine.connect() as conn:
+        # Usamos AUTOCOMMIT para ejecutar comandos de creación de schema (DDL)
+        conn.execution_options(isolation_level='AUTOCOMMIT').execute(text(f'CREATE SCHEMA IF NOT EXISTS {schema}'))
+        print(f'✅ Schema \"{schema}\" verificado o creado con éxito.')
+except Exception as e:
+    print(f'❌ Error al crear el schema: {e}')
+    exit(1)
 "
 
-# 3. Migraciones (Con captura de errores para evitar paros críticos)
+# 3. Migraciones
 echo "📑 Ejecutando migraciones..."
 if alembic upgrade head; then
     echo "✅ Migraciones aplicadas con éxito."
 else
-    echo "⚠️  ADVERTENCIA: Las migraciones fallaron o ya estaban aplicadas."
-    echo "Si el error es 'index already exists' o 'index does not exist', puedes ignorarlo si la DB ya tiene la estructura."
+    echo "⚠️  ADVERTENCIA: Las migraciones fallaron o no hay cambios pendientes."
+    echo "Si es la primera vez, asegúrate de que tus modelos estén vinculados a Base."
 fi
 
 # 4. Lanzar Aplicación
-echo "🚀 Iniciando servidor..."
+echo "🚀 Iniciando servidor FastAPI..."
 exec python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
