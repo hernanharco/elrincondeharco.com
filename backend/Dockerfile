@@ -1,57 +1,42 @@
-# Use Python 3.12 slim as base
+# 1. Usamos una imagen base ligera de Python 3.12
 FROM python:3.12-slim
 
-# Install system dependencies (incluimos libpq-dev para psycopg)
+# 2. Variables de entorno para optimizar Python en Docker
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_CACHE_DIR='/tmp/poetry_cache'
+
+# 3. Instalamos dependencias del sistema necesarias (libpq-dev para PostgreSQL)
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
+# 4. Establecemos el directorio de trabajo
 WORKDIR /app
 
-# Copy requirements and install
+# 5. Copiamos los archivos de dependencias primero (mejor aprovechamiento de caché)
 COPY pyproject.toml poetry.lock* ./
 
-# --- MEJORA DE AUTOCURACIÓN ---
-# 1. Instalamos poetry
-# 2. Desactivamos venv (usamos el global de la imagen)
-# 3. Sincronizamos el lock al vuelo para evitar el error de "changed significantly"
-# 4. Instalamos solo lo necesario para producción
-RUN pip install --no-cache-dir poetry && \
-    poetry config virtualenvs.create false && \
+# 6. Instalamos Poetry, sincronizamos el lock si hubo cambios y bajamos dependencias
+# El comando 'poetry lock --no-update' es el que evita el error que tenías
+RUN pip install --no-cache-dir poetry==2.0.1 && \
     poetry lock --no-update && \
-    poetry install --only main --no-root
-# ------------------------------
+    poetry install --only main --no-root && \
+    rm -rf $POETRY_CACHE_DIR
 
-# Copy application code
-COPY app/ ./app/
-COPY migrations/ ./migrations/
-COPY alembic.ini ./alembic.ini
+# 7. Copiamos el resto del código del proyecto
+COPY . .
 
-# --- CONFIGURACIÓN DEL ENTRYPOINT ---
-COPY scripts/entrypoint.sh ./scripts/entrypoint.sh
-RUN chmod +x ./scripts/entrypoint.sh
-RUN sed -i 's/\r$//' ./scripts/entrypoint.sh
-# ------------------------------------
+# 8. Instalamos el proyecto (si fuera necesario para el path)
+RUN poetry install --only main
 
-# Create non-root user y cambiar dueño de la carpeta /app
-RUN useradd --create-home --shell /bin/bash app && \
-    chown -R app:app /app
-
-# Cambiamos al usuario app
-USER app
-
-# Expose port
+# 9. Exponemos el puerto del backend (FastAPI suele usar 8000 o 8080)
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD ["curl", "-f", "http://localhost:8000/docs"]
-
-# USAR EL ENTRYPOINT PARA PREPARAR LA DB
-ENTRYPOINT ["./scripts/entrypoint.sh"]
-
-# Start the application
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 10. Comando para ejecutar la aplicación con Uvicorn
+# Ajusta 'main:app' según el nombre de tu archivo de entrada
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
