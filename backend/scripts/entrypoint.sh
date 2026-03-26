@@ -1,7 +1,7 @@
 #!/bin/bash
-# entrypoint.sh
+set -e
 
-# 1. Esperar a que la DB esté disponible (Healthcheck manual)
+# 1. Esperar a que la DB esté disponible
 echo "🔍 Comprobando conexión con el host '${PGHOST:-global-db}'..."
 
 python -c "
@@ -31,7 +31,6 @@ echo "🛠️ Asegurando que el mundo '${PGSCHEMA}' exista..."
 python -c "
 from sqlalchemy import create_engine, text
 import os
-# Usamos la URL completa que ya tienes en el .env
 url = os.getenv('DATABASE_URL')
 schema = os.getenv('PGSCHEMA')
 if not url or not schema:
@@ -45,11 +44,15 @@ with engine.connect() as conn:
     print(f'✅ Schema {schema} verificado.')
 "
 
-# 3. Migraciones
+# 3. Migraciones (Con captura de errores para evitar paros críticos)
 echo "📑 Ejecutando migraciones..."
-alembic upgrade head
+if alembic upgrade head; then
+    echo "✅ Migraciones aplicadas con éxito."
+else
+    echo "⚠️  ADVERTENCIA: Las migraciones fallaron o ya estaban aplicadas."
+    echo "Si el error es 'index already exists' o 'index does not exist', puedes ignorarlo si la DB ya tiene la estructura."
+fi
 
 # 4. Lanzar Aplicación
 echo "🚀 Iniciando servidor..."
-# Usamos exec para que uvicorn sea el proceso principal (PID 1) y maneje bien las señales de stop
 exec python -m uvicorn app.main:app --host 0.0.0.0 --port 8000

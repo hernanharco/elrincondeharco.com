@@ -29,8 +29,23 @@ case "${1:-help}" in
     "prod")
         log "Iniciando Backend + DB en modo producción..."
         check_env
+        
+        # Levantamos los servicios
         $DOCKER_COMPOSE up --build -d
-        success "Servicios iniciados en segundo plano."
+        
+        log "Verificando estabilidad del contenedor (5s)..."
+        sleep 5
+        
+        # Buscamos cualquier contenedor del proyecto que esté en estado 'running'
+        # Esto evita errores si el nombre del servicio varía entre entornos
+        RUNNING_CONTAINERS=$($DOCKER_COMPOSE ps --filter "status=running" -q)
+        
+        if [ -z "$RUNNING_CONTAINERS" ]; then
+            error "Ningún contenedor está corriendo. Revisa los logs con: ./scripts/setup.sh logs"
+        else
+            success "Servicios iniciados y estables en segundo plano."
+            log "Puedes ver los logs en tiempo real con: ./scripts/setup.sh logs"
+        fi
         ;;
     "stop")
         log "Deteniendo servicios..."
@@ -43,7 +58,7 @@ case "${1:-help}" in
         $DOCKER_COMPOSE ps
         ;;
     *)
-        echo "Uso: $0 {prod|stop|logs|status}"
+        echo -e "${BLUE}Uso:${NC} $0 {prod|stop|logs|status}"
         exit 1
         ;;
 esac
