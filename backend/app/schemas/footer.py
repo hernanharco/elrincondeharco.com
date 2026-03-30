@@ -33,4 +33,4 @@ class FooterResponse(BaseModel):
     quick_links: List[Dict[str, str]]
 
     class Config:
-        orm_mode = True
+        model_config = {"from_attributes": True}
