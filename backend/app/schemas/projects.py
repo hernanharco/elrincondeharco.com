@@ -32,4 +32,4 @@ class ProjectResponse(BaseModel):
     github_url: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        model_config = {"from_attributes": True}

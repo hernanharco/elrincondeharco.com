@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     local_time = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
     print(f"🌍 Timezone: {local_tz} | 🕒 Local Time: {local_time}")
 
-    print("--- Verificando conexión a NEON (development) ---")
+    print("--- Verificando conexión a PostgresSQL (DOKPLOY) ---")
     try:
         async with engine.begin() as conn:
             # Función interna para inspeccionar tablas existentes
