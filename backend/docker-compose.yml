@@ -5,11 +5,12 @@ services:
       dockerfile: Dockerfile
     container_name: elrincon-backend
     restart: always
+    # Mantenemos los puertos para que puedas acceder desde fuera al puerto 8000
     ports:
       - "8000:8000"
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-production}
-      # Pasamos las variables del .env al contenedor
+      # Estas variables se inyectarán desde tu archivo .env
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
       - PGDATABASE=${PGDATABASE}
@@ -20,9 +21,11 @@ services:
     env_file:
       - .env
     networks:
-      - harco_network
+      - dokploy-network
 
 networks:
-  harco_network:
-    name: harco_network
+  dokploy-network:
+    name: dokploy-network
+    # IMPORTANTE: Como vimos en tu terminal, esta red es de tipo 'overlay' y 'swarm'.
+    # Al marcarla como external, el compose se unirá a ella.
     external: true
