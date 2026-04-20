@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     stack,
     footer,
     site_settings,
+    showroom,
 )
 
 api_router = APIRouter()
@@ -19,6 +20,7 @@ api_router.include_router(passions.router, prefix="/passions", tags=["passions"]
 api_router.include_router(projects.router, prefix="/projects", tags=["projects"])
 api_router.include_router(stack.router, prefix="/stacks", tags=["stacks"])
 api_router.include_router(footer.router, prefix="/footers", tags=["footers"])
+api_router.include_router(showroom.router, prefix="/showrooms", tags=["showrooms"])
 api_router.include_router(
     site_settings.router, prefix="/site-settings", tags=["site-settings"]
 )

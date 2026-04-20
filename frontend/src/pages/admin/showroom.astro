@@ -1,0 +1,10 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ShowroomEditor from '../../components/admin/ShowroomEditor.svelte';
+
+const currentPath = Astro.url.pathname;
+---
+
+<AdminLayout title="Showroom" currentPath={currentPath}>
+  <ShowroomEditor client:load />
+</AdminLayout>

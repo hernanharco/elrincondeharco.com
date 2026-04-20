@@ -6,7 +6,7 @@
 
 # Levantar servidor en modo desarrollo (reload) make dev
 dev:
-	poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+	poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 
 # Levantar servidor en modo producción
 start:
