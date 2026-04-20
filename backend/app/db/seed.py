@@ -57,7 +57,7 @@ async def seed_heroes(db):
     item = Hero(
         title="Desarrollador Full Stack",
         subtitle="Hernan Arango Cortes",
-        description="Transformando 14+ años de experiencia...",
+        description="Transformando 14+ años de experiencia en liderazgo y análisis en soluciones tecnológicas innovadoras. Mi familia es mi motor, la tecnología mi pasión, y el emprendimiento mi camino hacia el futuro.",
         contact_button_text="Contactar",
         cv_button_text="Descargar CV",
         cv_url=cv_url
