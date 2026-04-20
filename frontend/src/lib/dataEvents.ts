@@ -1,7 +1,7 @@
 // Sistema de eventos para sincronizar cambios entre admin y componentes públicos
 
 // Tipos de datos válidos para eventos
-type DataType = 'hero' | 'about' | 'stack' | 'projects' | 'passions' | 'footer' | 'site-settings';
+type DataType = 'hero' | 'about' | 'stack' | 'projects' | 'passions' | 'footer' | 'site-settings' | 'showroom';
 
 type DataChangeEvent = CustomEvent<{
   type: DataType;

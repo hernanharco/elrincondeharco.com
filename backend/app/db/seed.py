@@ -10,6 +10,7 @@ from app.models.projects import Project
 from app.models.stack import Stack
 from app.models.site_settings import SiteSettings
 from app.models.footer import Footer
+from app.models.showroom import Showroom
 
 
 def fix_cloudinary_pdf(url: str) -> str:
@@ -40,7 +41,7 @@ async def seed_site_settings(db):
             "github": "https://github.com/hernanharco",
             "linkedin": "https://www.linkedin.com/in/hernan-harco/",
         },
-        is_active=True
+        is_active=True,
     )
     db.add(item)
 
@@ -60,7 +61,7 @@ async def seed_heroes(db):
         description="Transformando 14+ años de experiencia en liderazgo y análisis en soluciones tecnológicas innovadoras. Mi familia es mi motor, la tecnología mi pasión, y el emprendimiento mi camino hacia el futuro.",
         contact_button_text="Contactar",
         cv_button_text="Descargar CV",
-        cv_url=cv_url
+        cv_url=cv_url,
     )
     db.add(item)
 
@@ -107,22 +108,22 @@ async def seed_projects(db):
             description="Plataforma de gestión para taller de tapicería. Seguimiento de pedidos e inventario.",
             tags=["Vite", "Neon", "Django", "Tailwind"],
             icon_name="Layers",
-            color="from-amber-500/20 to-orange-600/20"
+            color="from-amber-500/20 to-orange-600/20",
         ),
         Project(
             title="CoreAppointment",
             description="Sistema modular de gestión de citas y turnos multi-tenant.",
             tags=["FastAPI", "Svelte", "PostgreSQL"],
             icon_name="Calendar",
-            color="from-blue-500/20 to-cyan-600/20"
+            color="from-blue-500/20 to-cyan-600/20",
         ),
         Project(
             title="Módulo de Seguridad",
             description="Autenticación robusta con JWT y OAuth2 para aplicaciones FastAPI.",
             tags=["FastAPI", "JWT", "Security"],
             icon_name="Lock",
-            color="from-pink-500/20 to-rose-600/20"
-        )
+            color="from-pink-500/20 to-rose-600/20",
+        ),
     ]
     db.add_all(items)
 
@@ -133,42 +134,257 @@ async def seed_stacks(db):
 
     items = [
         # FRONTEND
-        Stack(name="HTML5", category="Frontend", icon="Globe", description="Estructura Web", color="text-orange-500", border="group-hover:border-orange-500/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.3)]"),
-        Stack(name="CSS3", category="Frontend", icon="Palette", description="Estilos Modernos", color="text-blue-500", border="group-hover:border-blue-500/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]"),
-        Stack(name="Tailwind CSS", category="Frontend", icon="Palette", description="Estilos Utilitarios", color="text-cyan-400", border="group-hover:border-cyan-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"),
-        Stack(name="JavaScript", category="Frontend", icon="FileCode2", description="Interactividad", color="text-yellow-400", border="group-hover:border-yellow-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(250,204,21,0.3)]"),
-        Stack(name="TypeScript", category="Frontend", icon="FileCode2", description="JS Tipado", color="text-blue-400", border="group-hover:border-blue-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(96,165,250,0.3)]"),
-        Stack(name="React", category="Frontend", icon="Atom", description="Interfaces interactivas", color="text-cyan-400", border="group-hover:border-cyan-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"),
-        Stack(name="Astro", category="Frontend", icon="Rocket", description="Webs ultra rápidas", color="text-orange-400", border="group-hover:border-orange-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(251,146,60,0.3)]"),
-        Stack(name="Next.js", category="Frontend", icon="LayoutTemplate", description="Framework de producción", color="text-white", border="group-hover:border-white/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)]"),
-
+        Stack(
+            name="HTML5",
+            category="Frontend",
+            icon="Globe",
+            description="Estructura Web",
+            color="text-orange-500",
+            border="group-hover:border-orange-500/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.3)]",
+        ),
+        Stack(
+            name="CSS3",
+            category="Frontend",
+            icon="Palette",
+            description="Estilos Modernos",
+            color="text-blue-500",
+            border="group-hover:border-blue-500/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]",
+        ),
+        Stack(
+            name="Tailwind CSS",
+            category="Frontend",
+            icon="Palette",
+            description="Estilos Utilitarios",
+            color="text-cyan-400",
+            border="group-hover:border-cyan-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]",
+        ),
+        Stack(
+            name="JavaScript",
+            category="Frontend",
+            icon="FileCode2",
+            description="Interactividad",
+            color="text-yellow-400",
+            border="group-hover:border-yellow-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(250,204,21,0.3)]",
+        ),
+        Stack(
+            name="TypeScript",
+            category="Frontend",
+            icon="FileCode2",
+            description="JS Tipado",
+            color="text-blue-400",
+            border="group-hover:border-blue-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(96,165,250,0.3)]",
+        ),
+        Stack(
+            name="React",
+            category="Frontend",
+            icon="Atom",
+            description="Interfaces interactivas",
+            color="text-cyan-400",
+            border="group-hover:border-cyan-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]",
+        ),
+        Stack(
+            name="Astro",
+            category="Frontend",
+            icon="Rocket",
+            description="Webs ultra rápidas",
+            color="text-orange-400",
+            border="group-hover:border-orange-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(251,146,60,0.3)]",
+        ),
+        Stack(
+            name="Next.js",
+            category="Frontend",
+            icon="LayoutTemplate",
+            description="Framework de producción",
+            color="text-white",
+            border="group-hover:border-white/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)]",
+        ),
         # BACKEND
-        Stack(name="Python", category="Backend", icon="Terminal", description="Lenguaje Versátil", color="text-yellow-300", border="group-hover:border-yellow-300/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(253,224,71,0.3)]"),
-        Stack(name="FastAPI", category="Backend", icon="Zap", description="APIs rápidas con Python", color="text-teal-400", border="group-hover:border-teal-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(45,212,191,0.3)]"),
-        Stack(name="Django", category="Backend", icon="Layers", description="Framework Web Robusto", color="text-green-600", border="group-hover:border-green-600/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(22,163,74,0.3)]"),
-        Stack(name="API REST", category="Backend", icon="Server", description="Arquitectura de APIs", color="text-indigo-400", border="group-hover:border-indigo-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(129,140,248,0.3)]"),
-        Stack(name="JWT", category="Backend", icon="Lock", description="Seguridad & Auth", color="text-pink-500", border="group-hover:border-pink-500/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(236,72,153,0.3)]"),
-        Stack(name="MongoDB", category="Backend", icon="Database", description="NoSQL escalable", color="text-green-400", border="group-hover:border-green-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(74,222,128,0.3)]"),
-        Stack(name="NEON", category="Backend", icon="Server", description="Postgres Serverless", color="text-blue-400", border="group-hover:border-blue-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(96,165,250,0.3)]"),
-
+        Stack(
+            name="Python",
+            category="Backend",
+            icon="Terminal",
+            description="Lenguaje Versátil",
+            color="text-yellow-300",
+            border="group-hover:border-yellow-300/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(253,224,71,0.3)]",
+        ),
+        Stack(
+            name="FastAPI",
+            category="Backend",
+            icon="Zap",
+            description="APIs rápidas con Python",
+            color="text-teal-400",
+            border="group-hover:border-teal-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(45,212,191,0.3)]",
+        ),
+        Stack(
+            name="Django",
+            category="Backend",
+            icon="Layers",
+            description="Framework Web Robusto",
+            color="text-green-600",
+            border="group-hover:border-green-600/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(22,163,74,0.3)]",
+        ),
+        Stack(
+            name="API REST",
+            category="Backend",
+            icon="Server",
+            description="Arquitectura de APIs",
+            color="text-indigo-400",
+            border="group-hover:border-indigo-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(129,140,248,0.3)]",
+        ),
+        Stack(
+            name="JWT",
+            category="Backend",
+            icon="Lock",
+            description="Seguridad & Auth",
+            color="text-pink-500",
+            border="group-hover:border-pink-500/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(236,72,153,0.3)]",
+        ),
+        Stack(
+            name="MongoDB",
+            category="Backend",
+            icon="Database",
+            description="NoSQL escalable",
+            color="text-green-400",
+            border="group-hover:border-green-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(74,222,128,0.3)]",
+        ),
+        Stack(
+            name="NEON",
+            category="Backend",
+            icon="Server",
+            description="Postgres Serverless",
+            color="text-blue-400",
+            border="group-hover:border-blue-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(96,165,250,0.3)]",
+        ),
         # DEVOPS
-        Stack(name="Docker", category="DevOps", icon="Container", description="Contenedorización", color="text-blue-500", border="group-hover:border-blue-500/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]"),
-        Stack(name="Git", category="DevOps", icon="GitBranch", description="Control de versiones", color="text-red-500", border="group-hover:border-red-500/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(239,68,68,0.3)]"),
-        Stack(name="GitHub", category="DevOps", icon="Github", description="Colaboración", color="text-white", border="group-hover:border-white/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)]"),
-        Stack(name="Vercel", category="DevOps", icon="Triangle", description="Deploy Frontend", color="text-gray-200", border="group-hover:border-gray-200/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(229,231,235,0.2)]"),
-        Stack(name="Render", category="DevOps", icon="Cloud", description="Cloud Hosting", color="text-purple-400", border="group-hover:border-purple-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(192,132,252,0.3)]"),
-
+        Stack(
+            name="Docker",
+            category="DevOps",
+            icon="Container",
+            description="Contenedorización",
+            color="text-blue-500",
+            border="group-hover:border-blue-500/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]",
+        ),
+        Stack(
+            name="Git",
+            category="DevOps",
+            icon="GitBranch",
+            description="Control de versiones",
+            color="text-red-500",
+            border="group-hover:border-red-500/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(239,68,68,0.3)]",
+        ),
+        Stack(
+            name="GitHub",
+            category="DevOps",
+            icon="Github",
+            description="Colaboración",
+            color="text-white",
+            border="group-hover:border-white/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.2)]",
+        ),
+        Stack(
+            name="Vercel",
+            category="DevOps",
+            icon="Triangle",
+            description="Deploy Frontend",
+            color="text-gray-200",
+            border="group-hover:border-gray-200/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(229,231,235,0.2)]",
+        ),
+        Stack(
+            name="Render",
+            category="DevOps",
+            icon="Cloud",
+            description="Cloud Hosting",
+            color="text-purple-400",
+            border="group-hover:border-purple-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(192,132,252,0.3)]",
+        ),
         # HERRAMIENTAS
-        Stack(name="VS Code", category="Herramientas", icon="Code2", description="Editor de Código", color="text-blue-500", border="group-hover:border-blue-500/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]"),
-        Stack(name="Postman", category="Herramientas", icon="Send", description="Testing de APIs", color="text-orange-500", border="group-hover:border-orange-500/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.3)]"),
-        Stack(name="IA & LLMs", category="Herramientas", icon="BrainCircuit", description="Inteligencia Artificial", color="text-rose-400", border="group-hover:border-rose-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(251,113,133,0.3)]"),
-        Stack(name="Optimización", category="Herramientas", icon="Gauge", description="Performance Web", color="text-yellow-400", border="group-hover:border-yellow-400/50", glow="group-hover:shadow-[0_0_30px_-5px_rgba(250,204,21,0.3)]"),
+        Stack(
+            name="VS Code",
+            category="Herramientas",
+            icon="Code2",
+            description="Editor de Código",
+            color="text-blue-500",
+            border="group-hover:border-blue-500/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]",
+        ),
+        Stack(
+            name="Postman",
+            category="Herramientas",
+            icon="Send",
+            description="Testing de APIs",
+            color="text-orange-500",
+            border="group-hover:border-orange-500/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.3)]",
+        ),
+        Stack(
+            name="IA & LLMs",
+            category="Herramientas",
+            icon="BrainCircuit",
+            description="Inteligencia Artificial",
+            color="text-rose-400",
+            border="group-hover:border-rose-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(251,113,133,0.3)]",
+        ),
+        Stack(
+            name="Optimización",
+            category="Herramientas",
+            icon="Gauge",
+            description="Performance Web",
+            color="text-yellow-400",
+            border="group-hover:border-yellow-400/50",
+            glow="group-hover:shadow-[0_0_30px_-5px_rgba(250,204,21,0.3)]",
+        ),
+    ]
+    db.add_all(items)
+
+
+async def seed_showrooms(db):
+    print("  ðŸ’» Seeding Showroom...")
+    await db.execute(delete(Showroom))
+    items = [
+        Showroom(
+            title="Tapicería Moderna",
+            description="Sistema completo de gestión para taller de tapicería con seguimiento de pedidos en tiempo real.",
+            category="Web App",
+            deploy_url="https://tapiceria-moderna.vercel.app",
+        ),
+        Showroom(
+            title="CoreAppointment",
+            description="Plataforma multi-tenant de gestión de citas y turnos con calendario integrado.",
+            category="SaaS",
+            deploy_url="https://core-appointment-demo.vercel.app",
+        ),
+        Showroom(
+            title="Portfolio Personal",
+            description="Mi portfolio personal desarrollado con Astro y optimizado para rendimiento máximo.",
+            category="Portfolio",
+            deploy_url="https://elrincondeharco.com",
+        ),
     ]
     db.add_all(items)
 
 
 async def seed_footers(db):
-    print("  🦶 Seeding Footer...")
+    print("  ðŸ‘  Seeding Footer...")
     await db.execute(delete(Footer))
     item = Footer(
         name="Hernan Arango Cortes",
@@ -178,8 +394,8 @@ async def seed_footers(db):
         quick_links=[
             {"text": "Inicio", "href": "#inicio"},
             {"text": "Sobre Mí", "href": "#sobre-mi"},
-            {"text": "Stack", "href": "#stack"}
-        ]
+            {"text": "Stack", "href": "#stack"},
+        ],
     )
     db.add(item)
 
@@ -187,7 +403,9 @@ async def seed_footers(db):
 async def main():
     async with AsyncSessionLocal() as db:
         try:
-            print("\n🚀 Iniciando sincronización de base de datos (Seed) en Neon/PostgreSQL...")
+            print(
+                "\n🚀 Iniciando sincronización de base de datos (Seed) en Neon/PostgreSQL..."
+            )
 
             await seed_site_settings(db)
             await seed_heroes(db)
@@ -195,6 +413,7 @@ async def main():
             await seed_passions(db)
             await seed_projects(db)
             await seed_stacks(db)
+            await seed_showrooms(db)
             await seed_footers(db)
 
             await db.commit()
