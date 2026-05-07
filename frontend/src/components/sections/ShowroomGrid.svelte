@@ -50,7 +50,7 @@
     <!-- Header -->
     <div class="text-center mb-16">
       <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-        Showroom de <span class="text-amber-400">Prototipos</span>
+        Bocetos de <span class="text-amber-400">Innovacción</span>
       </h1>
       <p class="text-xl text-zinc-400 max-w-2xl mx-auto">
         Explora mis diseños y prototipos funcionales ya desplegados en producción
