@@ -31,26 +31,26 @@
   });
 
   function getIcon(iconName: string): string {
-  if (!iconName) return 'lucide:layers';
+    if (!iconName) return 'lucide:layers';
 
-  // Convertir PascalCase → kebab-case: "ExternalLink" → "external-link"
-  const kebab = iconName
-    .replace(/([A-Z])/g, (match, letter, offset) =>
-      offset > 0 ? '-' + letter.toLowerCase() : letter.toLowerCase()
-    )
-    .replace(/(\d+)/g, '-$1')
-    .replace(/--+/g, '-')
-    .replace(/-+$/, '');
+    // Convertir PascalCase → kebab-case: "ExternalLink" → "external-link"
+    const kebab = iconName
+      .replace(/([A-Z])/g, (match, letter, offset) =>
+        offset > 0 ? '-' + letter.toLowerCase() : letter.toLowerCase(),
+      )
+      .replace(/(\d+)/g, '-$1')
+      .replace(/--+/g, '-')
+      .replace(/-+$/, '');
 
-  // Renombrados de Lucide v0.468+
-  const renames: Record<string, string> = {
-    'globe': 'earth',
-    'globe-icon': 'earth',
-  };
+    // Renombrados de Lucide v0.468+
+    const renames: Record<string, string> = {
+      globe: 'earth',
+      'globe-icon': 'earth',
+    };
 
-  const resolved = renames[kebab] || kebab;
-  return `lucide:${resolved}`;
-}
+    const resolved = renames[kebab] || kebab;
+    return `lucide:${resolved}`;
+  }
 </script>
 
 <section id="proyectos" class="py-24 bg-zinc-900 text-white">
@@ -152,6 +152,23 @@
           </div>
         {/each}
       {/if}
+    </div>
+
+    <!-- Botón Explorar Showroom -->
+    <div class="text-center mt-16">
+      <a
+        href="/showroom"
+        class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25 group"
+      >
+        <Icon icon="lucide:rocket" width={20} height={20} />
+        <span>Bocetos de Innovación</span>
+        <Icon
+          icon="lucide:arrow-right"
+          width={16}
+          height={16}
+          class="transition-transform duration-300 group-hover:translate-x-1"
+        />
+      </a>
     </div>
   </div>
 </section>
