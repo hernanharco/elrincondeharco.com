@@ -1,4 +1,10 @@
-const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
+/**
+ * Configuración de API para Portfolio.
+ * El JWT viaja en cookie httpOnly (HTTP Only Cookie) en vez de localStorage.
+ * La cookie la setea authCore (Google OAuth) o el backend de Portfolio (login con credenciales).
+ */
+
+ const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
 
 export async function fetchApi<T>(
   endpoint: string,
@@ -6,22 +12,22 @@ export async function fetchApi<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  const config: RequestInit = {
-    ...options,
-    headers: { ...options?.headers },
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>),
   };
 
-  if (!(options?.body instanceof FormData)) {
-    config.headers = {
-      ...config.headers,
-      "Content-Type": "application/json",
-    };
-  }
+  // La cookie httpOnly se envía automáticamente con credentials: 'include'
+  const config: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include',
+  };
 
   const response = await fetch(url, config);
 
   if (!response.ok) {
-    let errorMessage = "Error desconocido del servidor";
+    let errorMessage = 'Error desconocido del servidor';
     try {
       const errorData = await response.json();
       errorMessage = errorData.detail || errorMessage;

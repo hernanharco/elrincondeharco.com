@@ -1,5 +1,6 @@
 import os
 import re
+import asyncio
 import cloudinary
 import cloudinary.uploader
 from fastapi import UploadFile, HTTPException
@@ -47,7 +48,7 @@ async def upload_image(file: UploadFile) -> str:
         else:
             upload_kwargs["public_id"] = clean_name
 
-        result = cloudinary.uploader.upload(contents, **upload_kwargs)
+        result = await asyncio.to_thread(cloudinary.uploader.upload, contents, **upload_kwargs)
 
         secure_url = result.get("secure_url")
         if not secure_url:

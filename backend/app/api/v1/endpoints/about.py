@@ -6,6 +6,8 @@ from app.db.session import get_db
 from app.core.cloudinary import upload_image
 from app.models.about import About
 from app.schemas.about import AboutCreate, AboutUpdate, AboutResponse
+from app.core.security import get_current_admin_user
+from typing import Any, Dict
 
 async def get_about_form(
     title: str = Form(...),
@@ -81,7 +83,8 @@ async def get_latest(db: AsyncSession = Depends(get_db)):
 async def create(
     form_data: AboutCreate = Depends(get_about_form),
     image: Optional[UploadFile] = File(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     image_url = None
     if image and image.filename:
@@ -97,7 +100,8 @@ async def update(
     id: int,
     form_data: AboutUpdate = Depends(get_about_update_form),
     image: Optional[UploadFile] = File(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(About, id)
     if not obj:
@@ -111,7 +115,10 @@ async def update(
     return obj
 
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db)):
+async def delete(id: int, db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
+    obj = await db.get
     obj = await db.get(About, id)
     if not obj:
         raise HTTPException(status_code=404, detail="About no encontrado")

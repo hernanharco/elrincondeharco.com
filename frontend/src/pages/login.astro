@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LoginForm from '../components/auth/LoginForm.svelte';
+
+const redirect = Astro.url.searchParams.get('redirect') || '/admin';
+---
+
+<Layout title="Iniciar sesión — Admin">
+  <main class="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
+    <div class="w-full max-w-sm">
+      <!-- Logo / Brand -->
+      <div class="text-center mb-8">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500
+                    flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/20">
+          <span class="text-zinc-900 font-bold text-xl">H</span>
+        </div>
+        <h1 class="text-2xl font-bold text-zinc-100">Panel de Administración</h1>
+        <p class="text-zinc-500 text-sm mt-1">Iniciá sesión con tu cuenta de authCore</p>
+      </div>
+
+      <!-- Formulario -->
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-xl">
+        <LoginForm client:load redirectParam={redirect} />
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-zinc-600 text-xs mt-6">
+        ¿No tenés cuenta? Contactá al administrador del sistema
+      </p>
+    </div>
+  </main>
+</Layout>

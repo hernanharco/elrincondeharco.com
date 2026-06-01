@@ -6,6 +6,8 @@ from app.db.session import get_db
 from app.core.cloudinary import upload_image
 from app.models.hero import Hero
 from app.schemas.hero import HeroCreate, HeroUpdate, HeroResponse
+from app.core.security import get_current_admin_user
+from typing import Any, Dict
 
 async def get_hero_form(
     title: str = Form(...),
@@ -69,7 +71,8 @@ async def get_latest(db: AsyncSession = Depends(get_db)):
 async def create(
     form_data: HeroCreate = Depends(get_hero_form),
     image: Optional[UploadFile] = File(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     image_url = None
     if image and image.filename:
@@ -86,7 +89,8 @@ async def update(
     form_data: HeroUpdate = Depends(get_hero_update_form),
     image: Optional[UploadFile] = File(None),
     cv_file: Optional[UploadFile] = File(None), # <-- Nuevo parámetro
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(Hero, id)
     if not obj:
@@ -110,7 +114,10 @@ async def update(
     return obj
 
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db)):
+async def delete(id: int, db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
+    obj = await db.get
     obj = await db.get(Hero, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Hero no encontrado")

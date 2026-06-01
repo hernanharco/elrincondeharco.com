@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     local_time = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
     
     # 1. Obtener el nombre del esquema desde el .env
-    schema_name = getattr(settings, "PGSCHEMA", "elrincondeharco")
+    schema_name = settings.pg_schema
     print(f"🌍 {local_time} | Esquema objetivo: {schema_name}")
 
     try:
@@ -71,4 +71,4 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
-    return {"message": "✅ Backend en línea", "schema": settings.PGSCHEMA}
+    return {"message": "✅ Backend en línea", "schema": settings.pg_schema}

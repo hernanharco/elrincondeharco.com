@@ -24,6 +24,12 @@ class Settings(BaseSettings):
     cloudinary_api_key: str = Field(..., alias="CLOUDINARY_API_KEY")
     cloudinary_api_secret: str = Field(..., alias="CLOUDINARY_API_SECRET")
 
+    # authCore — validación de JWT
+    authcore_jwks_url: str = Field(
+        "http://localhost:8000/.well-known/jwks.json",
+        alias="AUTHCORE_JWKS_URL",
+    )
+
     @computed_field
     @property
     def database_url(self) -> str:

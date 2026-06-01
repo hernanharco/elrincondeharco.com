@@ -1,0 +1,123 @@
+# ============================================================
+# compose.yaml — Portfolio elRinconDeHarco (desarrollo)
+# ============================================================
+# Red compartida: se conecta con authCore vía elrincondeharco_net
+# authCore DEBE estar corriendo ANTES que Portfolio.
+#   docker network create elrincondeharco_net   (1 vez)
+#   docker compose up -d                         (en authCore/)
+#   docker compose up -d                         (en Portfolio/)
+# ============================================================
+
+services:
+  # ── Base de datos ────────────────────────────────────────────
+  portfolio-db:
+    image: postgres:16-alpine
+    container_name: portfolio-dev-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: portfolio_dev
+    volumes:
+      - portfolio_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+    networks:
+      - elrincondeharco_net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  # ── Backend FastAPI ──────────────────────────────────────────
+  portfolio-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: portfolio-dev-backend
+    entrypoint: ["/bin/bash", "/app/scripts/entrypoint.dev.sh"]
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    environment:
+      PGHOST: portfolio-db
+      PGPORT: "5432"
+      PGUSER: portfolio
+      PGPASSWORD: portfolio_dev
+      PGDATABASE: portfolio
+      PGSCHEMA: public
+      SECRET_KEY: dev-secret-key-no-usar-en-produccion
+      ENVIRONMENT: development
+      DEBUG: "true"
+      CORS_ORIGINS: '["http://localhost:4322", "http://localhost:4321"]'
+      CLOUDINARY_CLOUD_NAME: dev-placeholder
+      CLOUDINARY_API_KEY: dev-placeholder
+      CLOUDINARY_API_SECRET: dev-placeholder
+      # authCore — validación JWT (se conecta vía red compartida)
+      AUTHCORE_JWKS_URL: "http://authcore-api:8000/.well-known/jwks.json"
+      # Qué usuario de authCore es el dueño de esta landing page
+      COMPANY_USER_ID: "1"
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/scripts:/app/scripts
+      - /app/.venv
+    depends_on:
+      portfolio-db:
+        condition: service_healthy
+    networks:
+      - elrincondeharco_net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  # ── Frontend Astro ───────────────────────────────────────────
+  portfolio-web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      args:
+        PUBLIC_API_URL: "http://localhost:8001"
+    container_name: portfolio-dev-frontend
+    command: ["pnpm", "dev"]
+    restart: unless-stopped
+    ports:
+      - "4322:4322"
+    environment:
+      PUBLIC_API_URL: "http://localhost:8001"
+      PUBLIC_AUTHCORE_URL: "http://authcore-api:8000"
+      SSR_API_URL: "http://portfolio-api:8000"
+      HOST: "0.0.0.0"
+      PORT: "4322"
+      NODE_ENV: development
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/astro.config.mjs:/app/astro.config.mjs
+      - /app/node_modules
+    depends_on:
+      - portfolio-api
+    networks:
+      - elrincondeharco_net
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: "1.0"
+
+# ── Volúmenes persistentes ─────────────────────────────────────
+volumes:
+  portfolio_pgdata:
+
+# ── Red compartida con authCore ────────────────────────────────
+networks:
+  elrincondeharco_net:
+    external: true
+    name: elrincondeharco_net

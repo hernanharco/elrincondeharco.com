@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from app.api.v1.endpoints import (
+    auth,
+    company,
     example,
     hero,
     about,
@@ -13,6 +15,8 @@ from app.api.v1.endpoints import (
 
 api_router = APIRouter()
 
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+api_router.include_router(company.router, prefix="/company", tags=["company"])
 api_router.include_router(example.router, prefix="/example", tags=["example"])
 api_router.include_router(hero.router, prefix="/heroes", tags=["heroes"])
 api_router.include_router(about.router, prefix="/abouts", tags=["abouts"])

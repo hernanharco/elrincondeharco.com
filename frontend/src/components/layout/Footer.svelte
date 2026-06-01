@@ -7,17 +7,32 @@
 
   let footerData: FooterResponse | null = null;
   let siteSettings: SiteSettingsResponse | null = null;
+  let companyData: {
+    company_name: string;
+    address: string | null;
+    email: string | null;
+    phone: string | null;
+    contact_name: string | null;
+  } | null = null;
   let loading = true;
 
   async function loadAllData() {
     try {
-      // Cargamos ambos en paralelo para mayor velocidad
-      const [fResponse, sResponse] = await Promise.all([
+      // Cargamos los 3 orígenes en paralelo
+      const [fResponse, sResponse, cResponse] = await Promise.all([
         fetchApi<FooterResponse>('/api/v1/footers/latest/'),
         fetchApi<SiteSettingsResponse>('/api/v1/site-settings/latest/'),
+        fetchApi<{
+          company_name: string;
+          address: string | null;
+          email: string | null;
+          phone: string | null;
+          contact_name: string | null;
+        }>('/api/v1/company/public').catch(() => null),  // Si falla, no rompe
       ]);
       footerData = fResponse;
       siteSettings = sResponse;
+      companyData = cResponse;
     } catch (error) {
       console.error('Error cargando el footer:', error);
     } finally {
@@ -26,24 +41,24 @@
   }
 
   onMount(() => {
-    // 1. Llamamos a la carga inicial (loadAllData ya es async)
     loadAllData();
 
-    // 2. Suscripción a cambios en ambos dominios
     const cleanupFooter = listenForDataChange('footer', loadAllData);
     const cleanupSettings = listenForDataChange('site-settings', loadAllData);
 
-    // 3. El retorno es una función síncrona, como espera TypeScript
     return () => {
       cleanupFooter();
       cleanupSettings();
     };
   });
 
-  // Valores por defecto inteligentes si la DB está vacía
-  $: brandName = siteSettings?.brand_name || 'elRincondelHarco.com';
-  // $: legalName = siteSettings?.legal_name || 'Hernan Arango Cortes';
-  $: contactEmail = siteSettings?.contact_email || footerData?.email || 'hernan.harco@gmail.com';
+  // Prioridad: authCore > DB > hardcode
+  // Los datos de authCore (company_profiles) son la fuente de verdad para contacto
+  $: brandName = companyData?.company_name || siteSettings?.brand_name || 'elRincondelHarco.com';
+  $: contactEmail = companyData?.email || siteSettings?.contact_email || footerData?.email || 'hernan.harco@gmail.com';
+  $: contactAddress = companyData?.address || footerData?.location || 'Avilés, Asturias';
+  $: contactPhone = companyData?.phone || '';
+  $: contactName = companyData?.contact_name || '';
   $: currentYear = new Date().getFullYear();
 </script>
 
@@ -91,16 +106,28 @@
           Contacto
         </h3>
         <ul class="space-y-4 text-gray-400">
-          <li class="flex items-center gap-3">
-            <Icon icon="lucide:map-pin" width={18} height={18} class="text-amber-400" />
-            <span>{footerData?.location || 'Avilés, Asturias'}</span>
-          </li>
-          <li class="flex items-center gap-3">
-            <Icon icon="lucide:mail" width={18} height={18} class="text-amber-400" />
-            <a href="mailto:{contactEmail}" class="hover:text-amber-400 transition-colors truncate">
-              {contactEmail}
-            </a>
-          </li>
+          {#if contactAddress}
+            <li class="flex items-center gap-3">
+              <Icon icon="lucide:map-pin" width={18} height={18} class="text-amber-400" />
+              <span>{contactAddress}</span>
+            </li>
+          {/if}
+          {#if contactPhone}
+            <li class="flex items-center gap-3">
+              <Icon icon="lucide:phone" width={18} height={18} class="text-amber-400" />
+              <a href="tel:{contactPhone}" class="hover:text-amber-400 transition-colors">
+                {contactPhone}
+              </a>
+            </li>
+          {/if}
+          {#if contactEmail}
+            <li class="flex items-center gap-3">
+              <Icon icon="lucide:mail" width={18} height={18} class="text-amber-400" />
+              <a href="mailto:{contactEmail}" class="hover:text-amber-400 transition-colors truncate">
+                {contactEmail}
+              </a>
+            </li>
+          {/if}
 
           <li class="flex gap-5 mt-6">
             {#if siteSettings?.social_networks?.github}

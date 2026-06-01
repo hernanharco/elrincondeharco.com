@@ -10,6 +10,8 @@ from app.schemas.site_settings import (
     SiteSettingsUpdate,
     SiteSettingsResponse,
 )
+from app.core.security import get_current_admin_user
+from typing import Any, Dict
 
 # --- Helpers de Limpieza ---
 
@@ -118,6 +120,7 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
 async def create(
     form_data: SiteSettingsCreate = Depends(get_site_settings_form),
     db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     # En Pydantic v2 se prefiere model_dump() sobre dict()
     db_obj = SiteSettings(**form_data.model_dump())
@@ -131,6 +134,7 @@ async def update(
     id: int,
     form_data: SiteSettingsUpdate = Depends(get_site_settings_update_form),
     db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(SiteSettings, id)
     if not obj:
@@ -154,7 +158,10 @@ async def update(
     return obj
 
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db)):
+async def delete(id: int, db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
+    obj = await db.get
     obj = await db.get(SiteSettings, id)
     if not obj:
         raise HTTPException(status_code=404, detail="SiteSettings no encontrado")
