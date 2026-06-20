@@ -67,7 +67,7 @@ async def create(
     db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    db_obj = Stack(**form_data.dict())
+    db_obj = Stack(**form_data.model_dump())
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -83,7 +83,7 @@ async def update(
     obj = await db.get(Stack, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Stack no encontrado")
-    for key, value in form_data.dict(exclude_none=True).items():
+    for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     await db.commit()
     await db.refresh(obj)
@@ -93,7 +93,6 @@ async def update(
 async def delete(id: int, db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    obj = await db.get
     obj = await db.get(Stack, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Stack no encontrado")

@@ -36,5 +36,4 @@ class AboutResponse(BaseModel):
     experience_title: str
     experience_desc: str
 
-    class Config:
-        model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True}

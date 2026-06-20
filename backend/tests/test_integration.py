@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
 from app.models.hero import Hero
-from app.models.project import Project
+from app.models.projects import Project
 from app.models.stack import Stack
 from app.models.site_settings import SiteSettings
 
@@ -16,24 +16,24 @@ class TestIntegration:
             title="Integration Test Hero",
             subtitle="Test Subtitle",
             description="Test Description",
+            contact_button_text="Contact",
+            cv_button_text="Download CV",
+            image_url="https://example.com/hero.jpg",
             cv_url="https://example.com/cv.pdf",
-            email="integration@test.com",
-            phone="+1234567890",
-            location="Test Location"
         )
         
         db_session.add(hero)
         await db_session.commit()
         await db_session.refresh(hero)
         
-        # 2. Fetch through API
-        response = await client.get("/api/hero")
+        # 2. Fetch through API (list endpoint returns array)
+        response = await client.get("/api/v1/heroes/")
         assert response.status_code == 200
         
         # 3. Verify API response matches database
         data = response.json()
-        assert data["title"] == "Integration Test Hero"
-        assert data["email"] == "integration@test.com"
+        assert len(data) > 0
+        assert data[0]["title"] == "Integration Test Hero"
     
     async def test_projects_api_with_database(self, client: AsyncClient, db_session):
         """Test projects API with real database data."""
@@ -54,7 +54,7 @@ class TestIntegration:
         await db_session.commit()
         
         # Test API response
-        response = await client.get("/api/projects")
+        response = await client.get("/api/v1/projects/")
         assert response.status_code == 200
         
         data = response.json()
@@ -103,7 +103,7 @@ class TestIntegration:
         await db_session.commit()
         
         # Test API returns all stacks
-        response = await client.get("/api/stacks")
+        response = await client.get("/api/v1/stacks/")
         assert response.status_code == 200
         
         data = response.json()
@@ -130,7 +130,7 @@ class TestIntegration:
         await db_session.commit()
         
         # Test API response
-        response = await client.get("/api/site-settings")
+        response = await client.get("/api/v1/site-settings/")
         assert response.status_code == 200
         
         data = response.json()
@@ -141,19 +141,19 @@ class TestIntegration:
     async def test_error_handling_integration(self, client: AsyncClient):
         """Test error handling across the application."""
         # Test non-existent endpoint
-        response = await client.get("/api/nonexistent")
+        response = await client.get("/api/v1/nonexistent")
         assert response.status_code == 404
         assert "detail" in response.json()
         
         # Test invalid method
-        response = await client.post("/api/hero")
+        response = await client.post("/api/v1/heroes/")
         # This should return 405 Method Not Allowed or 422 for validation error
         assert response.status_code in [405, 422]
     
     async def test_cors_integration(self, client: AsyncClient):
         """Test CORS integration with frontend."""
         # Test preflight request
-        response = await client.options("/api/projects")
+        response = await client.options("/api/v1/projects/")
         assert response.status_code == 200
         
         # Check CORS headers
@@ -177,7 +177,7 @@ class TestIntegration:
             # Transaction will be committed automatically
         
         # Verify it's available through API
-        response = await client.get("/api/projects")
+        response = await client.get("/api/v1/projects/")
         assert response.status_code == 200
         
         data = response.json()
@@ -203,18 +203,18 @@ class TestIntegration:
         await db_session.commit()
         
         # Test all endpoints return data
-        hero_response = await client.get("/api/hero")
+        hero_response = await client.get("/api/v1/heroes/")
         assert hero_response.status_code == 200
         
-        projects_response = await client.get("/api/projects")
+        projects_response = await client.get("/api/v1/projects/")
         assert projects_response.status_code == 200
         assert len(projects_response.json()) > 0
         
-        stacks_response = await client.get("/api/stacks")
+        stacks_response = await client.get("/api/v1/stacks/")
         assert stacks_response.status_code == 200
         assert len(stacks_response.json()) > 0
         
-        settings_response = await client.get("/api/site-settings")
+        settings_response = await client.get("/api/v1/site-settings/")
         assert settings_response.status_code == 200
         assert "brand_name" in settings_response.json()
     
@@ -224,7 +224,7 @@ class TestIntegration:
         
         # Make multiple concurrent requests
         async def make_request():
-            return await client.get("/api/projects")
+            return await client.get("/api/v1/projects/")
         
         tasks = [make_request() for _ in range(10)]
         responses = await asyncio.gather(*tasks)

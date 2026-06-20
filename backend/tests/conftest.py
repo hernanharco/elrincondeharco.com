@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.core.config import settings
-from app.db.base import Base
+from app.models.base import Base
 from app.db.session import get_db
 
 # Test database URL
@@ -77,10 +77,11 @@ async def sample_hero(db_session):
         title="Test Hero",
         subtitle="Test Subtitle",
         description="Test Description",
+        background_image="https://example.com/bg.jpg",
+        contact_button_text="Contact",
+        cv_button_text="Download CV",
+        image_url="https://example.com/hero.jpg",
         cv_url="https://example.com/cv.pdf",
-        email="test@example.com",
-        phone="+1234567890",
-        location="Test Location"
     )
     
     db_session.add(hero)
@@ -93,7 +94,7 @@ async def sample_hero(db_session):
 @pytest.fixture
 async def sample_project(db_session):
     """Create a sample project for testing."""
-    from app.models.project import Project
+    from app.models.projects import Project
     
     project = Project(
         title="Test Project",

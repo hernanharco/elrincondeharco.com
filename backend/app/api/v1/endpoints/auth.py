@@ -93,7 +93,7 @@ async def login(
         max_age=expires_in,
         path="/",
         samesite="lax",
-        secure=False,  # False en desarrollo local
+        secure=not settings.debug,
     )
 
     logging.info(f"✅ Login exitoso via Portfolio proxy: {credentials.username}")
@@ -134,7 +134,7 @@ async def set_session(
         max_age=86400,  # 24h
         path="/",
         samesite="lax",
-        secure=False,
+        secure=not settings.debug,
     )
 
     return {

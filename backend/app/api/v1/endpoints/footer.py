@@ -59,13 +59,6 @@ async def get_all(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Footer))
     return result.scalars().all()
 
-@router.get("/{id}", response_model=FooterResponse)
-async def get_one(id: int, db: AsyncSession = Depends(get_db)):
-    obj = await db.get(Footer, id)
-    if not obj:
-        raise HTTPException(status_code=404, detail="Footer no encontrado")
-    return obj
-
 @router.get("/latest/", response_model=FooterResponse)
 async def get_latest(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
@@ -76,13 +69,20 @@ async def get_latest(db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No hay registros")
     return obj
 
+@router.get("/{id}", response_model=FooterResponse)
+async def get_one(id: int, db: AsyncSession = Depends(get_db)):
+    obj = await db.get(Footer, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Footer no encontrado")
+    return obj
+
 @router.post("/", response_model=FooterResponse)
 async def create(
     form_data: FooterCreate = Depends(get_footer_form),
     db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    db_obj = Footer(**form_data.dict())
+    db_obj = Footer(**form_data.model_dump())
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -98,7 +98,7 @@ async def update(
     obj = await db.get(Footer, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Footer no encontrado")
-    for key, value in form_data.dict(exclude_none=True).items():
+    for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     await db.commit()
     await db.refresh(obj)
@@ -108,7 +108,6 @@ async def update(
 async def delete(id: int, db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    obj = await db.get
     obj = await db.get(Footer, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Footer no encontrado")

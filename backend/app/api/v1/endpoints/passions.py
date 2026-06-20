@@ -58,13 +58,6 @@ async def get_all(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Passion))
     return result.scalars().all()
 
-@router.get("/{id}", response_model=PassionResponse)
-async def get_one(id: int, db: AsyncSession = Depends(get_db)):
-    obj = await db.get(Passion, id)
-    if not obj:
-        raise HTTPException(status_code=404, detail="Passion no encontrado")
-    return obj
-
 @router.get("/latest/", response_model=PassionResponse)
 async def get_latest(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
@@ -73,6 +66,13 @@ async def get_latest(db: AsyncSession = Depends(get_db)):
     obj = result.scalars().first()
     if not obj:
         raise HTTPException(status_code=404, detail="No hay registros")
+    return obj
+
+@router.get("/{id}", response_model=PassionResponse)
+async def get_one(id: int, db: AsyncSession = Depends(get_db)):
+    obj = await db.get(Passion, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Passion no encontrado")
     return obj
 
 @router.post("/", response_model=PassionResponse)
@@ -85,7 +85,7 @@ async def create(
     image_url = None
     if image and image.filename:
         image_url = await upload_image(image)
-    db_obj = Passion(**form_data.dict(), image_url=image_url)
+    db_obj = Passion(**form_data.model_dump(), image_url=image_url)
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -102,7 +102,7 @@ async def update(
     obj = await db.get(Passion, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Passion no encontrado")
-    for key, value in form_data.dict(exclude_none=True).items():
+    for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     if image and image.filename:
         obj.image_url = await upload_image(image)
@@ -114,7 +114,6 @@ async def update(
 async def delete(id: int, db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    obj = await db.get
     obj = await db.get(Passion, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Passion no encontrado")

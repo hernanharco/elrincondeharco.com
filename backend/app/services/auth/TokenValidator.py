@@ -9,6 +9,7 @@ Flujo:
 """
 
 import logging
+import time
 from typing import Dict, Any, Optional
 from jose import jwk, jwt, JWTError
 from app.core.config import settings
@@ -17,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 # Cache de la clave pública RSA construida desde JWKS
 _rsa_key_cache: Optional[jwk.RSAKey] = None
+_rsa_key_cache_time: float = 0.0
+_JWKS_CACHE_TTL: int = 3600  # 1 hora
 
 
 async def _fetch_jwks() -> dict:
@@ -51,13 +54,15 @@ def _build_rsa_key_from_jwks(jwks: dict) -> jwk.RSAKey:
 
 async def get_rsa_key() -> jwk.RSAKey:
     """
-    Retorna la clave pública RSA (con caché).
-    En producción se podría refrescar periódicamente.
+    Retorna la clave pública RSA (con caché con TTL de 1 hora).
+    Si el caché expiró, refetchea el JWKS para soportar rotación de claves.
     """
-    global _rsa_key_cache
-    if _rsa_key_cache is None:
+    global _rsa_key_cache, _rsa_key_cache_time
+    now = time.time()
+    if _rsa_key_cache is None or (now - _rsa_key_cache_time) > _JWKS_CACHE_TTL:
         jwks = await _fetch_jwks()
         _rsa_key_cache = _build_rsa_key_from_jwks(jwks)
+        _rsa_key_cache_time = now
         logger.info("✅ Clave RSA cargada desde authCore JWKS")
     return _rsa_key_cache
 
@@ -81,5 +86,6 @@ async def verify_token(token: str) -> Optional[Dict[str, Any]]:
 
 def invalidate_cache():
     """Invalida el caché (útil si authCore rota las claves)."""
-    global _rsa_key_cache
+    global _rsa_key_cache, _rsa_key_cache_time
     _rsa_key_cache = None
+    _rsa_key_cache_time = 0.0

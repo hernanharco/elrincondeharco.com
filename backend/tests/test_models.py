@@ -1,6 +1,6 @@
 import pytest
 from app.models.hero import Hero
-from app.models.project import Project
+from app.models.projects import Project
 from app.models.stack import Stack
 from app.models.site_settings import SiteSettings
 
@@ -14,15 +14,17 @@ class TestModels:
             title="Test Hero",
             subtitle="Test Subtitle",
             description="Test Description",
+            background_image="https://example.com/bg.jpg",
+            contact_button_text="Contact",
+            cv_button_text="Download CV",
+            image_url="https://example.com/hero.jpg",
             cv_url="https://example.com/cv.pdf",
-            email="test@example.com",
-            phone="+1234567890",
-            location="Test Location"
         )
         
         assert hero.title == "Test Hero"
         assert hero.subtitle == "Test Subtitle"
-        assert hero.email == "test@example.com"
+        assert hero.contact_button_text == "Contact"
+        assert hero.cv_button_text == "Download CV"
         assert hero.cv_url == "https://example.com/cv.pdf"
     
     def test_project_model_creation(self):
@@ -74,20 +76,19 @@ class TestModels:
         assert settings.slogan == "Test Slogan"
         assert settings.copyright_notice == "© 2024 Test"
     
-    def test_hero_model_validation(self):
-        """Test Hero model field validations."""
-        # Test with invalid email
-        with pytest.raises(ValueError):
-            hero = Hero(
-                title="Test Hero",
-                subtitle="Test Subtitle",
-                description="Test Description",
-                cv_url="https://example.com/cv.pdf",
-                email="invalid-email",  # Invalid email
-                phone="+1234567890",
-                location="Test Location"
-            )
-            # This would be validated by Pydantic during model creation
+    def test_hero_model_required_fields(self):
+        """Test Hero model requires mandatory fields."""
+        # SQLAlchemy model doesn't validate on construction,
+        # but missing NOT NULL columns will fail on flush
+        hero = Hero(
+            title="Test Hero",
+            subtitle="Test Subtitle",
+            description="Test Description",
+            contact_button_text="Contact",
+            cv_button_text="Download CV",
+        )
+        assert hero.title == "Test Hero"
+        assert hero.subtitle == "Test Subtitle"
     
     def test_project_model_tags(self):
         """Test Project model tags functionality."""

@@ -26,8 +26,7 @@ RUN pip install --no-cache-dir poetry==$POETRY_VERSION
 COPY pyproject.toml poetry.lock* ./
 
 # 7. Instalamos dependencias de Python
-RUN poetry lock && \
-    poetry install --only main --no-root && \
+RUN poetry install --only main --no-root && \
     rm -rf $POETRY_CACHE_DIR
 
 # 8. Copiamos el resto del código
