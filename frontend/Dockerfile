@@ -13,8 +13,8 @@ WORKDIR /app
 # Copy lockfile and package manifest
 COPY package.json pnpm-lock.yaml ./
 
-# Install ALL dependencies including optional (rollup needs platform-specific binaries)
-RUN pnpm install --frozen-lockfile
+# Install ALL dependencies (esbuild y sharp vienen con bins precargados desde v19+)
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
 

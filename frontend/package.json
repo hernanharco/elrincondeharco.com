@@ -22,16 +22,19 @@
   "dependencies": {
     "@astrojs/svelte": "^8.0.2",
     "@iconify-json/lucide": "^1.2.98",
-    "@iconify/svelte": "4.2.0",
+    "@iconify/svelte": "^4.2.0",
     "astro": "^6.0.6",
     "svelte": "^5.54.0",
     "typescript": "^5.9.3"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp"]
+  },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.19",
     "@playwright/test": "^1.40.0",
-    "@testing-library/svelte": "^5.2.4", 
+    "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/svelte": "^5.2.4",
     "@testing-library/user-event": "^14.5.0",
     "@vitest/coverage-v8": "^1.0.0",
     "@vitest/ui": "^1.0.0",

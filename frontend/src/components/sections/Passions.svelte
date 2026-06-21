@@ -4,6 +4,7 @@
   import { fetchApi } from '$lib/config';
   import type { PassionResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
+  import { fallbackPassion } from '$lib/fallback-data';
 
   let data: PassionResponse | null = null;
   let loading = true;
@@ -12,7 +13,7 @@
     try {
       data = await fetchApi<PassionResponse>('/api/v1/passions/latest/');
     } catch {
-      // mantener null — el template maneja el estado vacío
+      data = fallbackPassion;
     } finally {
       loading = false;
     }

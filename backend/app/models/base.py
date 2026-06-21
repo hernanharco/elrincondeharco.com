@@ -12,5 +12,7 @@ try:
     from app.models.projects import Project
     from app.models.stack import Stack
     from app.models.footer import Footer
+    from app.models.showroom import Showroom
+    from app.models.site_settings import SiteSettings
 except ImportError:
     pass

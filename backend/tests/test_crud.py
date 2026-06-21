@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.hero import Hero
-from app.models.project import Project
+from app.models.projects import Project
 from app.models.stack import Stack
 from app.models.site_settings import SiteSettings
 
@@ -15,10 +15,10 @@ class TestCRUD:
             title="Test Hero",
             subtitle="Test Subtitle",
             description="Test Description",
+            contact_button_text="Contact",
+            cv_button_text="Download CV",
+            image_url="https://example.com/hero.jpg",
             cv_url="https://example.com/cv.pdf",
-            email="test@example.com",
-            phone="+1234567890",
-            location="Test Location"
         )
         
         db_session.add(hero)
@@ -27,7 +27,7 @@ class TestCRUD:
         
         assert hero.id is not None
         assert hero.title == "Test Hero"
-        assert hero.email == "test@example.com"
+        assert hero.subtitle == "Test Subtitle"
     
     async def test_read_hero(self, db_session: AsyncSession, sample_hero):
         """Test reading a hero from the database."""
@@ -41,19 +41,19 @@ class TestCRUD:
         
         assert hero is not None
         assert hero.title == sample_hero.title
-        assert hero.email == sample_hero.email
+        assert hero.subtitle == sample_hero.subtitle
     
     async def test_update_hero(self, db_session: AsyncSession, sample_hero):
         """Test updating a hero in the database."""
         # Update hero
         sample_hero.title = "Updated Hero"
-        sample_hero.email = "updated@example.com"
+        sample_hero.subtitle = "Updated Subtitle"
         
         await db_session.commit()
         await db_session.refresh(sample_hero)
         
         assert sample_hero.title == "Updated Hero"
-        assert sample_hero.email == "updated@example.com"
+        assert sample_hero.subtitle == "Updated Subtitle"
     
     async def test_delete_hero(self, db_session: AsyncSession, sample_hero):
         """Test deleting a hero from the database."""

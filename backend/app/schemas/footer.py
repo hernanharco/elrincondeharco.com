@@ -32,5 +32,4 @@ class FooterResponse(BaseModel):
     twitter_url: Optional[str] = None
     quick_links: List[Dict[str, str]]
 
-    class Config:
-        model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True}

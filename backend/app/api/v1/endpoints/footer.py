@@ -7,6 +7,8 @@ from app.db.session import get_db
 from app.core.cloudinary import upload_image
 from app.models.footer import Footer
 from app.schemas.footer import FooterCreate, FooterUpdate, FooterResponse
+from app.core.security import get_current_admin_user
+from typing import Any, Dict
 
 async def get_footer_form(
     name: str = Form(...),
@@ -57,13 +59,6 @@ async def get_all(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Footer))
     return result.scalars().all()
 
-@router.get("/{id}", response_model=FooterResponse)
-async def get_one(id: int, db: AsyncSession = Depends(get_db)):
-    obj = await db.get(Footer, id)
-    if not obj:
-        raise HTTPException(status_code=404, detail="Footer no encontrado")
-    return obj
-
 @router.get("/latest/", response_model=FooterResponse)
 async def get_latest(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
@@ -74,12 +69,20 @@ async def get_latest(db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No hay registros")
     return obj
 
+@router.get("/{id}", response_model=FooterResponse)
+async def get_one(id: int, db: AsyncSession = Depends(get_db)):
+    obj = await db.get(Footer, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Footer no encontrado")
+    return obj
+
 @router.post("/", response_model=FooterResponse)
 async def create(
     form_data: FooterCreate = Depends(get_footer_form),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    db_obj = Footer(**form_data.dict())
+    db_obj = Footer(**form_data.model_dump())
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -89,19 +92,22 @@ async def create(
 async def update(
     id: int,
     form_data: FooterUpdate = Depends(get_footer_update_form),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(Footer, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Footer no encontrado")
-    for key, value in form_data.dict(exclude_none=True).items():
+    for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     await db.commit()
     await db.refresh(obj)
     return obj
 
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db)):
+async def delete(id: int, db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
     obj = await db.get(Footer, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Footer no encontrado")

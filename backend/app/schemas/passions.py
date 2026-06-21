@@ -33,5 +33,4 @@ class PassionResponse(BaseModel):
     coding_title: str
     coding_desc: str
 
-    class Config:
-        model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True}

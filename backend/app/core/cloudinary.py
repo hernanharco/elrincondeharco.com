@@ -1,5 +1,6 @@
 import os
 import re
+import asyncio
 import cloudinary
 import cloudinary.uploader
 from fastapi import UploadFile, HTTPException
@@ -15,11 +16,23 @@ cloudinary.config(
 
 logger = logging.getLogger(__name__)
 
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+IMAGE_MAX_SIZE = 5 * 1024 * 1024   # 5MB para imágenes
+
 async def upload_image(file: UploadFile) -> str:
     try:
         contents = await file.read()
         if not contents:
             raise HTTPException(status_code=400, detail="El archivo está vacío")
+
+        size_limit = IMAGE_MAX_SIZE if (
+            file.content_type and file.content_type.startswith('image/')
+        ) else MAX_FILE_SIZE
+        if len(contents) > size_limit:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Archivo demasiado grande. Máximo {size_limit // (1024*1024)}MB"
+            )
 
         filename = file.filename if file.filename else "archivo"
         
@@ -47,7 +60,7 @@ async def upload_image(file: UploadFile) -> str:
         else:
             upload_kwargs["public_id"] = clean_name
 
-        result = cloudinary.uploader.upload(contents, **upload_kwargs)
+        result = await asyncio.to_thread(cloudinary.uploader.upload, contents, **upload_kwargs)
 
         secure_url = result.get("secure_url")
         if not secure_url:

@@ -29,5 +29,4 @@ class StackResponse(BaseModel):
     border: str
     glow: str
 
-    class Config:
-        model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True}

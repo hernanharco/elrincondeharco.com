@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 from typing import List
 
 from app.db.session import get_db
 from app.models.example import Example
-from app.schemas.user import UserResponse
 
 router = APIRouter()
 
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.get("/", response_model=List[dict])
 async def get_examples(db: AsyncSession = Depends(get_db)):
     """Get all examples from the database."""
-    result = await db.execute("SELECT * FROM examples")
+    result = await db.execute(text("SELECT * FROM examples"))
     examples = result.fetchall()
     return [
         {"id": row[0], "name": row[1], "description": row[2], "created_at": row[3]}

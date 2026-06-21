@@ -6,6 +6,7 @@
   import { fetchApi } from '$lib/config';
   import type { AboutResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
+  import { fallbackAbout } from '$lib/fallback-data';
 
   let data: AboutResponse | null = null;
   let loading = true;
@@ -15,7 +16,7 @@
       data = await fetchApi<AboutResponse>('/api/v1/abouts/latest/');
     } catch (err) {
       console.error('Error cargando About:', err);
-      data = null;
+      data = fallbackAbout;
     } finally {
       loading = false;
     }

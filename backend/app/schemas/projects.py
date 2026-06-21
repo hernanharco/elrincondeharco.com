@@ -31,5 +31,4 @@ class ProjectResponse(BaseModel):
     demo_url: Optional[str] = None
     github_url: Optional[str] = None
 
-    class Config:
-        model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True}

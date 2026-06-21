@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from app.core.config import settings
-from app.db.base import Base
+from app.models.base import Base
 
 
 class TestDatabase:
@@ -59,10 +59,10 @@ class TestDatabase:
                 title="Test Hero",
                 subtitle="Test Subtitle",
                 description="Test Description",
+                contact_button_text="Contact",
+                cv_button_text="Download CV",
+                image_url="https://example.com/hero.jpg",
                 cv_url="https://example.com/cv.pdf",
-                email="test@example.com",
-                phone="+1234567890",
-                location="Test Location"
             )
             session.add(hero)
             await session.flush()
@@ -133,7 +133,10 @@ class TestDatabase:
         # Verify data was seeded
         async with TestSessionLocal() as session:
             from sqlalchemy import select
-            from app.models.hero import Hero, Project, Stack, SiteSettings
+            from app.models.hero import Hero
+            from app.models.projects import Project
+            from app.models.stack import Stack
+            from app.models.site_settings import SiteSettings
             
             # Check site settings
             result = await session.execute(select(SiteSettings))

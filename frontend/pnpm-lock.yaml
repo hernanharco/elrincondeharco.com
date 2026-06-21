@@ -15,7 +15,7 @@ importers:
         specifier: ^1.2.98
         version: 1.2.99
       '@iconify/svelte':
-        specifier: 4.2.0
+        specifier: ^4.2.0
         version: 4.2.0(svelte@5.55.0)
       astro:
         specifier: ^6.0.6

@@ -6,6 +6,8 @@ from app.db.session import get_db
 from app.core.cloudinary import upload_image
 from app.models.stack import Stack
 from app.schemas.stack import StackCreate, StackUpdate, StackResponse
+from app.core.security import get_current_admin_user
+from typing import Any, Dict
 
 async def get_stack_form(
     name: str = Form(...),
@@ -62,9 +64,10 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
 @router.post("/", response_model=StackResponse)
 async def create(
     form_data: StackCreate = Depends(get_stack_form),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    db_obj = Stack(**form_data.dict())
+    db_obj = Stack(**form_data.model_dump())
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -74,19 +77,22 @@ async def create(
 async def update(
     id: int,
     form_data: StackUpdate = Depends(get_stack_update_form),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(Stack, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Stack no encontrado")
-    for key, value in form_data.dict(exclude_none=True).items():
+    for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     await db.commit()
     await db.refresh(obj)
     return obj
 
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db)):
+async def delete(id: int, db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
     obj = await db.get(Stack, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Stack no encontrado")

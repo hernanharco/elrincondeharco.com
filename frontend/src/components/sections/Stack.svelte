@@ -4,6 +4,7 @@
   import { fetchApi } from '$lib/config';
   import type { StackResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
+  import { fallbackStacks } from '$lib/fallback-data';
 
   let activeCategory = 'Todos';
   let items: StackResponse[] = [];
@@ -15,7 +16,7 @@
     try {
       items = await fetchApi<StackResponse[]>('/api/v1/stacks/');
     } catch {
-      items = [];
+      items = fallbackStacks;
     } finally {
       loading = false;
     }

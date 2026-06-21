@@ -74,11 +74,10 @@ class TestConfig:
         # In production, debug should be False
         assert isinstance(settings.debug, bool)
     
-    def test_frontend_url_configuration(self):
-        """Test frontend URL configuration."""
-        assert hasattr(settings, 'frontend_url')
-        if settings.frontend_url:
-            assert settings.frontend_url.startswith(("http://", "https://"))
+    def test_authcore_jwks_url_configuration(self):
+        """Test authCore JWKS URL configuration."""
+        assert hasattr(settings, 'authcore_jwks_url')
+        assert settings.authcore_jwks_url.startswith(("http://", "https://"))
     
     def test_database_ssl_mode(self):
         """Test database SSL mode configuration."""

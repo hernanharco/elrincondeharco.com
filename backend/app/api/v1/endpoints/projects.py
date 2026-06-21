@@ -7,6 +7,8 @@ from app.db.session import get_db
 from app.core.cloudinary import upload_image
 from app.models.projects import Project
 from app.schemas.projects import ProjectCreate, ProjectUpdate, ProjectResponse
+from app.core.security import get_current_admin_user
+from typing import Any, Dict
 
 async def get_project_form(
     title: str = Form(...),
@@ -64,12 +66,13 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
 async def create(
     form_data: ProjectCreate = Depends(get_project_form),
     image: Optional[UploadFile] = File(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     image_url = None
     if image and image.filename:
         image_url = await upload_image(image)
-    db_obj = Project(**form_data.dict(), image_url=image_url)
+    db_obj = Project(**form_data.model_dump(), image_url=image_url)
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -80,12 +83,13 @@ async def update(
     id: int,
     form_data: ProjectUpdate = Depends(get_project_update_form),
     image: Optional[UploadFile] = File(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(Project, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Project no encontrado")
-    for key, value in form_data.dict(exclude_none=True).items():
+    for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     if image and image.filename:
         obj.image_url = await upload_image(image)
@@ -94,7 +98,9 @@ async def update(
     return obj
 
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db)):
+async def delete(id: int, db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
     obj = await db.get(Project, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Project no encontrado")

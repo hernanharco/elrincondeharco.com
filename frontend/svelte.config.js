@@ -3,6 +3,8 @@ import { vitePreprocess } from '@astrojs/svelte';
 export default {
 	preprocess: vitePreprocess(),
 	compilerOptions: {
-		runes: false // Disable global runes mode until lucide-svelte is compatible
+		// false = Svelte 4 syntax (export let, let, $:, <slot />)
+		// @iconify/svelte v4 usa esta sintaxis
+		runes: false
 	}
 }

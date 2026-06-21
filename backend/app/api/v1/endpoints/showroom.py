@@ -6,6 +6,8 @@ from app.db.session import get_db
 from app.core.cloudinary import upload_image
 from app.models.showroom import Showroom
 from app.schemas.showroom import ShowroomCreate, ShowroomUpdate, ShowroomResponse
+from app.core.security import get_current_admin_user
+from typing import Any, Dict
 
 async def get_showroom_form(
     title: str = Form(...),
@@ -51,12 +53,13 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
 async def create(
     form_data: ShowroomCreate = Depends(get_showroom_form),
     image: Optional[UploadFile] = File(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     image_url = None
     if image and image.filename:
         image_url = await upload_image(image)
-    db_obj = Showroom(**form_data.dict(), image_url=image_url)
+    db_obj = Showroom(**form_data.model_dump(), image_url=image_url)
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -67,12 +70,13 @@ async def update(
     id: int,
     form_data: ShowroomUpdate = Depends(get_showroom_update_form),
     image: Optional[UploadFile] = File(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(Showroom, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Showroom no encontrado")
-    for key, value in form_data.dict(exclude_none=True).items():
+    for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     if image and image.filename:
         obj.image_url = await upload_image(image)
@@ -81,7 +85,9 @@ async def update(
     return obj
 
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db)):
+async def delete(id: int, db: AsyncSession = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
     obj = await db.get(Showroom, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Showroom no encontrado")

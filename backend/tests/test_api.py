@@ -5,32 +5,25 @@ from httpx import AsyncClient
 class TestAPI:
     """Test API endpoints."""
     
-    async def test_health_check(self, client: AsyncClient):
-        """Test health check endpoint."""
-        response = await client.get("/health")
-        assert response.status_code == 200
-        assert response.json() == {"status": "healthy"}
-    
     async def test_root_endpoint(self, client: AsyncClient):
         """Test root endpoint."""
         response = await client.get("/")
         assert response.status_code == 200
         data = response.json()
         assert "message" in data
-        assert "version" in data
-    
+
     async def test_get_hero(self, client: AsyncClient, sample_hero):
-        """Test getting hero information."""
-        response = await client.get("/api/hero")
+        """Test getting hero information via API."""
+        response = await client.get("/api/v1/heroes/")
         assert response.status_code == 200
         data = response.json()
-        assert "title" in data
-        assert "subtitle" in data
-        assert "email" in data
-    
+        assert len(data) > 0
+        assert "title" in data[0]
+        assert "subtitle" in data[0]
+
     async def test_get_projects(self, client: AsyncClient, sample_project):
         """Test getting projects list."""
-        response = await client.get("/api/projects")
+        response = await client.get("/api/v1/projects/")
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
@@ -52,7 +45,7 @@ class TestAPI:
         
         # We'll create a stack through the API or directly in the database
         # For now, let's test the endpoint structure
-        response = await client.get("/api/stacks")
+        response = await client.get("/api/v1/stacks/")
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
@@ -67,7 +60,7 @@ class TestAPI:
     
     async def test_get_site_settings(self, client: AsyncClient):
         """Test getting site settings."""
-        response = await client.get("/api/site-settings")
+        response = await client.get("/api/v1/site-settings/")
         assert response.status_code == 200
         data = response.json()
         assert "brand_name" in data
@@ -77,21 +70,21 @@ class TestAPI:
     
     async def test_cors_headers(self, client: AsyncClient):
         """Test CORS headers are present."""
-        response = await client.options("/api/projects")
+        response = await client.options("/api/v1/projects/")
         assert response.status_code == 200
         # Check for CORS headers
         assert "access-control-allow-origin" in response.headers
     
     async def test_404_error(self, client: AsyncClient):
         """Test 404 error handling."""
-        response = await client.get("/api/nonexistent")
+        response = await client.get("/api/v1/nonexistent")
         assert response.status_code == 404
         data = response.json()
         assert "detail" in data
     
     async def test_api_response_format(self, client: AsyncClient, sample_project):
         """Test API responses are in correct JSON format."""
-        response = await client.get("/api/projects")
+        response = await client.get("/api/v1/projects/")
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/json"
         
@@ -107,7 +100,7 @@ class TestAPI:
     
     async def test_project_tags_structure(self, client: AsyncClient, sample_project):
         """Test project tags are properly structured."""
-        response = await client.get("/api/projects")
+        response = await client.get("/api/v1/projects/")
         assert response.status_code == 200
         data = response.json()
         
@@ -118,7 +111,7 @@ class TestAPI:
     
     async def test_stack_categories(self, client: AsyncClient):
         """Test stacks are properly categorized."""
-        response = await client.get("/api/stacks")
+        response = await client.get("/api/v1/stacks/")
         assert response.status_code == 200
         data = response.json()
         

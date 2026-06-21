@@ -4,6 +4,7 @@
   import { fetchApi } from '$lib/config';
   import type { HeroResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
+  import { fallbackHero } from '$lib/fallback-data';
 
   let data: HeroResponse | null = null;
   let loading = true;
@@ -26,7 +27,7 @@
       const response = await fetchApi<HeroResponse | HeroResponse[]>('/api/v1/heroes/latest/');
       data = Array.isArray(response) ? response[0] : response;
     } catch {
-      // mantener null
+      data = fallbackHero;
     } finally {
       loading = false;
     }
