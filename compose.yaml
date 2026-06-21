@@ -45,13 +45,15 @@ services:
     restart: unless-stopped
     ports:
       - "8001:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      PGHOST: portfolio-db
+      PGHOST: host.docker.internal
       PGPORT: "5432"
-      PGUSER: portfolio
-      PGPASSWORD: portfolio_dev
-      PGDATABASE: portfolio
-      PGSCHEMA: public
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+      PGSCHEMA: elrincondeharco
       SECRET_KEY: dev-secret-key-no-usar-en-produccion
       ENVIRONMENT: development
       DEBUG: "true"
@@ -67,9 +69,6 @@ services:
       - ./backend/app:/app/app
       - ./backend/scripts:/app/scripts
       - /app/.venv
-    depends_on:
-      portfolio-db:
-        condition: service_healthy
     networks:
       - elrincondeharco_net
     deploy:

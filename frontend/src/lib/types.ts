@@ -90,3 +90,12 @@ export interface SiteSettingsResponse {
   social_networks: SocialNetworks | null;
   is_active: boolean;
 }
+
+export interface ShowroomResponse {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  deploy_url: string | null;
+  image_url: string | null;
+}

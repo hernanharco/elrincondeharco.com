@@ -4,6 +4,7 @@
   import { fetchApi } from '$lib/config';
   import type { ProjectResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
+  import { fallbackProjects } from '$lib/fallback-data';
 
   let items: ProjectResponse[] = [];
   let loading = true;
@@ -12,7 +13,7 @@
     try {
       items = await fetchApi<ProjectResponse[]>('/api/v1/projects/');
     } catch {
-      items = [];
+      items = fallbackProjects;
     } finally {
       loading = false;
     }

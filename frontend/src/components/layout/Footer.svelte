@@ -4,6 +4,7 @@
   import { fetchApi } from '$lib/config';
   import type { FooterResponse, SiteSettingsResponse } from '$lib/types';
   import { listenForDataChange } from '$lib/dataEvents';
+  import { fallbackFooter, fallbackSiteSettings } from '$lib/fallback-data';
 
   let footerData: FooterResponse | null = null;
   let siteSettings: SiteSettingsResponse | null = null;
@@ -35,6 +36,8 @@
       companyData = cResponse;
     } catch (error) {
       console.error('Error cargando el footer:', error);
+      footerData = fallbackFooter;
+      siteSettings = fallbackSiteSettings;
     } finally {
       loading = false;
     }

@@ -3,15 +3,8 @@
   import Icon from '@iconify/svelte';
   import { fetchApi } from '$lib/config';
   import { listenForDataChange } from '$lib/dataEvents';
-
-  interface ShowroomResponse {
-    id: number;
-    title: string;
-    description: string;
-    category: string;
-    deploy_url: string | null;
-    image_url: string | null;
-  }
+  import type { ShowroomResponse } from '$lib/types';
+  import { fallbackShowrooms } from '$lib/fallback-data';
 
   let items: ShowroomResponse[] = [];
   let loading = true;
@@ -20,7 +13,7 @@
     try {
       items = await fetchApi<ShowroomResponse[]>('/api/v1/showrooms/');
     } catch {
-      items = [];
+      items = fallbackShowrooms;
     } finally {
       loading = false;
     }
