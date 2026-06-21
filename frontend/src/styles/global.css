@@ -183,3 +183,39 @@
     line-height: 1.5;
   }
 }
+
+/* ── Rendimiento en móvil ────────────────────────────────────
+ * Los touch devices no necesitan hover effects complejos.
+ * Esto evita glitches de GPU en Brave/Chrome Android.
+ */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    transition-duration: 150ms !important;
+    animation-duration: 300ms !important;
+  }
+
+  .group:hover .group-hover\:scale-110,
+  .group:hover .group-hover\:translate-x-1,
+  .group:hover .group-hover\:-translate-y-1,
+  .group:hover .group-hover\:shadow-\[0_0_30px_-5px_rgba\(.*\)\],
+  .hover\:scale-105:hover,
+  .hover\:scale-110:hover {
+    transform: none !important;
+  }
+
+  .hover\:shadow-\[0_0_20px_rgba\(.*\)\]:hover,
+  .group:hover .group-hover\:shadow-\[0_0_30px_-5px_rgba\(.*\)\] {
+    box-shadow: none !important;
+  }
+}
+
+/* ── Preferencia de movimiento reducido ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
