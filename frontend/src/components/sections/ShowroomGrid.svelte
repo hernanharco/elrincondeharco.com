@@ -69,7 +69,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {#each items as item (item.id)}
           <div
-            class="group relative bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 hover:border-amber-400/50 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-500/10"
+            class="group relative bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 hover:border-amber-400/50 transition-shadow duration-500 hover:shadow-2xl hover:shadow-amber-500/10"
           >
             <!-- Imagen -->
             <div class="relative h-48 overflow-hidden">
@@ -127,7 +127,7 @@
               {#if item.deploy_url}
                 <button
                   on:click={() => launchPrototype(item.deploy_url)}
-                  class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25 flex items-center justify-center gap-2 group"
+                  class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-colors duration-300 shadow-lg hover:shadow-amber-500/25 flex items-center justify-center gap-2 group"
                 >
                   <span>Lanzar Prototipo</span>
                   <Icon

@@ -17,7 +17,7 @@
 
 <div 
   class={`
-    relative group rounded-2xl overflow-hidden transition-all duration-500 transform hover:scale-[1.02] hover:shadow-2xl
+    relative group rounded-2xl overflow-hidden transition-shadow duration-500 hover:shadow-2xl
     ${featured 
       ? 'bg-gradient-to-br from-amber-500/10 to-orange-600/10 border border-amber-400/30 hover:border-amber-400/50' 
       : 'bg-zinc-900/50 border border-zinc-800 hover:border-amber-400/30'
@@ -80,7 +80,7 @@
     {#if deployUrl}
       <button
         on:click={handleVisitPrototype}
-        class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25 flex items-center justify-center gap-2 group"
+        class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium rounded-xl hover:from-amber-600 hover:to-orange-700 transition-colors duration-300 shadow-lg hover:shadow-amber-500/25 flex items-center justify-center gap-2 group"
       >
         <span>Ver Prototipo</span>
         <Icon 

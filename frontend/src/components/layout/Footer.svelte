@@ -88,7 +88,7 @@
             <li>
               <a
                 href={link.href}
-                class="hover:text-amber-400 hover:translate-x-1 inline-block transition-all underline-offset-4 hover:underline"
+                class="hover:text-amber-400 hover:translate-x-1 inline-block transition-colors underline-offset-4 hover:underline"
               >
                 {link.text}
               </a>
