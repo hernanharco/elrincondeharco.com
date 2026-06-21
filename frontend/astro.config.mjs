@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
+import vercel from '@astrojs/vercel/serverless';
 
 // ── URL base de authCore (backend) ──────────────────────────
 // En desarrollo local: http://localhost:8000
@@ -8,6 +9,11 @@ const AUTHCORE_API = process.env.PUBLIC_AUTHCORE_URL || 'http://localhost:8000';
 
 export default defineConfig({
   output: 'server',
+  adapter: vercel({
+    // Los ISR (Incremental Static Regeneration) no aplican aquí —
+    // usamos server-rendered para tener datos siempre frescos
+    isr: false,
+  }),
   integrations: [svelte()],
   server: {
     port: 4322,
