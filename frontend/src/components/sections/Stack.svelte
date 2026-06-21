@@ -111,7 +111,7 @@
         {#each categories as cat}
           <button
             on:click={() => setCategory(cat)}
-            class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 border {activeCategory ===
+            class="px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center gap-2 border {activeCategory ===
             cat
               ? 'bg-amber-400 text-black border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.4)]'
               : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30 hover:text-white'}"
@@ -134,7 +134,7 @@
       {:else}
         {#each filteredTech as tech (tech.id)}
           <div
-            class="group relative p-4 h-32 flex flex-col justify-between bg-zinc-900/50 rounded-xl border border-white/5 transition-all duration-300 hover:-translate-y-1 {tech.border} {tech.glow}"
+            class="group relative p-4 h-32 flex flex-col justify-between bg-zinc-900/50 rounded-xl border border-white/5 transition-transform duration-300 hover:-translate-y-1 {tech.border} {tech.glow}"
           >
             <div class="flex justify-between items-start">
               <div class="p-2 rounded-lg bg-white/5 {tech.color}">
