@@ -6,25 +6,22 @@
   import type { ShowroomResponse } from '$lib/types';
   import { fallbackShowrooms } from '$lib/fallback-data';
 
-  let items: ShowroomResponse[] = [];
-  let loading = true;
+  // ── Estado inicial: siempre con datos (fallback) ─────────────
+  let items: ShowroomResponse[] = fallbackShowrooms;
 
   async function loadData() {
     try {
-      items = await fetchApi<ShowroomResponse[]>('/api/v1/showrooms/');
+      const fresh = await fetchApi<ShowroomResponse[]>('/api/v1/showrooms/');
+      if (fresh && fresh.length > 0) items = fresh;
     } catch {
-      items = fallbackShowrooms;
-    } finally {
-      loading = false;
+      // fallback ya está como estado inicial — no pasa nada
     }
   }
 
   onMount(() => {
     loadData();
 
-    // Escuchar cambios desde el admin
     const cleanup = listenForDataChange('showroom', async () => {
-      loading = true;
       await loadData();
     });
 
@@ -50,29 +47,7 @@
       </p>
     </div>
 
-    <!-- Loading State -->
-    {#if loading}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {#each Array(6) as _}
-          <div class="animate-pulse">
-            <!-- Skeleton Card -->
-            <div class="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800">
-              <!-- Image Skeleton -->
-              <div class="h-48 bg-zinc-800"></div>
-              <!-- Content Skeleton -->
-              <div class="p-6 space-y-4">
-                <div class="h-4 bg-zinc-800 rounded w-3/4"></div>
-                <div class="space-y-2">
-                  <div class="h-3 bg-zinc-800 rounded"></div>
-                  <div class="h-3 bg-zinc-800 rounded w-5/6"></div>
-                </div>
-                <div class="h-10 bg-zinc-800 rounded"></div>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {:else if items.length === 0}
+    {#if items.length === 0}
       <!-- Empty State -->
       <div class="text-center py-20 border-2 border-dashed border-zinc-800 rounded-2xl">
         <div class="max-w-md mx-auto space-y-6">

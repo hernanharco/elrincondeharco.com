@@ -6,8 +6,9 @@
   import { listenForDataChange } from '$lib/dataEvents';
   import { fallbackFooter, fallbackSiteSettings } from '$lib/fallback-data';
 
-  let footerData: FooterResponse | null = null;
-  let siteSettings: SiteSettingsResponse | null = null;
+  // ── Estado inicial: siempre con datos (fallback) ─────────────
+  let footerData: FooterResponse = fallbackFooter;
+  let siteSettings: SiteSettingsResponse = fallbackSiteSettings;
   let companyData: {
     company_name: string;
     address: string | null;
@@ -15,11 +16,9 @@
     phone: string | null;
     contact_name: string | null;
   } | null = null;
-  let loading = true;
 
   async function loadAllData() {
     try {
-      // Cargamos los 3 orígenes en paralelo
       const [fResponse, sResponse, cResponse] = await Promise.all([
         fetchApi<FooterResponse>('/api/v1/footers/latest/'),
         fetchApi<SiteSettingsResponse>('/api/v1/site-settings/latest/'),
@@ -29,17 +28,14 @@
           email: string | null;
           phone: string | null;
           contact_name: string | null;
-        }>('/api/v1/company/public').catch(() => null),  // Si falla, no rompe
+        }>('/api/v1/company/public').catch(() => null),
       ]);
-      footerData = fResponse;
-      siteSettings = sResponse;
+      if (fResponse) footerData = fResponse;
+      if (sResponse) siteSettings = sResponse;
       companyData = cResponse;
     } catch (error) {
       console.error('Error cargando el footer:', error);
-      footerData = fallbackFooter;
-      siteSettings = fallbackSiteSettings;
-    } finally {
-      loading = false;
+      // fallback ya está como estado inicial — no pasa nada
     }
   }
 
@@ -56,10 +52,9 @@
   });
 
   // Prioridad: authCore > DB > hardcode
-  // Los datos de authCore (company_profiles) son la fuente de verdad para contacto
-  $: brandName = companyData?.company_name || siteSettings?.brand_name || 'elRincondelHarco.com';
-  $: contactEmail = companyData?.email || siteSettings?.contact_email || footerData?.email || 'hernan.harco@gmail.com';
-  $: contactAddress = companyData?.address || footerData?.location || 'Avilés, Asturias';
+  $: brandName = companyData?.company_name || siteSettings.brand_name;
+  $: contactEmail = companyData?.email || siteSettings.contact_email || footerData.email;
+  $: contactAddress = companyData?.address || footerData.location;
   $: contactPhone = companyData?.phone || '';
   $: contactName = companyData?.contact_name || '';
   $: currentYear = new Date().getFullYear();

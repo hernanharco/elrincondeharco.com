@@ -6,25 +6,22 @@
   import { listenForDataChange } from '$lib/dataEvents';
   import { fallbackPassion } from '$lib/fallback-data';
 
-  let data: PassionResponse | null = null;
-  let loading = true;
+  // ── Estado inicial: siempre con datos (fallback) ─────────────
+  let data: PassionResponse = fallbackPassion;
 
   async function loadData() {
     try {
-      data = await fetchApi<PassionResponse>('/api/v1/passions/latest/');
+      const fresh = await fetchApi<PassionResponse>('/api/v1/passions/latest/');
+      if (fresh) data = fresh;
     } catch {
-      data = fallbackPassion;
-    } finally {
-      loading = false;
+      // fallback ya está como estado inicial — no pasa nada
     }
   }
 
   onMount(async () => {
     await loadData();
 
-    // Escuchar cambios desde el admin
     const cleanup = listenForDataChange('passions', async () => {
-      loading = true;
       await loadData();
     });
 
@@ -41,8 +38,7 @@
         </h2>
 
         <p class="text-xl text-gray-300">
-          {data?.description ||
-            'Mi pasión, aparte de programar y jugar videojuegos, es estar con mi familia.'}
+          {data.description}
         </p>
 
         <div class="space-y-6">
@@ -52,11 +48,10 @@
             </div>
             <div>
               <h3 class="text-xl font-semibold text-white mb-1">
-                {data?.family_title || 'Mi Familia'}
+                {data.family_title}
               </h3>
               <p class="text-gray-400">
-                {data?.family_desc ||
-                  'Son mi motor, mi pasión y la razón de querer continuar cada día y cada momento.'}
+                {data.family_desc}
               </p>
             </div>
           </div>
@@ -67,11 +62,10 @@
             </div>
             <div>
               <h3 class="text-xl font-semibold text-white mb-1">
-                {data?.games_title || 'Videojuegos'}
+                {data.games_title}
               </h3>
               <p class="text-gray-400">
-                {data?.games_desc ||
-                  'Un hobby que me permite desconectar y explorar nuevos mundos digitales.'}
+                {data.games_desc}
               </p>
             </div>
           </div>
@@ -82,11 +76,10 @@
             </div>
             <div>
               <h3 class="text-xl font-semibold text-white mb-1">
-                {data?.coding_title || 'Programación'}
+                {data.coding_title}
               </h3>
               <p class="text-gray-400">
-                {data?.coding_desc ||
-                  'No es solo mi trabajo, es mi forma de crear y aportar valor al mundo.'}
+                {data.coding_desc}
               </p>
             </div>
           </div>

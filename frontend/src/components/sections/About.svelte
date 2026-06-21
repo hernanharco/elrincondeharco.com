@@ -8,27 +8,22 @@
   import { listenForDataChange } from '$lib/dataEvents';
   import { fallbackAbout } from '$lib/fallback-data';
 
-  let data: AboutResponse | null = null;
-  let loading = true;
+  // ── Estado inicial: siempre con datos (fallback) ─────────────
+  let data: AboutResponse = fallbackAbout;
 
   async function loadData() {
     try {
-      data = await fetchApi<AboutResponse>('/api/v1/abouts/latest/');
-    } catch (err) {
-      console.error('Error cargando About:', err);
-      data = fallbackAbout;
-    } finally {
-      loading = false;
+      const fresh = await fetchApi<AboutResponse>('/api/v1/abouts/latest/');
+      if (fresh) data = fresh;
+    } catch {
+      // fallback ya está como estado inicial — no pasa nada
     }
   }
 
   onMount(() => {
     loadData();
 
-    // 2. Escuchar cambios desde el admin
-    // Guardamos la función de limpieza para que Svelte la ejecute al destruir el componente
     const cleanup = listenForDataChange('about', async () => {
-      loading = true;
       await loadData();
     });
 
@@ -44,7 +39,7 @@
       <div class="relative">
         <div class="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-2xl group">
           <img
-            src={data?.image_url ||
+            src={data.image_url ||
               'https://images.unsplash.com/photo-1631624220291-8f191fbdb543?q=80&w=1080'}
             alt="Hernan Arango Cortes"
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -55,7 +50,7 @@
           <div class="absolute bottom-6 left-6 text-white">
             <p class="flex items-center gap-2 text-amber-400 font-medium">
               <Icon icon="lucide:map-pin" width={18} height={18} />
-              {data?.location || 'Avilés, Asturias, España'}
+              {data.location}
             </p>
           </div>
         </div>
@@ -67,11 +62,11 @@
 
       <div class="space-y-6">
         <h2 class="text-3xl md:text-4xl font-bold">
-          <span class="text-amber-400">{data?.years_experience || '14+ Años'}</span> de Trayectoria Profesional
+          <span class="text-amber-400">{data.years_experience}</span> de Trayectoria Profesional
         </h2>
 
         <div class="space-y-4 text-gray-300 leading-relaxed">
-          <p>{data?.description || ''}</p>
+          <p>{data.description}</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
@@ -79,9 +74,9 @@
             class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-amber-500/50 transition-colors"
           >
             <Icon icon="lucide:award" class="text-amber-400 mb-2" width={24} height={24} />
-            <h3 class="font-semibold text-white">{data?.leadership_title || 'Liderazgo'}</h3>
+            <h3 class="font-semibold text-white">{data.leadership_title}</h3>
             <p class="text-sm text-gray-400">
-              {data?.leadership_desc || 'Formación de equipos...'}
+              {data.leadership_desc}
             </p>
           </div>
 
@@ -89,8 +84,8 @@
             class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-amber-500/50 transition-colors"
           >
             <Icon icon="lucide:briefcase" class="text-amber-400 mb-2" width={24} height={24} />
-            <h3 class="font-semibold text-white">{data?.experience_title || 'Experiencia'}</h3>
-            <p class="text-sm text-gray-400">{data?.experience_desc || 'Más de una década...'}</p>
+            <h3 class="font-semibold text-white">{data.experience_title}</h3>
+            <p class="text-sm text-gray-400">{data.experience_desc}</p>
           </div>
         </div>
       </div>

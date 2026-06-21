@@ -7,27 +7,24 @@
   import { fallbackStacks } from '$lib/fallback-data';
 
   let activeCategory = 'Todos';
-  let items: StackResponse[] = [];
-  let loading = true;
+  // ── Estado inicial: siempre con datos (fallback) ─────────────
+  let items: StackResponse[] = fallbackStacks;
 
   const categories = ['Todos', 'Frontend', 'Backend', 'DevOps', 'Herramientas'];
 
   async function loadData() {
     try {
-      items = await fetchApi<StackResponse[]>('/api/v1/stacks/');
+      const fresh = await fetchApi<StackResponse[]>('/api/v1/stacks/');
+      if (fresh && fresh.length > 0) items = fresh;
     } catch {
-      items = fallbackStacks;
-    } finally {
-      loading = false;
+      // fallback ya está como estado inicial — no pasa nada
     }
   }
 
   onMount(() => {
     loadData();
 
-    // Escuchar cambios desde el admin
     const cleanup = listenForDataChange('stack', async () => {
-      loading = true;
       await loadData();
     });
 
@@ -130,14 +127,7 @@
 
     <!-- Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-      {#if loading}
-        <!-- Loading skeleton -->
-        {#each Array(20) as _}
-          <div class="animate-pulse">
-            <div class="h-32 bg-zinc-800 rounded-xl"></div>
-          </div>
-        {/each}
-      {:else if filteredTech.length === 0}
+      {#if filteredTech.length === 0}
         <div class="col-span-full text-center py-8">
           <p class="text-zinc-500">No hay tecnologías en esta categoría</p>
         </div>

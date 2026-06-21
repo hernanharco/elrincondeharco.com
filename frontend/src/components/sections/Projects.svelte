@@ -6,25 +6,22 @@
   import { listenForDataChange } from '$lib/dataEvents';
   import { fallbackProjects } from '$lib/fallback-data';
 
-  let items: ProjectResponse[] = [];
-  let loading = true;
+  // ── Estado inicial: siempre con datos (fallback) ─────────────
+  let items: ProjectResponse[] = fallbackProjects;
 
   async function loadData() {
     try {
-      items = await fetchApi<ProjectResponse[]>('/api/v1/projects/');
+      const fresh = await fetchApi<ProjectResponse[]>('/api/v1/projects/');
+      if (fresh && fresh.length > 0) items = fresh;
     } catch {
-      items = fallbackProjects;
-    } finally {
-      loading = false;
+      // fallback ya está como estado inicial — no pasa nada
     }
   }
 
   onMount(() => {
     loadData();
 
-    // Escuchar cambios desde el admin
     const cleanup = listenForDataChange('projects', async () => {
-      loading = true;
       await loadData();
     });
 
@@ -66,22 +63,7 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {#if loading}
-        <!-- Loading skeleton -->
-        {#each Array(6) as _}
-          <div class="animate-pulse">
-            <div class="h-48 bg-zinc-800 rounded-t-2xl"></div>
-            <div class="p-6 bg-black border border-white/10 rounded-b-2xl">
-              <div class="h-6 bg-zinc-700 rounded mb-2"></div>
-              <div class="h-4 bg-zinc-700 rounded mb-4"></div>
-              <div class="flex gap-2 mb-4">
-                <div class="h-6 w-16 bg-zinc-700 rounded-full"></div>
-                <div class="h-6 w-16 bg-zinc-700 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        {/each}
-      {:else if items.length === 0}
+      {#if items.length === 0}
         <div class="col-span-full text-center py-8">
           <p class="text-zinc-500">No hay proyectos registrados</p>
         </div>
