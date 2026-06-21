@@ -1,19 +1,23 @@
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
-import vercel from '@astrojs/vercel';
 
 // ── URL base de authCore (backend) ──────────────────────────
 // En desarrollo local: http://localhost:8000
 // En Docker: http://authcore-api:8000
 const AUTHCORE_API = process.env.PUBLIC_AUTHCORE_URL || 'http://localhost:8000';
 
+// ── Adaptador Vercel (solo en producción) ───────────────────
+// Vercel setea automáticamente la variable VERCEL=1 durante el build.
+// En desarrollo local no se necesita ni se importa.
+let adapter;
+if (process.env.VERCEL) {
+  const { default: vercel } = await import('@astrojs/vercel');
+  adapter = vercel({ isr: false });
+}
+
 export default defineConfig({
   output: 'server',
-  adapter: vercel({
-    // Los ISR (Incremental Static Regeneration) no aplican aquí —
-    // usamos server-rendered para tener datos siempre frescos
-    isr: false,
-  }),
+  ...(adapter ? { adapter } : {}),
   integrations: [svelte()],
   server: {
     port: 4322,
@@ -21,6 +25,12 @@ export default defineConfig({
     host: true
   },
   vite: {
+    optimizeDeps: {
+      include: ['@iconify/svelte'],
+    },
+    ssr: {
+      noExternal: ['@iconify/svelte'],
+    },
     server: {
       proxy: {
         // Proxy para llamadas a authCore desde el frontend
