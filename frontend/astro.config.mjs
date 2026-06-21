@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
-import vercel from '@astrojs/vercel/serverless';
+import vercel from '@astrojs/vercel';
 
 // ── URL base de authCore (backend) ──────────────────────────
 // En desarrollo local: http://localhost:8000
