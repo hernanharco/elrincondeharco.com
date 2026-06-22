@@ -70,7 +70,7 @@
       {:else}
         {#each items as project, index}
           <div
-            class="group bg-black border border-white/10 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-shadow duration-500 hover:shadow-[0_0_30px_-5px_rgba(251,191,36,0.15)] flex flex-col h-full"
+            class="group bg-black border border-white/10 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(251,191,36,0.15)] flex flex-col h-full"
           >
             <!-- Image Container -->
             <div class="relative h-48 overflow-hidden">
@@ -141,7 +141,7 @@
     <div class="text-center mt-16">
       <a
         href="/showroom"
-        class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-colors duration-300 shadow-lg hover:shadow-amber-500/25 group"
+        class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25 group"
       >
         <Icon icon="lucide:rocket" width={20} height={20} />
         <span>Bocetos de Innovación</span>

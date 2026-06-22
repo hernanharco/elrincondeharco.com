@@ -90,4 +90,20 @@
 
 ---
 
+---
+
+## 📸 DEPURACIÓN VISUAL CON PLAYWRIGHT
+
+Si hay problemas visuales en móvil o querés ver cómo se ve una página sin usar el navegador:
+
+| Decime esto | Lo que pasa |
+|-------------|-------------|
+| "Tomá captura de [URL] en móvil" | Playwright abre la URL en modo Android, toma captura de toda la página y la guarda |
+| "Inspeccioná [URL]" | Analiza el DOM, busca errores de JS, detecta problemas de hidratación |
+| "Compará [URL] con y sin JS" | Toma 2 capturas: una sin JavaScript (solo SSR) y otra con JS, las compara |
+
+**Requiere:** Playwright instalado en el proyecto (`pnpm add -D @playwright/test` + `npx playwright install chromium`).
+
+---
+
 > **Recordá:** No necesitás memorizarte esto. Cuando quieras consultarlo, decime "acordate del cheat sheet" y yo lo busco en memoria.
