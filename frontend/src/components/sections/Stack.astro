@@ -96,7 +96,7 @@ function getIconSvg(iconName: string, size: number = 24): string {
         {items.map(tech => (
           <div
             data-category={tech.category}
-          class={`stack-item group relative p-4 h-32 flex flex-col justify-between bg-zinc-900/50 rounded-xl border border-white/5 transition-all duration-300 hover:-translate-y-1 ${tech.border} ${tech.glow}`}
+          class={`stack-item group relative p-4 h-32 flex flex-col justify-between bg-zinc-900/50 rounded-xl border border-white/5 transition-shadow duration-300 hover:-translate-y-1 ${tech.border} ${tech.glow}`}
         >
           <div class="flex justify-between items-start">
             <div class={`p-2 rounded-lg bg-white/5 ${tech.color}`}>
