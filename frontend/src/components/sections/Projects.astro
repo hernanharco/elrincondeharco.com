@@ -49,7 +49,7 @@ function getIconSvg(iconName: string, size: number = 24): string {
             class="group bg-black border border-white/10 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(251,191,36,0.15)] flex flex-col h-full"
           >
             <div class="relative h-48 overflow-hidden">
-              <div class="absolute inset-0 bg-gradient-to-tr {project.color} opacity-60 z-10"></div>
+              <div class={`absolute inset-0 bg-gradient-to-tr ${project.color} opacity-60 z-10`}></div>
               <img
                 src={project.image_url ||
                   'https://images.unsplash.com/photo-1762803841043-bee9f5691411?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBmdXJuaXR1cmUlMjB1cGhvbHN0ZXJ5JTIwd29ya3Nob3B8ZW58MXx8fHwxNzcwNDgzNjg3fDA&ixlib=rb-4.1.0&q=80&w=1080'}
