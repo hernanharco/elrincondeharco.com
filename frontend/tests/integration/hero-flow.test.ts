@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mount } from '@sveltejs/testing-library';
 import { mockApiResponse } from '../setup';
+import type { HeroResponse, ProjectResponse } from '$lib/types';
 
 // Mock the components
 vi.mock('$lib/components/sections/Hero.svelte', () => ({

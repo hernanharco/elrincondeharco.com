@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/svelte';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Projects from '$lib/components/sections/Projects.svelte';
 import type { ProjectResponse } from '$lib/types';
-import { mockApiResponse } from '../setup';
+import { mockApiResponse } from '../../setup';
 
 // Mock dataEvents
 vi.mock('$lib/dataEvents', () => ({

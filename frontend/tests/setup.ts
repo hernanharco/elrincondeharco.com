@@ -1,27 +1,35 @@
 import '@testing-library/jest-dom';
+import { vi, beforeEach } from 'vitest';
+
+// Mock all .svelte component imports — no compile needed in tests
+vi.mock('$lib/components/sections/Hero.svelte', () => ({
+  default: { render: () => '' }
+}));
+vi.mock('$lib/components/sections/About.svelte', () => ({
+  default: { render: () => '' }
+}));
+vi.mock('$lib/components/sections/Stack.svelte', () => ({
+  default: { render: () => '' }
+}));
+vi.mock('$lib/components/sections/Projects.svelte', () => ({
+  default: { render: () => '' }
+}));
+vi.mock('$lib/components/sections/Passions.svelte', () => ({
+  default: { render: () => '' }
+}));
+vi.mock('$lib/components/layout/Footer.svelte', () => ({
+  default: { render: () => '' }
+}));
+vi.mock('$lib/components/layout/Navbar.svelte', () => ({
+  default: { render: () => '' }
+}));
 
 // Mock fetch globally
 global.fetch = vi.fn();
 
-// Mock environment variables
-vi.mock('$app/environment', () => ({
-  dev: true,
-  browser: true,
-  building: false,
-  version: '1.0.0'
-}));
-
-// Mock import.meta.env
-vi.mock('$app/environment', () => ({
-  dev: true,
-  browser: true,
-  building: false,
-  version: '1.0.0'
-}));
-
 // Setup fetch mock
 beforeEach(() => {
-  (fetch as any).mockClear();
+  vi.clearAllMocks();
 });
 
 // Mock API responses
