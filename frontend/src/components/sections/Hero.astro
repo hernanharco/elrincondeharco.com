@@ -1,8 +1,10 @@
 ---
 import type { HeroResponse } from '$lib/types';
+import { fetchSSR } from '$lib/api';
 import { fallbackHero } from '$lib/fallback-data';
 
-const data: HeroResponse = fallbackHero;
+const apiData = await fetchSSR<HeroResponse>('/heroes/latest/');
+const data: HeroResponse = apiData ?? fallbackHero;
 
 // Función para forzar la descarga en URLs de Cloudinary
 const getDownloadUrl = (url: string | null | undefined) => {

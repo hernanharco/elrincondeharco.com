@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fetchApi } from '$lib/config';
@@ -62,8 +64,8 @@
     editingId = item.id;
   }
 
-  function handleImageChange(e: CustomEvent<{ file: File | null; preview: string | null }>) {
-    imageFile = e.detail.file;
+  function handleImageChange(detail: { file: File | null; preview: string | null }) {
+    imageFile = detail.file;
   }
 
   async function handleSubmit() {
@@ -292,7 +294,7 @@
           label="Imagen del proyecto"
           accept="image/*"
           maxSizeMB={5}
-          on:change={handleImageChange}
+          onChange={handleImageChange}
         />
 
         <div class="flex items-center gap-4">

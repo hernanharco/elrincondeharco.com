@@ -4,7 +4,7 @@ from sqlalchemy import select
 from typing import Optional
 import json
 from app.db.session import get_db
-from app.core.cloudinary import upload_image
+from app.core.cloudinary import process_file_upload
 from app.models.projects import Project
 from app.schemas.projects import ProjectCreate, ProjectUpdate, ProjectResponse
 from app.core.security import get_current_admin_user
@@ -69,9 +69,7 @@ async def create(
     db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    image_url = None
-    if image and image.filename:
-        image_url = await upload_image(image)
+    image_url = await process_file_upload(image)
     db_obj = Project(**form_data.model_dump(), image_url=image_url)
     db.add(db_obj)
     await db.commit()
@@ -91,8 +89,9 @@ async def update(
         raise HTTPException(status_code=404, detail="Project no encontrado")
     for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
-    if image and image.filename:
-        obj.image_url = await upload_image(image)
+    image_url = await process_file_upload(image)
+    if image_url:
+        obj.image_url = image_url
     await db.commit()
     await db.refresh(obj)
     return obj

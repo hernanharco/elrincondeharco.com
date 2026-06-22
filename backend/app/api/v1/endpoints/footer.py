@@ -4,7 +4,7 @@ from sqlalchemy import select
 from typing import Optional
 import json
 from app.db.session import get_db
-from app.core.cloudinary import upload_image
+
 from app.models.footer import Footer
 from app.schemas.footer import FooterCreate, FooterUpdate, FooterResponse
 from app.core.security import get_current_admin_user

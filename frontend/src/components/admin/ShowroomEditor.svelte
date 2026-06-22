@@ -14,20 +14,20 @@
     image_url: string | null;
   }
 
-  let items: ShowroomResponse[] = [];
-  let loading = true;
-  let saving = false;
-  let message = '';
-  let messageType: 'success' | 'error' = 'success';
-  let editingId: number | null = null;
+  let items: ShowroomResponse[] = $state([]);
+  let loading = $state(true);
+  let saving = $state(false);
+  let message = $state('');
+  let messageType: 'success' | 'error' = $state('success');
+  let editingId: number | null = $state(null);
 
   // Formulario
-  let title = '';
-  let description = '';
-  let category = '';
-  let deploy_url = '';
-  let imageFile: File | null = null;
-  let currentImage: string | null = null;
+  let title = $state('');
+  let description = $state('');
+  let category = $state('');
+  let deploy_url = $state('');
+  let imageFile: File | null = $state(null);
+  let currentImage: string | null = $state(null);
 
   const categoryOptions = ['Web App', 'SaaS', 'Portfolio', 'Mobile', 'Desktop', 'API'];
 
@@ -66,12 +66,13 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleImageChange(e: CustomEvent<{ file: File | null; preview: string | null }>) {
-    imageFile = e.detail.file;
-    currentImage = e.detail.preview;
+  function handleImageChange(detail: { file: File | null; preview: string | null }) {
+    imageFile = detail.file;
+    currentImage = detail.preview;
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(e: Event) {
+    e.preventDefault();
     saving = true;
     message = '';
 
@@ -144,7 +145,7 @@
             {editingId ? '📝 Editar Proyecto' : '🆕 Nuevo Proyecto'}
           </h2>
 
-          <form on:submit|preventDefault={handleSubmit} class="space-y-4">
+          <form onsubmit={handleSubmit} class="space-y-4">
             <div>
               <label for="title" class="block text-sm font-medium text-zinc-300 mb-2">Nombre del Proyecto</label>
               <input
@@ -200,9 +201,9 @@
 
             <div class="py-2">
               <ImageUpload 
-                currentImage={currentImage} 
+                {currentImage} 
                 label="Miniatura del Prototipo"
-                on:change={handleImageChange}
+                onChange={handleImageChange}
               />
             </div>
 
@@ -218,7 +219,7 @@
               {#if editingId}
                 <button
                   type="button"
-                  on:click={resetForm}
+                  onclick={resetForm}
                   class="px-6 py-2 bg-zinc-700 text-white rounded-lg hover:bg-zinc-600 transition-all"
                 >
                   Cancelar
@@ -259,14 +260,14 @@
                   
                   <div class="flex gap-2">
                     <button
-                      on:click={() => editItem(item)}
+                      onclick={() => editItem(item)}
                       class="p-2 text-amber-400 hover:bg-amber-400/10 rounded-lg transition-colors"
                       title="Editar"
                     >
                       Editar
                     </button>
                     <button
-                      on:click={() => deleteItem(item.id)}
+                      onclick={() => deleteItem(item.id)}
                       class="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
                       title="Eliminar"
                     >

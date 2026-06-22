@@ -3,8 +3,8 @@ import { vitePreprocess } from '@astrojs/svelte';
 export default {
 	preprocess: vitePreprocess(),
 	compilerOptions: {
-		// false = Svelte 4 syntax (export let, let, $:, <slot />)
-		// @iconify/svelte v4 usa esta sintaxis
-		runes: false
+		// true = Svelte 5 runes ($state, $derived, $effect, $props)
+		// Los componentes legacy tienen <svelte:options runes={false} />
+		runes: true
 	}
 }

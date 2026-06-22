@@ -1,21 +1,25 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import Icon from '@iconify/svelte';
 
-  export let currentImage: string | null = null;
-  export let label = 'Subir imagen';
-  export let accept = 'image/*';
-  export let maxSizeMB = 10;
+  let {
+    currentImage = null,
+    label = 'Subir imagen',
+    accept = 'image/*',
+    maxSizeMB = 10,
+    onChange,
+  }: {
+    currentImage?: string | null;
+    label?: string;
+    accept?: string;
+    maxSizeMB?: number;
+    onChange?: (detail: { file: File | null; preview: string | null }) => void;
+  } = $props();
 
-  let file: File | null = null;
-  let preview: string | null = currentImage;
-  let isDragging = false;
-  let isUploading = false;
-  let error = '';
-
-  const dispatch = createEventDispatcher();
-
-  $: preview = currentImage;
+  let file: File | null = $state(null);
+  let preview: string | null = $state(currentImage);
+  let isDragging = $state(false);
+  let isUploading = $state(false);
+  let error = $state('');
 
   function handleFileSelect(selectedFile: File) {
     error = '';
@@ -42,7 +46,7 @@
     };
     reader.readAsDataURL(selectedFile);
 
-    dispatch('change', { file: selectedFile, preview });
+    onChange?.({ file: selectedFile, preview });
   }
 
   function handleDrop(e: DragEvent) {
@@ -76,7 +80,7 @@
     file = null;
     preview = null;
     error = '';
-    dispatch('change', { file: null, preview: null });
+    onChange?.({ file: null, preview: null });
   }
 
   function openFileDialog() {
@@ -93,10 +97,10 @@
     role="button"
     tabindex="0"
     class="relative group"
-    on:drop={handleDrop}
-    on:dragover={handleDragOver}
-    on:dragleave={handleDragLeave}
-    on:keydown={(e) => {
+    ondrop={handleDrop}
+    ondragover={handleDragOver}
+    ondragleave={handleDragLeave}
+    onkeydown={(e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         openFileDialog();
@@ -114,14 +118,14 @@
         >
           <button
             type="button"
-            on:click={openFileDialog}
+            onclick={openFileDialog}
             class="p-3 bg-amber-500/90 text-white rounded-full hover:bg-amber-500 transition-colors shadow-lg"
           >
             <Icon icon="lucide:upload" width={20} height={20} />
           </button>
           <button
             type="button"
-            on:click={removeImage}
+            onclick={removeImage}
             class="p-3 bg-red-500/90 text-white rounded-full hover:bg-red-500 transition-colors shadow-lg"
           >
             <Icon icon="lucide:x" width={20} height={20} />
@@ -138,7 +142,7 @@
       <div
         role="button"
         tabindex="0"
-        on:keydown={(e) => {
+        onkeydown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             openFileDialog();
@@ -152,9 +156,9 @@
               : 'border-zinc-700 hover:border-amber-400/50 hover:bg-zinc-800/50'
           }
         `}
-        on:click={openFileDialog}
+        onclick={openFileDialog}
       >
-        <input id="file-input" type="file" {accept} on:change={handleInputChange} class="hidden" />
+        <input id="file-input" type="file" {accept} onchange={handleInputChange} class="hidden" />
 
         <div class="space-y-4">
           <div

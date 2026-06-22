@@ -1,8 +1,10 @@
 ---
 import type { PassionResponse } from '$lib/types';
+import { fetchSSR } from '$lib/api';
 import { fallbackPassion } from '$lib/fallback-data';
 
-const data: PassionResponse = fallbackPassion;
+const apiData = await fetchSSR<PassionResponse>('/passions/latest/');
+const data: PassionResponse = apiData ?? fallbackPassion;
 ---
 
 <section id="pasiones" class="py-20 bg-zinc-900 text-white overflow-hidden">

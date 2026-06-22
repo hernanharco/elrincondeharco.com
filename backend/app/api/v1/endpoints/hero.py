@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional
 from app.db.session import get_db
-from app.core.cloudinary import upload_image
+from app.core.cloudinary import process_file_upload
 from app.models.hero import Hero
 from app.schemas.hero import HeroCreate, HeroUpdate, HeroResponse
 from app.core.security import get_current_admin_user
@@ -71,13 +71,14 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
 async def create(
     form_data: HeroCreate = Depends(get_hero_form),
     image: Optional[UploadFile] = File(None),
+    cv_file: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    image_url = None
-    if image and image.filename:
-        image_url = await upload_image(image)
-    db_obj = Hero(**form_data.model_dump(), image_url=image_url)
+    image_url = await process_file_upload(image)
+    cv_url = await process_file_upload(cv_file)
+
+    db_obj = Hero(**form_data.model_dump(), image_url=image_url, cv_url=cv_url)
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
@@ -99,15 +100,14 @@ async def update(
     for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
     
-    # Manejo de Imagen
-    if image and image.filename:
-        obj.image_url = await upload_image(image)
-        
-    # Manejo de CV (PDF)
-    if cv_file and cv_file.filename:
-        # La función upload_image ya debería funcionar, 
-        # pero asegúrate que en cloudinary.py uses resource_type="auto"
-        obj.cv_url = await upload_image(cv_file)
+    # Manejo de archivos (imagen y CV)
+    image_url = await process_file_upload(image)
+    if image_url:
+        obj.image_url = image_url
+
+    cv_url = await process_file_upload(cv_file)
+    if cv_url:
+        obj.cv_url = cv_url
         
     await db.commit()
     await db.refresh(obj)
