@@ -79,7 +79,7 @@
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
         <a
           href="#contact"
-          class="inline-flex items-center px-8 py-3 border border-transparent text-base font-bold rounded-full text-black bg-amber-400 hover:bg-amber-500 transition-colors shadow-[0_0_20px_rgba(251,191,36,0.3)] active:scale-95"
+          class="inline-flex items-center px-8 py-3 border border-transparent text-base font-bold rounded-full text-black bg-amber-400 hover:bg-amber-500 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:scale-105 active:scale-95"
         >
           {data.contact_button_text}
           <Icon icon="lucide:arrow-right" class="ml-2 h-5 w-5" />
@@ -91,7 +91,7 @@
             target="_blank"
             rel="noopener noreferrer"
             download
-            class="inline-flex items-center px-8 py-3 border border-white/20 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors backdrop-blur-sm hover:border-amber-400/50 group"
+            class="inline-flex items-center px-8 py-3 border border-white/20 text-base font-medium rounded-full text-white hover:bg-white/10 transition-all backdrop-blur-sm hover:border-amber-400/50 group"
           >
             {data.cv_button_text}
             <Icon

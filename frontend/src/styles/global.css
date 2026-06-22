@@ -184,19 +184,29 @@
   }
 }
 
-/* ── Preferencia de movimiento reducido ────────────────────
- * En móvil, desactivamos TODAS las transiciones y animaciones
- * para evitar glitches de GPU durante la hidratación de Svelte.
+/* ── Transiciones seguras durante hidratación ──────────────
+ * Durante la hidratación (SSR → cliente), las transiciones
+ * y animaciones se desactivan para evitar glitches de GPU.
+ *
+ * astro-island[ssr] = componente AÚN no hidratado (HTML estático)
+ * astro-island       = componente YA hidratado (transiciones activas)
+ *
+ * Esto permite tener efectos visuales completos SIN glitches.
  */
-@media (hover: none) and (pointer: coarse), (prefers-reduced-motion: reduce) {
+astro-island[ssr] *,
+astro-island[ssr] *::before,
+astro-island[ssr] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ── Preferencia de movimiento reducido ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation: none !important;
-    animation-duration: 0s !important;
-    transition: none !important;
-    transition-duration: 0s !important;
-    transition-property: none !important;
-    transform: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
