@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ShowroomGrid from '../components/sections/ShowroomGrid.svelte';
+import ShowroomGrid from '../components/sections/ShowroomGrid.astro';
 
 const currentPath = Astro.url.pathname;
 ---
@@ -26,5 +26,5 @@ const currentPath = Astro.url.pathname;
   </div>
 
   <!-- Grid de Showroom -->
-  <ShowroomGrid client:load />
+  <ShowroomGrid />
 </Layout>
