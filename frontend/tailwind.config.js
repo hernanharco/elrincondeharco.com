@@ -15,12 +15,6 @@ export default {
       pattern: /^border-(orange|blue|cyan|yellow|teal|green|indigo|pink|red|purple|gray|rose|white)-(300|400|500|600)\/50$/,
       variants: ['group-hover'],
     },
-    // Brillos/Glow (Valores arbitrarios de tu JSON)
-    // Usamos un patrón más flexible para capturar las sombras dinámicas
-    {
-      pattern: /shadow-\[0_0_30px_-5px_rgba\(.*\)]/,
-      variants: ['group-hover'],
-    }
   ],
 
   theme: {
