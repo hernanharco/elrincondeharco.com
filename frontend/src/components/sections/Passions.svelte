@@ -8,6 +8,7 @@
 
   // ── Estado inicial: siempre con datos (fallback) ─────────────
   let data: PassionResponse = fallbackPassion;
+  let hydrated = false;
 
   async function loadData() {
     try {
@@ -19,6 +20,7 @@
   }
 
   onMount(async () => {
+    hydrated = true;
     await loadData();
 
     const cleanup = listenForDataChange('passions', async () => {
@@ -29,7 +31,7 @@
   });
 </script>
 
-<section id="pasiones" class="py-20 bg-zinc-900 text-white overflow-hidden">
+<section id="pasiones" class="py-20 bg-zinc-900 text-white overflow-hidden" class:hydrated={hydrated}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
       <div class="order-2 lg:order-1 space-y-8">

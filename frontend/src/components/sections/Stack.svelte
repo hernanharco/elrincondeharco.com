@@ -9,6 +9,7 @@
   let activeCategory = 'Todos';
   // ── Estado inicial: siempre con datos (fallback) ─────────────
   let items: StackResponse[] = fallbackStacks;
+  let hydrated = false;
 
   const categories = ['Todos', 'Frontend', 'Backend', 'DevOps', 'Herramientas'];
 
@@ -22,6 +23,7 @@
   }
 
   onMount(() => {
+    hydrated = true;
     loadData();
 
     const cleanup = listenForDataChange('stack', async () => {
@@ -93,7 +95,7 @@
   }
 </script>
 
-<section id="stack" class="py-24 bg-zinc-950 text-white relative">
+<section id="stack" class="py-24 bg-zinc-950 text-white relative" class:hydrated={hydrated}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">

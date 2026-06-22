@@ -10,6 +10,7 @@
 
   // ── Estado inicial: siempre con datos (fallback) ─────────────
   let data: AboutResponse = fallbackAbout;
+  let hydrated = false;
 
   async function loadData() {
     try {
@@ -21,6 +22,7 @@
   }
 
   onMount(() => {
+    hydrated = true;
     loadData();
 
     const cleanup = listenForDataChange('about', async () => {
@@ -33,7 +35,7 @@
   });
 </script>
 
-<section id="sobre-mi" class="py-20 bg-zinc-900 text-white">
+<section id="sobre-mi" class="py-20 bg-zinc-900 text-white" class:hydrated={hydrated}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
       <div class="relative">

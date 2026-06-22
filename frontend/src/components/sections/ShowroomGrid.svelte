@@ -8,6 +8,7 @@
 
   // ── Estado inicial: siempre con datos (fallback) ─────────────
   let items: ShowroomResponse[] = fallbackShowrooms;
+  let hydrated = false;
 
   async function loadData() {
     try {
@@ -19,6 +20,7 @@
   }
 
   onMount(() => {
+    hydrated = true;
     loadData();
 
     const cleanup = listenForDataChange('showroom', async () => {
@@ -35,7 +37,7 @@
   }
 </script>
 
-<section class="py-20 px-6 md:px-10 bg-zinc-950">
+<section id="showroom" class="py-20 px-6 md:px-10 bg-zinc-950" class:hydrated={hydrated}>
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="text-center mb-16">
