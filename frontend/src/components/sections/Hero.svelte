@@ -9,6 +9,7 @@
   // ── Estado inicial: siempre con datos (fallback) ─────────────
   // La API actualiza en segundo plano. Si falla, los datos estáticos persisten.
   let data: HeroResponse = fallbackHero;
+  let hydrated = false;
 
   // Función para forzar la descarga en URLs de Cloudinary
   const getDownloadUrl = (url: string | null | undefined) => {
@@ -32,6 +33,7 @@
   }
 
   onMount(async () => {
+    hydrated = true;
     await loadData();
 
     // Escuchar cambios desde el admin
@@ -46,6 +48,7 @@
 <section
   id="inicio"
   class="relative min-h-screen flex items-center justify-center overflow-hidden bg-black text-white"
+  class:hydrated={hydrated}
 >
   <div class="absolute inset-0 z-0">
     {#if data.background_image}

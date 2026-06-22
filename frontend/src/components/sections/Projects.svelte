@@ -8,6 +8,7 @@
 
   // ── Estado inicial: siempre con datos (fallback) ─────────────
   let items: ProjectResponse[] = fallbackProjects;
+  let hydrated = false;
 
   async function loadData() {
     try {
@@ -19,6 +20,7 @@
   }
 
   onMount(() => {
+    hydrated = true;
     loadData();
 
     const cleanup = listenForDataChange('projects', async () => {
@@ -51,7 +53,7 @@
   }
 </script>
 
-<section id="proyectos" class="py-24 bg-zinc-900 text-white">
+<section id="proyectos" class="py-24 bg-zinc-900 text-white" class:hydrated={hydrated}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-16">
       <h2 class="text-3xl md:text-5xl font-bold mb-4">
