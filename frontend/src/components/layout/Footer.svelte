@@ -62,7 +62,7 @@
 
 <footer
   id="contact"
-  class="bg-black text-white border-t border-white/10 pt-16 pb-8 transition-opacity duration-500 {loading
+  class="bg-black text-white border-t border-white/10 pt-16 pb-8 transition-opacity duration-500 opacity-100"
     ? 'opacity-50'
     : 'opacity-100'}"
 >
