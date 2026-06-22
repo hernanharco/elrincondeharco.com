@@ -1,22 +1,22 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/layout/Navbar.svelte';
-import Hero from '../components/sections/Hero.svelte';
-import About from '../components/sections/About.svelte';
-import Stack from '../components/sections/Stack.svelte';
-import Projects from '../components/sections/Projects.svelte';
-import Passions from '../components/sections/Passions.svelte';
-import Footer from '../components/layout/Footer.svelte';
+import Navbar from '../components/layout/Navbar.astro';
+import Hero from '../components/sections/Hero.astro';
+import About from '../components/sections/About.astro';
+import Stack from '../components/sections/Stack.astro';
+import Projects from '../components/sections/Projects.astro';
+import Passions from '../components/sections/Passions.astro';
+import Footer from '../components/layout/Footer.astro';
 ---
 
 <Layout>
 	<main>
-		<Navbar client:load />
-		<Hero client:visible />
-		<About client:visible />
-		<Stack client:idle />
-		<Projects client:visible />
-		<Passions client:visible />
-		<Footer client:visible />
+		<Navbar />
+		<Hero />
+		<About />
+		<Stack />
+		<Projects />
+		<Passions />
+		<Footer />
 	</main>
 </Layout>

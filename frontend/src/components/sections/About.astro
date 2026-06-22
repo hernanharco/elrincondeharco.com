@@ -1,41 +1,11 @@
-<script lang="ts">
-  import { onMount } from 'svelte';
-  // 1. IMPORTANTE: Agregamos los iconos que faltaban
-  import Icon from '@iconify/svelte';
+---
+import type { AboutResponse } from '$lib/types';
+import { fallbackAbout } from '$lib/fallback-data';
 
-  import { fetchApi } from '$lib/config';
-  import type { AboutResponse } from '$lib/types';
-  import { listenForDataChange } from '$lib/dataEvents';
-  import { fallbackAbout } from '$lib/fallback-data';
+const data: AboutResponse = fallbackAbout;
+---
 
-  // ── Estado inicial: siempre con datos (fallback) ─────────────
-  let data: AboutResponse = fallbackAbout;
-  let hydrated = false;
-
-  async function loadData() {
-    try {
-      const fresh = await fetchApi<AboutResponse>('/api/v1/abouts/latest/');
-      if (fresh) data = fresh;
-    } catch {
-      // fallback ya está como estado inicial — no pasa nada
-    }
-  }
-
-  onMount(() => {
-    hydrated = true;
-    loadData();
-
-    const cleanup = listenForDataChange('about', async () => {
-      await loadData();
-    });
-
-    return () => {
-      cleanup();
-    };
-  });
-</script>
-
-<section id="sobre-mi" class="py-20 bg-zinc-900 text-white" class:hydrated={hydrated}>
+<section id="sobre-mi" class="py-20 bg-zinc-900 text-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
       <div class="relative">
@@ -51,7 +21,7 @@
           ></div>
           <div class="absolute bottom-6 left-6 text-white">
             <p class="flex items-center gap-2 text-amber-400 font-medium">
-              <Icon icon="lucide:map-pin" width={18} height={18} />
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
               {data.location}
             </p>
           </div>
@@ -75,7 +45,7 @@
           <div
             class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-amber-500/50 transition-colors"
           >
-            <Icon icon="lucide:award" class="text-amber-400 mb-2" width={24} height={24} />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400 mb-2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
             <h3 class="font-semibold text-white">{data.leadership_title}</h3>
             <p class="text-sm text-gray-400">
               {data.leadership_desc}
@@ -85,7 +55,7 @@
           <div
             class="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-amber-500/50 transition-colors"
           >
-            <Icon icon="lucide:briefcase" class="text-amber-400 mb-2" width={24} height={24} />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400 mb-2"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
             <h3 class="font-semibold text-white">{data.experience_title}</h3>
             <p class="text-sm text-gray-400">{data.experience_desc}</p>
           </div>
