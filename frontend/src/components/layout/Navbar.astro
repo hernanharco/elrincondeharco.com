@@ -1,0 +1,86 @@
+---
+const links = [
+  { name: 'Inicio', href: '#inicio' },
+  { name: 'Sobre Mí', href: '#sobre-mi' },
+  { name: 'Stack', href: '#stack' },
+  { name: 'Proyectos', href: '#proyectos' },
+  { name: 'Pasiones', href: '#pasiones' },
+];
+---
+
+<nav class="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10 text-white nav-root">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <input type="checkbox" id="menu-toggle" class="hidden peer" />
+
+    <div class="flex items-center justify-between h-16">
+      <div class="flex-shrink-0">
+        <span
+          class="text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent cursor-pointer"
+        >
+          HAC
+        </span>
+      </div>
+
+      <div class="hidden md:block">
+        <div class="ml-10 flex items-baseline space-x-4">
+          {links.map(link => (
+            <a
+              href={link.href}
+              class="hover:text-amber-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="-mr-2 flex md:hidden">
+        <label
+          for="menu-toggle"
+          id="hamburger-btn"
+          class="menu-hamburger inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer"
+        >
+          <span class="sr-only">Abrir menú</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </label>
+        <label
+          for="menu-toggle"
+          id="close-btn"
+          class="menu-close hidden items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer"
+        >
+          <span class="sr-only">Cerrar menú</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </label>
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden bg-black/95 backdrop-blur-xl border-b border-white/10">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        {links.map(link => (
+          <a
+            href={link.href}
+            onclick="document.getElementById('menu-toggle').checked = false"
+            class="text-gray-300 hover:text-amber-400 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+          >
+            {link.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<style is:global>
+  #menu-toggle:checked ~ #mobile-menu { display: block; }
+  #menu-toggle:checked ~ div #hamburger-btn { display: none; }
+  #menu-toggle:checked ~ div #close-btn { display: inline-flex; }
+  #close-btn { display: none; }
+  #menu-toggle:not(:checked) ~ div #hamburger-btn { display: inline-flex; }
+  #menu-toggle:not(:checked) ~ div #close-btn { display: none; }
+
+  @media (min-width: 768px) {
+    #mobile-menu { display: none !important; }
+    #hamburger-btn { display: none !important; }
+    #close-btn { display: none !important; }
+  }
+</style>
