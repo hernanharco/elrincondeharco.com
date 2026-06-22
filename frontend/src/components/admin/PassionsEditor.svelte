@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fetchApi } from '$lib/config';
@@ -42,8 +44,8 @@
     }
   });
 
-  function handleImageChange(e: CustomEvent<{ file: File | null; preview: string | null }>) {
-    imageFile = e.detail.file;
+  function handleImageChange(detail: { file: File | null; preview: string | null }) {
+    imageFile = detail.file;
   }
 
   async function handleSubmit() {
@@ -105,7 +107,7 @@
       label="Imagen de pasiones"
       accept="image/*"
       maxSizeMB={5}
-      on:change={handleImageChange}
+      onChange={handleImageChange}
     />
 
     <!-- Campos principales -->

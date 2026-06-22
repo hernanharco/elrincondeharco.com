@@ -1,8 +1,10 @@
 ---
 import type { AboutResponse } from '$lib/types';
+import { fetchSSR } from '$lib/api';
 import { fallbackAbout } from '$lib/fallback-data';
 
-const data: AboutResponse = fallbackAbout;
+const apiData = await fetchSSR<AboutResponse>('/abouts/latest/');
+const data: AboutResponse = apiData ?? fallbackAbout;
 ---
 
 <section id="sobre-mi" class="py-20 bg-zinc-900 text-white">

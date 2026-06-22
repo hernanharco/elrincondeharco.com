@@ -3,6 +3,7 @@ import re
 import asyncio
 import cloudinary
 import cloudinary.uploader
+from typing import Optional
 from fastapi import UploadFile, HTTPException
 from app.core.config import settings
 import logging
@@ -80,3 +81,14 @@ async def upload_image(file: UploadFile) -> str:
         raise HTTPException(status_code=500, detail=f"Error en el servidor de medios: {str(e)}")
     finally:
         await file.close()
+
+
+async def process_file_upload(file: Optional[UploadFile]) -> Optional[str]:
+    """
+    Helper para subir un archivo opcional a Cloudinary.
+    Si el archivo es None o no tiene filename, retorna None.
+    Caso contrario, llama a upload_image y retorna la URL.
+    """
+    if file is None or not file.filename:
+        return None
+    return await upload_image(file)

@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script lang="ts">
   /**
    * AuthGuard — Guard client-side para rutas /admin.

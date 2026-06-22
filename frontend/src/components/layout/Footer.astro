@@ -1,9 +1,14 @@
 ---
 import type { FooterResponse, SiteSettingsResponse } from '$lib/types';
+import { fetchSSR } from '$lib/api';
 import { fallbackFooter, fallbackSiteSettings } from '$lib/fallback-data';
 
-const footerData: FooterResponse = fallbackFooter;
-const siteSettings: SiteSettingsResponse = fallbackSiteSettings;
+const [apiFooter, apiSiteSettings] = await Promise.all([
+  fetchSSR<FooterResponse>('/footers/latest/'),
+  fetchSSR<SiteSettingsResponse>('/site-settings/latest/'),
+]);
+const footerData: FooterResponse = apiFooter ?? fallbackFooter;
+const siteSettings: SiteSettingsResponse = apiSiteSettings ?? fallbackSiteSettings;
 
 const brandName = siteSettings.brand_name;
 const contactEmail = siteSettings.contact_email || footerData.email;

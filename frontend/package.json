@@ -23,8 +23,9 @@
     "@astrojs/svelte": "^8.0.2",
     "@astrojs/vercel": "^10.0.8",
     "@iconify-json/lucide": "^1.2.98",
-    "@iconify/svelte": "^4.2.0",
+    "@iconify/svelte": "^5.2.2",
     "astro": "^6.0.6",
+    "jose": "^6.2.3",
     "svelte": "^5.54.0",
     "typescript": "^5.9.3"
   },

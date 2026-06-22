@@ -3,11 +3,13 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from app.core.config import settings
+from app.core.exceptions import global_exception_handler, http_exception_global_handler
 from app.db.session import engine
 from app.models.base import Base
 from app.api.route import api_router
@@ -54,9 +56,15 @@ async def lifespan(app: FastAPI):
     print("🛑 Shutdown completado")
 
 app = FastAPI(
-    title="Auth Core Backend",
+    title="Portfolio API",
     lifespan=lifespan,
 )
+
+# ── Exception Handlers Globales ──────────────────────────────
+# Formato consistente para TODOS los errores:
+# { "detail": "...", "code": "ERROR_CODE", "status_code": 400 }
+app.add_exception_handler(HTTPException, http_exception_global_handler)
+app.add_exception_handler(Exception, global_exception_handler)
 
 # Middleware de CORS
 app.add_middleware(
@@ -66,6 +74,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Cache-Control para endpoints públicos ─────────────────────
+# Los GET a /api/v1/ se cachean 60s en el navegador/CDN.
+# Los POST/PUT/DELETE no se cachean.
+@app.middleware("http")
+async def add_cache_control(request: Request, call_next):
+    response = await call_next(request)
+    if (
+        request.method == "GET"
+        and response.status_code == 200
+        and request.url.path.startswith("/api/v1/")
+    ):
+        response.headers["Cache-Control"] = "public, max-age=60"
+    return response
 
 app.include_router(api_router, prefix="/api/v1")
 

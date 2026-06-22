@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional
 from app.db.session import get_db
-from app.core.cloudinary import upload_image
+
 from app.models.stack import Stack
 from app.schemas.stack import StackCreate, StackUpdate, StackResponse
 from app.core.security import get_current_admin_user

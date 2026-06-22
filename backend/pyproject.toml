@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "auth-core-backend"
+name = "portfolio-backend"
 version = "1.0.0"
-description = "Backend de autenticación con FastAPI y Postgres"
+description = "Backend del portfolio personal con FastAPI y PostgreSQL"
 package-mode = false
 
 [tool.poetry.dependencies]

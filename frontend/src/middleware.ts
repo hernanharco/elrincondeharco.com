@@ -1,25 +1,42 @@
 // src/middleware.ts — SSR Middleware para Portfolio
 // Valida la cookie access_token (seteada por authCore vía Google OAuth)
 // en rutas protegidas /admin/*
+//
+// Validación REAL del JWT contra JWKS de authCore (no solo base64 decode).
+// Usa createRemoteJWKSet que cachea las claves automáticamente (HTTP Cache-Control).
 
 import { defineMiddleware } from 'astro:middleware';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
+// ── Configuración ─────────────────────────────────────────────
 const SITE_ORIGIN = process.env.SITE_ORIGIN || 'http://localhost:4322';
 
-export const onRequest = defineMiddleware((context, next) => {
+// URL del JWKS de authCore (para validar la firma del JWT)
+// Fallback: http://localhost:8000 (desarrollo local sin Docker)
+const AUTHCORE_URL = process.env.PUBLIC_AUTHCORE_URL || 'http://localhost:8000';
+const JWKS_URL = new URL(
+  process.env.AUTHCORE_JWKS_URL || `${AUTHCORE_URL}/.well-known/jwks.json`
+);
+
+// Cliente JWKS con caché automática (createRemoteJWKSet maneja el caching)
+const JWKS = createRemoteJWKSet(JWKS_URL);
+
+// ── Middleware ─────────────────────────────────────────────────
+export const onRequest = defineMiddleware(async (context, next) => {
   const { url, cookies } = context;
 
-  // Rutas públicas — no requieren autenticación
+  // ── Rutas públicas ──────────────────────────────────────────
   const publicRoutes = ['/login', '/api/auth', '/_astro', '/favicon.ico', '/public'];
   const isPublicRoute = publicRoutes.some(route => url.pathname.startsWith(route));
   if (isPublicRoute) return next();
 
-  // Proteger rutas /admin
+  // ── Proteger rutas /admin ──────────────────────────────────
   const isProtectedRoute = url.pathname.startsWith('/admin');
 
   if (isProtectedRoute) {
     const sessionCookie = cookies.get('access_token');
 
+    // Sin cookie → redirect a login
     if (!sessionCookie || !sessionCookie.value) {
       const loginUrl = new URL('/login', SITE_ORIGIN);
       loginUrl.searchParams.set('error', 'no_session');
@@ -28,32 +45,48 @@ export const onRequest = defineMiddleware((context, next) => {
     }
 
     try {
-      const parts = sessionCookie.value.split('.');
-      if (parts.length !== 3) throw new Error('JWT format invalid');
+      // Validar el JWT contra el JWKS de authCore
+      // jose.jwtVerify verifica: firma (RS256/ES256), exp, iss, aud
+      const { payload } = await jwtVerify(sessionCookie.value, JWKS, {
+        // Opcional: validar issuer si authCore lo setea
+        // issuer: 'authcore',
+        // Opcional: validar audience
+        // audience: 'portfolio',
+      });
 
-      // Solo decodificamos el payload para lectura — la firma la valida el backend
-      const payload = JSON.parse(atob(parts[1]));
-      const now = Math.floor(Date.now() / 1000);
-
-      if (payload.exp && payload.exp < now) {
-        cookies.delete('access_token', { path: '/' });
-        const expiredUrl = new URL('/login', SITE_ORIGIN);
-        expiredUrl.searchParams.set('error', 'expired_token');
-        return context.redirect(expiredUrl.toString(), 302);
-      }
-
-      // Guardamos info del usuario para usar en layouts/páginas
+      // El token es VÁLIDO — guardamos info del usuario
       context.locals.user = {
         id: payload.sub || payload.id,
-        username: payload.username || payload.email,
-        role: payload.role,
+        username: (payload as any).username || (payload as any).email,
+        role: (payload as any).role,
         ...payload,
       };
-    } catch (error) {
-      console.error('❌ Error en Middleware Portfolio:', error);
+    } catch (error: any) {
+      // ── Manejo de errores específicos ───────────────────────
+      const errorCode = error?.code || 'invalid_token';
+      let errorParam = 'invalid_token';
+
+      if (errorCode === 'ERR_JWT_EXPIRED') {
+        errorParam = 'expired_token';
+      } else if (errorCode === 'ERR_JWS_INVALID') {
+        errorParam = 'invalid_signature';
+      } else if (errorCode === 'ERR_JWK_MULTIPLE_MATCHING_KEYS') {
+        errorParam = 'invalid_token';
+      }
+
+      // Si authCore está caído, no podemos verificar — fail closed
+      if (error?.message?.includes('fetch') || error?.message?.includes('connect')) {
+        console.error('❌ Middleware: authCore no disponible:', error.message);
+        errorParam = 'auth_unavailable';
+      }
+
+      console.error(`❌ Middleware Portfolio [${errorParam}]:`, error?.message);
+
+      // Limpiar cookie inválida y redirigir
       cookies.delete('access_token', { path: '/' });
       const errorUrl = new URL('/login', SITE_ORIGIN);
-      errorUrl.searchParams.set('error', 'invalid_token');
+      errorUrl.searchParams.set('error', errorParam);
+      errorUrl.searchParams.set('redirect', url.pathname + url.search);
       return context.redirect(errorUrl.toString(), 302);
     }
   }

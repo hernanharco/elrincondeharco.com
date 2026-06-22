@@ -1,7 +1,10 @@
 ---
+import type { ShowroomResponse } from '$lib/types';
+import { fetchSSR } from '$lib/api';
 import { fallbackShowrooms } from '$lib/fallback-data';
 
-const items = fallbackShowrooms;
+const apiItems = await fetchSSR<ShowroomResponse[]>('/showrooms/');
+const items = apiItems ?? fallbackShowrooms;
 ---
 
 <section id="showroom" class="py-20 px-6 md:px-10 bg-zinc-950">
