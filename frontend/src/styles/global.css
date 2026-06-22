@@ -163,14 +163,28 @@ footer[id]:not(.hydrated) * {
  * "pegado", causando artefactos visuales y glitches GPU.
  * Desactivamos transforms y shadows en hover para touch.
  */
-@media (hover: none) and (pointer: coarse) {
-  [class*="hover\\:"] {
-    transform: none !important;
-    box-shadow: none !important;
-  }
-  [class*="group-hover\\:"] {
-    transform: none !important;
-    box-shadow: none !important;
+/* ── Mobile-first: hover effects solo en desktop ───────────
+ * Por defecto: sin hover transforms/shadows en ningún dispositivo.
+ * Solo se activan cuando @media (hover: hover) está presente.
+ */
+[class*="hover:scale"],
+[class*="hover:-translate"],
+[class*="hover:shadow"],
+[class*="group-hover:scale"],
+[class*="group-hover:-translate"],
+[class*="group-hover:shadow"] {
+  transform: none !important;
+  box-shadow: none !important;
+}
+@media (hover: hover) {
+  [class*="hover:scale"],
+  [class*="hover:-translate"],
+  [class*="hover:shadow"],
+  [class*="group-hover:scale"],
+  [class*="group-hover:-translate"],
+  [class*="group-hover:shadow"] {
+    transform: revert !important;
+    box-shadow: revert !important;
   }
 }
 
