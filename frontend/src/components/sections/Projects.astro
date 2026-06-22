@@ -5,6 +5,29 @@ import { fallbackProjects } from '$lib/fallback-data';
 
 const apiItems = await fetchSSR<ProjectResponse[]>('/projects/');
 const items = apiItems ?? fallbackProjects;
+
+const iconPaths: Record<string, string> = {
+  layers: '<path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',
+  lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  calendar: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+};
+
+function pascalToKebab(name: string): string {
+  return name
+    .replace(/([A-Z])/g, (m, l, o) => (o > 0 ? '-' + l.toLowerCase() : l.toLowerCase()))
+    .replace(/(\d+)/g, '-$1')
+    .replace(/--+/g, '-')
+    .replace(/-+$/, '');
+}
+
+function getIconSvg(iconName: string, size: number = 24): string {
+  if (!iconName) iconName = 'layers';
+  const kebab = pascalToKebab(iconName);
+  const renames: Record<string, string> = { globe: 'earth', 'globe-icon': 'earth' };
+  const resolved = renames[kebab] || kebab;
+  const path = iconPaths[resolved] || iconPaths['layers'];
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+}
 ---
 
 <section id="proyectos" class="py-24 bg-zinc-900 text-white">
@@ -29,7 +52,7 @@ const items = apiItems ?? fallbackProjects;
             class="group bg-black border border-white/10 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(251,191,36,0.15)] flex flex-col h-full"
           >
             <div class="relative h-48 overflow-hidden">
-              <div class={`absolute inset-0 bg-gradient-to-tr ${project.color} opacity-60 z-10`}></div>
+              <div class="absolute inset-0 bg-gradient-to-tr {project.color} opacity-60 z-10"></div>
               <img
                 src={project.image_url ||
                   'https://images.unsplash.com/photo-1762803841043-bee9f5691411?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBmdXJuaXR1cmUlMjB1cGhvbHN0ZXJ5JTIwd29ya3Nob3B8ZW58MXx8fHwxNzcwNDgzNjg3fDA&ixlib=rb-4.1.0&q=80&w=1080'}
