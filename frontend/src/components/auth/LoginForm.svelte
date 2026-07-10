@@ -38,6 +38,15 @@
     }
   }
 
+  // URL base de la API (configurable via env)
+  const API_BASE = import.meta.env.PUBLIC_API_URL || 'http://localhost:8001';
+
+  function googleLoginUrl(): string {
+    const base = `${API_BASE}/api/v1/auth/google`;
+    const redirect = `${window.location.origin}/api/auth/callback`;
+    return `${base}?redirect_to=${encodeURIComponent(redirect)}`;
+  }
+
   function clearMessages() {
     if (error) error = null;
   }
@@ -46,7 +55,7 @@
 <div class="w-full max-w-md mx-auto">
   <!-- Google Login -->
   <a
-    href="http://localhost:8000/api/v1/auth/google?redirect_to=http://localhost:4322/api/auth/callback"
+    href={googleLoginUrl()}
     class="w-full py-2.5 px-4 bg-white hover:bg-gray-100 text-zinc-800 font-medium
            rounded-lg transition-all active:scale-[0.98] border border-zinc-300
            flex justify-center items-center gap-3 mb-6"
