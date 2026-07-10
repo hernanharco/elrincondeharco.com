@@ -3,8 +3,11 @@ import type { ProjectResponse } from '$lib/types';
 import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackProjects } from '$lib/fallback-data';
 
+// Merge: datos de API + fallback (evita duplicados por título)
 const apiItems = await fetchSSR<ProjectResponse[]>('/projects/');
-const items = apiItems ?? fallbackProjects;
+const apiTitles = new Set((apiItems ?? []).map(p => p.title));
+const merged = [...(apiItems ?? []), ...fallbackProjects.filter(p => !apiTitles.has(p.title))];
+const items = merged.length > 0 ? merged : fallbackProjects;
 
 const iconPaths: Record<string, string> = {
   layers: '<path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',

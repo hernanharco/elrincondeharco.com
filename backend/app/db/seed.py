@@ -124,6 +124,39 @@ async def seed_projects(db):
             icon_name="Lock",
             color="from-pink-500/20 to-rose-600/20",
         ),
+        Project(
+            title="Café Mi Tierra",
+            description="Web corporativa para cafetería/bar con efectos visuales inmersivos (Three.js, GSAP), panel de administración completo, galería interactiva, horarios, reseñas y sistema de contacto.",
+            tags=["Astro 7", "Svelte 5", "Three.js", "GSAP", "Hono.js", "PostgreSQL"],
+            icon_name="Coffee",
+            color="from-amber-700/30 to-red-800/30",
+            demo_url="https://frontend-gray-alpha-wjs0x2ofbn.vercel.app/",
+            github_url="https://github.com/hernanharco/cafemitierra",
+        ),
+        Project(
+            title="Nanatha",
+            description="Tienda online de moda femenina con catálogo inteligente, filtros avanzados por categoría/color/material, drops exclusivos y panel de administración.",
+            tags=["Astro 7", "Tailwind 4", "Hono.js", "Node.js"],
+            icon_name="ShoppingBag",
+            color="from-blush-400/30 to-rose-500/30",
+            demo_url="https://frontend-six-drab-fsccnsoh2d.vercel.app/",
+            github_url="https://github.com/hernanharco/tiendananatha",
+        ),
+        Project(
+            title="miniCRM Ghogares",
+            description="CRM inmobiliario inteligente con motor de matching automático. Integra scrapers de Fotocasa e Idealista para emparejar propiedades con contactos según presupuesto, ubicación y preferencias.",
+            tags=["FastAPI", "Python", "SQLAlchemy", "HTMX", "SQLite"],
+            icon_name="Building2",
+            color="from-emerald-500/30 to-teal-600/30",
+            github_url="https://github.com/hernanharco/miniCRM-Ghogares",
+        ),
+        Project(
+            title="Scrapers Inmobiliarios",
+            description="Sistema de scraping automático para portales inmobiliarios (Fotocasa e Idealista). Extracción programada de propiedades con normalización de datos y detección de cambios en tiempo real.",
+            tags=["Python", "Playwright", "ETL", "Automatización"],
+            icon_name="Bot",
+            color="from-violet-500/30 to-purple-700/30",
+        ),
     ]
     db.add_all(items)
 
