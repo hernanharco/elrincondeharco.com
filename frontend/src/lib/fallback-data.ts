@@ -145,7 +145,7 @@ export const fallbackProjects: ProjectResponse[] = [
     tags: ['Astro 7', 'Tailwind 4', 'Hono.js', 'Node.js'],
     icon_name: 'ShoppingBag',
     color: 'from-blush-400/30 to-rose-500/30',
-    demo_url: null,
+    demo_url: 'https://frontend-six-drab-fsccnsoh2d.vercel.app/',
     github_url: 'https://github.com/hernanharco/tiendananatha',
   },
   {
