@@ -1,0 +1,79 @@
+# ============================================================
+# compose.prod.yaml — Portfolio elRinconDeHarco (producción)
+# ============================================================
+# Uso: docker compose -f compose.prod.yaml up -d --build
+# ============================================================
+# Puertos: 8003 (API), 5439 (PostgreSQL)
+# Dominio: api.elrincondeharco.com → Cloudflare Tunnel → localhost:8003
+# ============================================================
+
+services:
+  # ── Base de datos ────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5439:5432"
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  # ── Backend FastAPI ──────────────────────────────────────────
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8003:8000"
+    environment:
+      PORT: 8000
+      DEBUG: "false"
+      ENVIRONMENT: production
+
+      # Base de Datos
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: portfolio
+      PGUSER: portfolio
+      PGPASSWORD: ${DB_PASSWORD}
+      PGSCHEMA: elrincondeharco
+      PGSSLMODE: disable
+
+      # Seguridad
+      SECRET_KEY: ${SECRET_KEY}
+
+      # Cloudinary
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+
+      # authCore — validación JWT
+      AUTHCORE_JWKS_URL: http://authcore-api:8000/.well-known/jwks.json
+
+      # CORS — frontend en Vercel
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+volumes:
+  pgdata:

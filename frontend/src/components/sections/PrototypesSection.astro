@@ -1,0 +1,107 @@
+---
+import type { ShowroomResponse } from '$lib/types';
+import { fetchSSR, optimizeImage } from '$lib/api';
+import { fallbackShowrooms } from '$lib/fallback-data';
+
+const apiItems = await fetchSSR<ShowroomResponse[]>('/showrooms/');
+const items = (apiItems ?? fallbackShowrooms).slice(0, 3);
+---
+
+<section id="prototipos" class="py-24 bg-zinc-950 text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-5xl font-bold mb-4">
+        Prototipos <span class="text-amber-400">Recientes</span>
+      </h2>
+      <p class="text-gray-400 max-w-2xl mx-auto text-lg">
+        Diseños funcionales y conceptos que muestran el proceso creativo detrás de cada solución.
+      </p>
+    </div>
+
+    {items.length === 0 ? (
+      <div class="text-center py-12">
+        <p class="text-zinc-500">No hay prototipos disponibles</p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {items.map(item => (
+          <a
+            href={item.deploy_url || '#'}
+            target={item.deploy_url ? '_blank' : undefined}
+            rel={item.deploy_url ? 'noopener noreferrer' : undefined}
+            class="group relative bg-zinc-900/50 rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/40 transition-all duration-500 hover:shadow-[0_0_40px_-10px_rgba(251,191,36,0.15)] hover:-translate-y-1"
+          >
+            <div class="relative h-40 overflow-hidden">
+              {item.image_url ? (
+                <img
+                  src={optimizeImage(item.image_url, 400)}
+                  alt={item.title}
+                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-full h-full bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400/30">
+                    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                  </svg>
+                </div>
+              )}
+              <div class="absolute top-3 left-3">
+                <span class="px-2.5 py-1 bg-amber-500/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
+                  {item.category}
+                </span>
+              </div>
+            </div>
+
+            <div class="p-5">
+              <h3 class="text-lg font-bold text-white group-hover:text-amber-400 transition-colors mb-2">
+                {item.title}
+              </h3>
+              <p class="text-gray-400 text-sm leading-relaxed line-clamp-2">
+                {item.description}
+              </p>
+            </div>
+
+            {item.deploy_url && (
+              <div class="absolute inset-0 bg-gradient-to-t from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            )}
+          </a>
+        ))}
+      </div>
+    )}
+
+    <div class="text-center mt-12">
+      <a
+        href="/showroom"
+        class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-amber-500/25 group"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+        <span>Ver Todos los Prototipos</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform duration-300 group-hover:translate-x-1"
+        ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

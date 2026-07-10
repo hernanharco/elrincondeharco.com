@@ -106,4 +106,53 @@ Si hay problemas visuales en móvil o querés ver cómo se ve una página sin us
 
 ---
 
+## 👁️ VISIÓN — Analizar imágenes y videos con Gemini
+
+El pipeline de visión permite que modelos text-only (deepseek-v4-flash) "vean" imágenes a través de Gemini.
+
+| Decime esto | Lo que pasa |
+|-------------|-------------|
+| *Pegar imagen (Ctrl+Shift+V)* | El plugin **Vision Assistant** la describe automáticamente con Gemini |
+| "Analizá la última captura" | Busca la última imagen en `~/Imágenes/Capturas de pantalla/` y la analiza |
+| "Usá vision_describe con la imagen X" | Tool directo para describir una imagen específica |
+| "Usá vision_analyze con la imagen X" | Análisis completo (metadatos + descripción + texto) |
+| "Usá analyze_video con URL de YouTube" | Analiza un video de YouTube usando Gemini (sin descargar nada) |
+
+### Herramientas CLI (terminal)
+
+| Comando | Qué hace |
+|---------|----------|
+| `ultima` | Copia la ruta de la última captura al portapapeles |
+| `vi` | Analiza la última captura desde la terminal |
+| `Ctrl+Shift+U` (WezTerm) | Keybinding directo para `ultima` |
+
+### Cómo funciona
+
+```
+Plugin Vision Assistant (vision-assistant.ts)
+  ├── hook "chat.message" → detecta imágenes pegadas → Gemini → texto descriptivo
+  ├── tool "vision_describe" → describe cualquier imagen
+  ├── tool "vision_analyze" → análisis completo
+  └── tool "analyze_video" → analiza videos de YouTube por URL
+```
+
+**Requerimiento:** API key de Google en `~/.config/opencode/.env` (`GOOGLE_API_KEY=...`)
+**Modelo:** Gemini 2.5 Flash (1,500 requests/día gratis, 1M tokens de contexto)
+
+---
+
+## 🧩 PLUGINS DE OPENCODE
+
+Los plugins reemplazan a los MCP servers en muchos casos. Se cargan automáticamente desde `~/.config/opencode/plugins/`.
+
+| Plugin | Qué hace |
+|--------|----------|
+| `vision-assistant.ts` | Tools de visión + auto-descripción de imágenes pegadas |
+| `engram.ts` | Memoria persistente entre sesiones |
+| `background-agents.ts` | Delegación de tareas en segundo plano |
+
+**Ventaja de plugins vs MCP:** Los plugins corren DENTRO del proceso de OpenCode. No necesitan ser spawneados como procesos separados, evitando problemas de pipes/stdio que tienen los MCP servers locales.
+
+---
+
 > **Recordá:** No necesitás memorizarte esto. Cuando quieras consultarlo, decime "acordate del cheat sheet" y yo lo busco en memoria.

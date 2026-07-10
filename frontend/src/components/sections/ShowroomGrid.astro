@@ -1,6 +1,6 @@
 ---
 import type { ShowroomResponse } from '$lib/types';
-import { fetchSSR } from '$lib/api';
+import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackShowrooms } from '$lib/fallback-data';
 
 const apiItems = await fetchSSR<ShowroomResponse[]>('/showrooms/');
@@ -44,9 +44,10 @@ const items = apiItems ?? fallbackShowrooms;
               {item.image_url ? (
                 <>
                   <img
-                    src={item.image_url}
+                    src={optimizeImage(item.image_url, 600)}
                     alt={item.title}
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
                   />
                   <div
                     class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/50 to-transparent"

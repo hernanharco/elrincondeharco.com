@@ -45,6 +45,44 @@ export async function fetchSSR<T>(endpoint: string): Promise<T | null> {
 // Usada en componentes Svelte (con credentials para cookies)
 const CLIENT_API_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.PUBLIC_API_URL) || 'http://localhost:8000';
 
+/**
+ * optimizeImage — Transforma URLs de imágenes para mejor rendimiento.
+ *
+ * Para Cloudinary: agrega f_webp, q_auto y redimensiona.
+ * Para Unsplash: reduce calidad y tamaño.
+ * Para otras URLs: devuelve tal cual.
+ *
+ * @param url    URL original de la imagen
+ * @param width  Ancho deseado en px (default: 600)
+ * @param quality Calidad (solo para non-Cloudinary, default: 60)
+ */
+export function optimizeImage(
+  url: string | null | undefined,
+  width: number = 600,
+  quality: number = 60
+): string {
+  if (!url) return '';
+
+  // ── Cloudinary: insertar transformaciones después de /upload/ ──
+  if (url.includes('cloudinary.com') && url.includes('/upload/')) {
+    return url.replace('/upload/', `/upload/f_webp,q_auto,w_${width}/`);
+  }
+
+  // ── Unsplash: ajustar params de calidad/tamaño ──
+  if (url.includes('unsplash.com')) {
+    try {
+      const urlObj = new URL(url);
+      urlObj.searchParams.set('w', String(width));
+      urlObj.searchParams.set('q', String(quality));
+      return urlObj.toString();
+    } catch {
+      return url;
+    }
+  }
+
+  return url;
+}
+
 export async function fetchApi<T>(
   endpoint: string,
   options?: RequestInit
