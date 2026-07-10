@@ -9,7 +9,7 @@ import { defineMiddleware } from 'astro:middleware';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 // ── Configuración ─────────────────────────────────────────────
-const SITE_ORIGIN = process.env.SITE_ORIGIN || 'http://localhost:4322';
+const SITE_ORIGIN = process.env.SITE_ORIGIN; // Opcional, fallback a context.url.origin
 
 // URL del JWKS de authCore (para validar la firma del JWT)
 // Fallback: http://localhost:8000 (desarrollo local sin Docker)
@@ -38,7 +38,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // Sin cookie → redirect a login
     if (!sessionCookie || !sessionCookie.value) {
-      const loginUrl = new URL('/login', SITE_ORIGIN);
+      const loginUrl = new URL('/login', SITE_ORIGIN || url.origin);
       loginUrl.searchParams.set('error', 'no_session');
       loginUrl.searchParams.set('redirect', url.pathname + url.search);
       return context.redirect(loginUrl.toString(), 302);
@@ -84,7 +84,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       // Limpiar cookie inválida y redirigir
       cookies.delete('access_token', { path: '/' });
-      const errorUrl = new URL('/login', SITE_ORIGIN);
+      const errorUrl = new URL('/login', SITE_ORIGIN || url.origin);
       errorUrl.searchParams.set('error', errorParam);
       errorUrl.searchParams.set('redirect', url.pathname + url.search);
       return context.redirect(errorUrl.toString(), 302);
