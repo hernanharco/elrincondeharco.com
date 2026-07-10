@@ -1,6 +1,6 @@
 ---
 import type { AboutResponse } from '$lib/types';
-import { fetchSSR } from '$lib/api';
+import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackAbout } from '$lib/fallback-data';
 
 const apiData = await fetchSSR<AboutResponse>('/abouts/latest/');
@@ -13,10 +13,11 @@ const data: AboutResponse = apiData ?? fallbackAbout;
       <div class="relative">
         <div class="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-2xl group">
           <img
-            src={data.image_url ||
-              'https://images.unsplash.com/photo-1631624220291-8f191fbdb543?q=80&w=1080'}
+            src={optimizeImage(data.image_url, 600) ||
+              optimizeImage('https://images.unsplash.com/photo-1631624220291-8f191fbdb543?q=80&w=1080', 600)}
             alt="Hernan Arango Cortes"
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            loading="lazy"
           />
           <div
             class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60"

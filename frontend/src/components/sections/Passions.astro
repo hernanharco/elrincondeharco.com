@@ -1,6 +1,6 @@
 ---
 import type { PassionResponse } from '$lib/types';
-import { fetchSSR } from '$lib/api';
+import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackPassion } from '$lib/fallback-data';
 
 const apiData = await fetchSSR<PassionResponse>('/passions/latest/');
@@ -69,10 +69,11 @@ const data: PassionResponse = apiData ?? fallbackPassion;
           class="relative rounded-2xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500"
         >
           <img
-            src={data?.image_url ||
-              'https://images.unsplash.com/photo-1758687126556-b2d1c32e4207?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aWRlbyUyMGdhbWVzJTIwY29udHJvbGxlciUyMGZhbWlseSUyMGxpdmluZyUyMHJvb218ZW58MXx8fHwxNzcwNDgwNjI4fDA&ixlib=rb-4.1.0&q=80&w=1080'}
+            src={optimizeImage(data?.image_url, 600) ||
+              optimizeImage('https://images.unsplash.com/photo-1758687126556-b2d1c32e4207?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aWRlbyUyMGdhbWVzJTIwY29udHJvbGxlciUyMGZhbWlseSUyMGxpdmluZyUyMHJvb218ZW58MXx8fHwxNzcwNDgwNjI4fDA&ixlib=rb-4.1.0&q=80&w=1080', 600)}
             alt="Family and Gaming"
             class="w-full h-[600px] object-cover"
+            loading="lazy"
           />
           <div
             class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"

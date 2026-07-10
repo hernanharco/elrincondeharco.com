@@ -5,17 +5,19 @@ import Hero from '../components/sections/Hero.astro';
 import About from '../components/sections/About.astro';
 import Stack from '../components/sections/Stack.astro';
 import Projects from '../components/sections/Projects.astro';
+import PrototypesSection from '../components/sections/PrototypesSection.astro';
 import Passions from '../components/sections/Passions.astro';
 import Footer from '../components/layout/Footer.astro';
 ---
 
-<Layout>
+<Layout title="Hernan Arango Cortes - Full Stack Developer" description="Portfolio de Hernan Arango Cortes. Desarrollador Full Stack con 14+ años de experiencia en FastAPI, Astro, React y TypeScript. Transformando ideas en soluciones digitales modulares y escalables.">
 	<main>
 		<Navbar />
 		<Hero />
 		<About />
 		<Stack />
 		<Projects />
+		<PrototypesSection />
 		<Passions />
 		<Footer />
 	</main>

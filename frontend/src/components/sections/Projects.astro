@@ -1,6 +1,6 @@
 ---
 import type { ProjectResponse } from '$lib/types';
-import { fetchSSR } from '$lib/api';
+import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackProjects } from '$lib/fallback-data';
 
 const apiItems = await fetchSSR<ProjectResponse[]>('/projects/');
@@ -10,6 +10,11 @@ const iconPaths: Record<string, string> = {
   layers: '<path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',
   lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   calendar: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+  coffee: '<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/>',
+  'shopping-bag': '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+  'building-2': '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  bot: '<path d="M12 8V4m0 0a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4m8-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/><path d="M2 21h20"/><rect x="2" y="8" width="20" height="8" rx="2"/><circle cx="8" cy="14" r="1.5" fill="currentColor"/><circle cx="16" cy="14" r="1.5" fill="currentColor"/><path d="M10 10h4"/>',
 };
 
 function pascalToKebab(name: string): string {
@@ -52,13 +57,23 @@ function getIconSvg(iconName: string, size: number = 24): string {
             class="group bg-black border border-white/10 rounded-2xl overflow-hidden hover:border-amber-500/30 transition-shadow duration-500 hover:shadow-[0_0_30px_-5px_rgba(251,191,36,0.15)] flex flex-col h-full"
           >
             <div class="relative h-48 overflow-hidden">
-              <div class="absolute inset-0 bg-gradient-to-tr {project.color} opacity-60 z-10"></div>
-              <img
-                src={project.image_url ||
-                  'https://images.unsplash.com/photo-1762803841043-bee9f5691411?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBmdXJuaXR1cmUlMjB1cGhvbHN0ZXJ5JTIwd29ya3Nob3B8ZW58MXx8fHwxNzcwNDgzNjg3fDA&ixlib=rb-4.1.0&q=80&w=1080'}
-                alt={project.title}
-                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-              />
+              {project.image_url ? (
+                <>
+                  <div class="absolute inset-0 bg-gradient-to-tr {project.color} opacity-60 z-10"></div>
+                  <img
+                    src={optimizeImage(project.image_url, 600)}
+                    alt={project.title}
+                    class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                    loading="lazy"
+                  />
+                </>
+              ) : (
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br {project.color}">
+                  <span class="text-white/30 scale-[4]">
+                    {getIconSvg(project.icon_name, 48)}
+                  </span>
+                </div>
+              )}
               <div
                 class="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-md p-2 rounded-lg border border-white/10 text-white"
               >
