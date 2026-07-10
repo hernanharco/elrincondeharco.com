@@ -38,11 +38,12 @@
     }
   }
 
-  // URL base de la API (configurable via env)
-  const API_BASE = import.meta.env.PUBLIC_API_URL || 'http://localhost:8001';
+  // URL base de authCore (configurable via env)
+  // En prod apunta a authCore en Hetzner, en dev a localhost:8000
+  const AUTHCORE_URL = import.meta.env.PUBLIC_AUTHCORE_URL || 'http://localhost:8000';
 
   function googleLoginUrl(): string {
-    const base = `${API_BASE}/api/v1/auth/google`;
+    const base = `${AUTHCORE_URL}/api/v1/auth/google`;
     const redirect = `${window.location.origin}/api/auth/callback`;
     return `${base}?redirect_to=${encodeURIComponent(redirect)}`;
   }
