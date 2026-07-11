@@ -32,7 +32,11 @@ const SSR_BASE_URL: string =
 export async function fetchSSR<T>(endpoint: string): Promise<T | null> {
   try {
     const url = `${SSR_BASE_URL}/api/v1${endpoint}`;
-    const res = await fetch(url, { next: { revalidate: 60 } });
+    // Timeout de 3s para evitar que la función serverless cuelgue en Vercel
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch (err) {
