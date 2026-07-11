@@ -12,6 +12,7 @@ from app.api.v1.endpoints import (
     footer,
     site_settings,
     showroom,
+    testimonials,
 )
 
 api_router = APIRouter()
@@ -27,6 +28,7 @@ api_router.include_router(sectors.router, prefix="/sectors", tags=["sectors"])
 api_router.include_router(stack.router, prefix="/stacks", tags=["stacks"])
 api_router.include_router(footer.router, prefix="/footers", tags=["footers"])
 api_router.include_router(showroom.router, prefix="/showrooms", tags=["showrooms"])
+api_router.include_router(testimonials.router, prefix="/testimonials", tags=["testimonials"])
 api_router.include_router(
     site_settings.router, prefix="/site-settings", tags=["site-settings"]
 )
