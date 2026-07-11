@@ -5,10 +5,11 @@
 
   export let sections = [
     { href: '/admin/hero', label: 'Hero', description: 'Título y subtítulo principal' },
-    { href: '/admin/about', label: 'About', description: 'Sección sobre mí' },
-    { href: '/admin/stack', label: 'Stack', description: 'Tecnologías y herramientas' },
-    { href: '/admin/projects', label: 'Proyectos', description: 'Galería de proyectos' },
-    { href: '/admin/passions', label: 'Pasiones', description: 'Sección de pasiones' },
+    { href: '/admin/projects', label: 'Proyectos', description: 'Galería de proyectos destacados' },
+    { href: '/admin/sectors', label: 'Sectores', description: 'Rubros y asignación de proyectos' },
+    { href: '/admin/testimonials', label: 'Testimonios', description: 'Lo que dicen los clientes' },
+    { href: '/admin/showroom', label: 'Showroom', description: 'Prototipos y experimentos' },
+    { href: '/admin/site-settings', label: 'Configuración', description: 'Nombre, redes, copyright' },
   ];
 </script>
 

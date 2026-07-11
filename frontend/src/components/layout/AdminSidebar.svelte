@@ -22,14 +22,10 @@
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: 'lucide:layout-dashboard' },
     { href: '/admin/hero', label: 'Hero', icon: 'lucide:sparkles' },
-    { href: '/admin/about', label: 'About', icon: 'lucide:user' },
-    { href: '/admin/stack', label: 'Stack', icon: 'lucide:code-2' },
     { href: '/admin/projects', label: 'Proyectos', icon: 'lucide:folder-kanban' },
     { href: '/admin/sectors', label: 'Sectores', icon: 'lucide:layout-list' },
     { href: '/admin/testimonials', label: 'Testimonios', icon: 'lucide:message-square-quote' },
     { href: '/admin/showroom', label: 'Showroom', icon: 'lucide:rocket' },
-    { href: '/admin/passions', label: 'Pasiones', icon: 'lucide:heart' },
-    { href: '/admin/footer', label: 'Footer', icon: 'lucide:mail' },
     { href: '/admin/site-settings', label: 'Configuración', icon: 'lucide:settings' },
   ];
 
