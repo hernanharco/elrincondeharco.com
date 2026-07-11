@@ -7,6 +7,7 @@ from app.api.v1.endpoints import (
     about,
     passions,
     projects,
+    sectors,
     stack,
     footer,
     site_settings,
@@ -22,6 +23,7 @@ api_router.include_router(hero.router, prefix="/heroes", tags=["heroes"])
 api_router.include_router(about.router, prefix="/abouts", tags=["abouts"])
 api_router.include_router(passions.router, prefix="/passions", tags=["passions"])
 api_router.include_router(projects.router, prefix="/projects", tags=["projects"])
+api_router.include_router(sectors.router, prefix="/sectors", tags=["sectors"])
 api_router.include_router(stack.router, prefix="/stacks", tags=["stacks"])
 api_router.include_router(footer.router, prefix="/footers", tags=["footers"])
 api_router.include_router(showroom.router, prefix="/showrooms", tags=["showrooms"])

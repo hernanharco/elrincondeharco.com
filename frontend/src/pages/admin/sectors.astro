@@ -1,0 +1,10 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SectorEditor from '../../components/admin/SectorEditor.svelte';
+
+const currentPath = Astro.url.pathname;
+---
+
+<AdminLayout title="Sectores" currentPath={currentPath}>
+  <SectorEditor client:load />
+</AdminLayout>

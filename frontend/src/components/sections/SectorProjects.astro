@@ -1,81 +1,78 @@
 ---
 // SectorProjects.astro — Unifica Sectores + Proyectos
-// Click en rubro → muestra proyectos con efecto 3D flip
+// AHORA los sectores vienen de la API (editables desde admin)
+// Fallback local si la API no responde
 
-import type { ProjectResponse } from '$lib/types';
+import type { ProjectResponse, SectorResponse } from '$lib/types';
 import { fetchSSR, optimizeImage } from '$lib/api';
-import { fallbackProjects } from '$lib/fallback-data';
-import { fallbackShowrooms } from '$lib/fallback-data';
+import { fallbackProjects, fallbackSectors, fallbackShowrooms } from '$lib/fallback-data';
 
-// ── Datos de sectores ──────────────────────────────────────
-const sectores = [
-  {
-    id: 'hosteleria', name: 'Hostelería', client: 'Café Mi Tierra',
-    icon: 'M17 8h1a4 4 0 1 1 0 8h-1 M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z',
-    gradient: 'from-amber-700/30 to-red-800/30',
-  },
-  {
-    id: 'inmobiliaria', name: 'Inmobiliaria', client: 'Grupo Hogares',
-    icon: 'M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2',
-    gradient: 'from-emerald-500/30 to-teal-600/30',
-  },
-  {
-    id: 'talleres', name: 'Talleres', client: 'Tapicería Moderna',
-    icon: 'M12 2 2 7l10 5 10-5-10-5Z m2 17 10 5 10-5',
-    gradient: 'from-amber-500/20 to-orange-600/20',
-  },
-  {
-    id: 'salud', name: 'Salud', client: 'Clínicas',
-    icon: 'M22 12h-4l-3 9L9 3l-3 9H2',
-    gradient: 'from-blue-500/20 to-cyan-600/20',
-  },
-  {
-    id: 'belleza', name: 'Belleza', client: 'Centros Estéticos',
-    icon: 'M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z',
-    gradient: 'from-blush-400/30 to-rose-500/30',
-  },
-  {
-    id: 'logistica', name: 'Logística', client: 'Distribución',
-    icon: 'M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
-    gradient: 'from-violet-500/30 to-purple-700/30',
-  },
+// ── Fetch sectores desde API ──────────────────────────────
+const apiSectors = await fetchSSR<SectorResponse[]>('/sectors/');
+const apiSectorTitles = new Set((apiSectors ?? []).map((s) => s.name));
+const mergedSectors = [
+  ...(apiSectors ?? []),
+  ...fallbackSectors.filter((s) => !apiSectorTitles.has(s.name)),
 ];
 
 // ── Fetch proyectos ────────────────────────────────────────
-const apiItems = await fetchSSR<ProjectResponse[]>('/projects/');
-const apiTitles = new Set((apiItems ?? []).map((p) => p.title));
+const apiProjects = await fetchSSR<ProjectResponse[]>('/projects/');
+const apiProjectTitles = new Set((apiProjects ?? []).map((p) => p.title));
 const allProjects = [
-  ...(apiItems ?? []),
-  ...fallbackProjects.filter((p) => !apiTitles.has(p.title)),
+  ...(apiProjects ?? []),
+  ...fallbackProjects.filter((p) => !apiProjectTitles.has(p.title)),
 ];
 
-// ── Mapa sector → proyectos (por título) ────────────────────
-// Agregamos proyectos de prototipos desde fallbackShowrooms
-const showroomBySector: Record<string, typeof fallbackShowrooms> = {
-  hosteleria: fallbackShowrooms.filter(s => s.title.includes('Gastronómica') || s.title.includes('Restauran')),
-  belleza: fallbackShowrooms.filter(s => s.title.includes('Estética') || s.title.includes('Beauty')),
-  salud: fallbackShowrooms.filter(s => s.title.includes('Clínica') || s.title.includes('Doctora')),
-  logistica: fallbackShowrooms.filter(s => s.title.includes('Prixline')),
-  talleres: fallbackShowrooms.filter(s => s.title.includes('Taller')),
-  inmobiliaria: [],
-};
+// ── Mapa: sector (por nombre) → títulos de proyectos ───────
+// Usa project_ids del sector para buscar proyectos por ID
+function buildProjectTitles(sectors: SectorResponse[], projects: ProjectResponse[]): Record<number, string[]> {
+  const map: Record<number, string[]> = {};
+  const projectById: Record<number, string> = {};
+  projects.forEach(p => { projectById[p.id] = p.title; });
+  sectors.forEach(s => {
+    map[s.id] = s.project_ids.map(id => projectById[id]).filter(Boolean);
+  });
+  return map;
+}
 
-const sectorProjectTitles: Record<string, string[]> = {
-  hosteleria: ['Café Mi Tierra'],
-  inmobiliaria: ['miniCRM Ghogares'],
-  talleres: ['Tapicería Moderna'],
-  salud: ['CoreAppointment'],
-  belleza: ['Nanatha'],
-  logistica: [],
-};
+const sectorProjectMap = buildProjectTitles(mergedSectors, allProjects);
 
-// ── Serializar datos para el cliente ───────────────────────
+// ── Showroom items como complemento (por nombre de sector) ──
+const showroomComplement: Record<number, typeof fallbackShowrooms> = {};
+mergedSectors.forEach(s => {
+  const name = s.name.toLowerCase();
+  if (name.includes('hostel') || name.includes('rest')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Gastronómica') || x.title.includes('Restauran'));
+  } else if (name.includes('belle') || name.includes('estét')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Estética') || x.title.includes('Beauty'));
+  } else if (name.includes('salud') || name.includes('clín')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Clínica') || x.title.includes('Doctora'));
+  } else if (name.includes('logíst') || name.includes('dist')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Prixline'));
+  } else if (name.includes('taller')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Taller'));
+  } else {
+    showroomComplement[s.id] = [];
+  }
+});
+
+// ── Serializar para el cliente ─────────────────────────────
 const sectorData = JSON.stringify({
-  sectores,
+  sectores: mergedSectors.map(s => ({
+    id: s.id,
+    name: s.name,
+    client: s.client_name,
+    icon: s.icon_path,
+    gradient: s.color_gradient,
+    description: s.description,
+  })),
   projects: allProjects,
-  projectTitles: sectorProjectTitles,
+  projectTitles: sectorProjectMap,
   showroomBySector: Object.fromEntries(
-    Object.entries(showroomBySector).map(([key, items]) => [key, items.map(s => ({ title: s.title, description: s.description, image_url: s.image_url, demo_url: s.deploy_url }))])
+    Object.entries(showroomComplement).map(([key, items]) => [
+      key,
+      items.map(s => ({ title: s.title, description: s.description, image_url: s.image_url, demo_url: s.deploy_url }))
+    ])
   ),
 });
 ---
