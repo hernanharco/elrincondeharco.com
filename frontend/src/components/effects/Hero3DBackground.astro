@@ -1,0 +1,139 @@
+<div class="hero-3d-bg absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+  <!-- Fallback estático (se ve SIN JavaScript) -->
+  <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black opacity-100"></div>
+  <canvas id="hero-3d-canvas" class="absolute inset-0 w-full h-full opacity-40"></canvas>
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  (function init() {
+  let canvas = document.getElementById('hero-3d-canvas');
+  if (!canvas) return;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 12;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // ── Geometrías ─────────────────────────────────────────────
+  const geometries = [];
+  const colors = [
+    new THREE.Color(0xf59e0b), // amber-500
+    new THREE.Color(0xd97706), // amber-600
+    new THREE.Color(0x92400e), // amber-800
+    new THREE.Color(0x78350f), // amber-900
+  ];
+
+  const types = [
+    { geo: new THREE.IcosahedronGeometry(0.6, 0), speed: 0.2 },
+    { geo: new THREE.TorusGeometry(0.5, 0.15, 12, 18), speed: 0.15 },
+    { geo: new THREE.OctahedronGeometry(0.5, 0), speed: 0.25 },
+    { geo: new THREE.TetrahedronGeometry(0.55, 0), speed: 0.3 },
+  ];
+
+  for (let i = 0; i < 18; i++) {
+    const t = types[i % types.length];
+    const mat = new THREE.MeshBasicMaterial({
+      color: colors[i % colors.length],
+      wireframe: true,
+      transparent: true,
+      opacity: 0.15 + Math.random() * 0.15,
+    });
+    const mesh = new THREE.Mesh(t.geo, mat);
+
+    mesh.position.set(
+      (Math.random() - 0.5) * 18,
+      (Math.random() - 0.5) * 10,
+      (Math.random() - 0.5) * 8 - 2
+    );
+
+    mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+
+    mesh.userData = {
+      rotX: t.speed * (0.5 + Math.random() * 0.5),
+      rotY: t.speed * (0.5 + Math.random() * 0.5),
+      floatAmp: 0.1 + Math.random() * 0.2,
+      floatSpeed: 0.3 + Math.random() * 0.3,
+      floatPhase: Math.random() * Math.PI * 2,
+      initialY: mesh.position.y,
+    };
+
+    scene.add(mesh);
+    geometries.push(mesh);
+  }
+
+  // ── Líneas de conexión sutiles ────────────────────────────
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0xf59e0b,
+    transparent: true,
+    opacity: 0.03,
+  });
+  const linePositions: number[] = [];
+  const lineGeo = new THREE.BufferGeometry();
+
+  for (let i = 0; i < 15; i++) {
+    const a = Math.floor(Math.random() * geometries.length);
+    let b = Math.floor(Math.random() * geometries.length);
+    while (b === a) b = Math.floor(Math.random() * geometries.length);
+    const p1 = geometries[a].position;
+    const p2 = geometries[b].position;
+    linePositions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+  }
+
+  lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+  const lineMesh = new THREE.LineSegments(lineGeo, lineMat);
+  scene.add(lineMesh);
+
+  // ── Mouse tracking ─────────────────────────────────────────
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  // ── Resize ─────────────────────────────────────────────────
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // ── Animación ──────────────────────────────────────────────
+  let clock = new THREE.Clock();
+
+  function animate() {
+    const time = clock.getElapsedTime();
+
+    geometries.forEach((mesh, i) => {
+      const ud = mesh.userData;
+      mesh.rotation.x += ud.rotX * 0.008;
+      mesh.rotation.y += ud.rotY * 0.008;
+      mesh.position.y = ud.initialY + Math.sin(time * ud.floatSpeed + ud.floatPhase) * ud.floatAmp;
+    });
+
+    // Seguir mouse sutilmente
+    camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.01;
+    camera.position.y += (-mouseY * 1 - camera.position.y) * 0.01;
+    camera.lookAt(0, 0, 0);
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+  })();
+</script>
+
+<style>
+  .hero-3d-bg canvas {
+    opacity: 0 !important;
+    animation: fadeInCanvas 2s ease forwards 0.5s;
+  }
+  @keyframes fadeInCanvas {
+    to { opacity: 0.4 !important; }
+  }
+</style>
