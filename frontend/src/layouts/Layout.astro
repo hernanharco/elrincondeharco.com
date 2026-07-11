@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Hero3DBackground from '../components/effects/Hero3DBackground.astro';
 
 export interface Props {
   title?: string;
@@ -8,12 +9,12 @@ export interface Props {
 
 const {
   title = 'Hernan Arango Cortes - Full Stack Developer',
-  description = 'Portfolio de Hernan Arango Cortes. Desarrollador Full Stack con 14+ años de experiencia en FastAPI, Astro, React y TypeScript. Transformando ideas en soluciones digitales modulares y escalables.',
+  description = 'Portfolio de Hernan Arango Cortes. Desarrollador Full Stack con 14+ años de experiencia.',
 } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -21,22 +22,25 @@ const {
 		<title>{title}</title>
 		<meta name="description" content={description} />
 
-		<!-- Preconnect para Google Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-		<!-- Google Fonts no bloqueante (media="print" → se carga async) -->
-		<link
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-			rel="stylesheet"
-			media="print"
-			onload="this.media='all'"
-		/>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 		<noscript>
 			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 		</noscript>
+
+		<style>
+			html { scroll-behavior: smooth; }
+			body { background: #060606; }
+		</style>
 	</head>
-	<body>
-		<slot />
+	<body class="font-[Inter] text-white">
+		<!-- 3D Background - persiste en todo el sitio -->
+		<Hero3DBackground />
+
+		<!-- Contenido sobre el 3D -->
+		<div class="relative z-10">
+			<slot />
+		</div>
 	</body>
 </html>
