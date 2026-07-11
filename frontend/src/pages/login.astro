@@ -1,5 +1,5 @@
 ---
-export const prerender = false;
+export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import LoginForm from '../components/auth/LoginForm.svelte';
 
@@ -21,7 +21,7 @@ const redirect = Astro.url.searchParams.get('redirect') || '/admin';
 
       <!-- Formulario -->
       <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-xl">
-        <LoginForm client:load redirectParam={redirect} />
+        <LoginForm client:only="svelte" redirectParam={redirect} />
       </div>
 
       <!-- Footer -->
