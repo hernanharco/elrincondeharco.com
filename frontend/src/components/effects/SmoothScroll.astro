@@ -12,6 +12,11 @@
   gsap.registerPlugin(ScrollTrigger);
 
   // ── Lenis Smooth Scroll ──────────────────────────────────
+  // IMPORTANTE: contentElement limita la transform a un wrapper,
+  // para que elementos con position:fixed (CaosOrden, Hero3DBackground)
+  // NO se muevan con el scroll y sigan siendo fixed relativos a la ventana.
+  const contentEl = document.getElementById("lenis-content");
+
   const lenis = new Lenis({
     duration: 1.4,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -19,6 +24,7 @@
     smoothWheel: true,
     wheelMultiplier: 0.9,
     touchMultiplier: 1.2,
+    content: contentEl, // ← solo transformar el contenido, no el HTML entero
   });
 
   lenis.on("scroll", ScrollTrigger.update);
