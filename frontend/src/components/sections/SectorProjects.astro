@@ -1,38 +1,62 @@
 ---
 // SectorProjects.astro — Unifica Sectores + Proyectos
-// Usa datos de fallback (los sectores se editan en /admin y
-// se actualiza el fallback cuando hay cambios)
+// Lee sectores desde API con fallback a datos locales
 
-import { optimizeImage } from '$lib/api';
+import type { SectorResponse, ProjectResponse } from '$lib/types';
+import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackProjects, fallbackSectors, fallbackShowrooms } from '$lib/fallback-data';
 
-// ── Usar datos de respaldo (siempre disponibles) ───────────
-const allProjects = fallbackProjects;
+// ── Fetch sectores desde API ─────────────────────────────
+const apiSectors = await fetchSSR<SectorResponse[]>('/sectors/');
+const apiSectorTitles = new Set((apiSectors ?? []).map((s) => s.name));
+const mergedSectors = [
+  ...(apiSectors ?? []),
+  ...fallbackSectors.filter((s) => !apiSectorTitles.has(s.name)),
+];
+
+// ── Fetch proyectos ────────────────────────────────────────
+const apiProjects = await fetchSSR<ProjectResponse[]>('/projects/');
+const apiProjectTitles = new Set((apiProjects ?? []).map((p) => p.title));
+const allProjects = [
+  ...(apiProjects ?? []),
+  ...fallbackProjects.filter((p) => !apiProjectTitles.has(p.title)),
+];
 
 // Template necesita sectores como variable para renderizar los botones
-const sectores = fallbackSectors;
+const sectores = mergedSectors;
 
-// ── Mapa: sector → títulos de proyectos ────────────────────
-// Como fallbackSectors no tiene project_ids reales, usamos
-// el mapeo por nombre de sector (compatible con el admin)
-const sectorProjectMap: Record<number, string[]> = {
-  1: ['Café Mi Tierra'],                     // Hostelería
-  2: ['miniCRM Ghogares'],                    // Inmobiliaria
-  3: ['Tapicería Moderna'],                   // Talleres
-  4: ['CoreAppointment'],                     // Salud
-  5: ['Nanatha'],                             // Belleza
-  6: [],                                      // Logística
-};
+// ── Mapa: sector (por ID) → títulos de proyectos ──────────
+// Usa project_ids del sector para buscar proyectos por ID
+function buildProjectTitles(sectors: SectorResponse[], projects: ProjectResponse[]): Record<number, string[]> {
+  const map: Record<number, string[]> = {};
+  const projectById: Record<number, string> = {};
+  projects.forEach(p => { projectById[p.id] = p.title; });
+  sectors.forEach(s => {
+    map[s.id] = (s.project_ids || []).map(id => projectById[id]).filter(Boolean);
+  });
+  return map;
+}
 
-// ── Showroom items como complemento ────────────────────────
-const showroomComplement: Record<number, typeof fallbackShowrooms> = {
-  1: fallbackShowrooms.filter(x => x.title.includes('Gastronómica') || x.title.includes('Restauran')),
-  2: [],
-  3: fallbackShowrooms.filter(x => x.title.includes('Taller')),
-  4: fallbackShowrooms.filter(x => x.title.includes('Clínica') || x.title.includes('Doctora')),
-  5: fallbackShowrooms.filter(x => x.title.includes('Estética') || x.title.includes('Beauty')),
-  6: fallbackShowrooms.filter(x => x.title.includes('Prixline')),
-};
+const sectorProjectMap = buildProjectTitles(mergedSectors, allProjects);
+
+// ── Showroom items como complemento (por nombre de sector) ──
+const showroomComplement: Record<number, typeof fallbackShowrooms> = {};
+mergedSectors.forEach(s => {
+  const name = s.name.toLowerCase();
+  if (name.includes('hostel') || name.includes('rest')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Gastronómica') || x.title.includes('Restauran'));
+  } else if (name.includes('belle') || name.includes('estét')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Estética') || x.title.includes('Beauty'));
+  } else if (name.includes('salud') || name.includes('clín')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Clínica') || x.title.includes('Doctora'));
+  } else if (name.includes('logíst') || name.includes('dist')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Prixline'));
+  } else if (name.includes('taller')) {
+    showroomComplement[s.id] = fallbackShowrooms.filter(x => x.title.includes('Taller'));
+  } else {
+    showroomComplement[s.id] = [];
+  }
+});
 
 // ── Serializar para el cliente ─────────────────────────────
 const sectorData = JSON.stringify({
