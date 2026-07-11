@@ -155,4 +155,37 @@ Los plugins reemplazan a los MCP servers en muchos casos. Se cargan automáticam
 
 ---
 
+## 🎯 DISEÑO 3D INMERSIVO — Three.js + GSAP + Lenis
+
+El skill `immersive-3d-web` se activa automáticamente cuando mencionés efectos 3D, Three.js o animaciones inmersivas.
+
+| Decime esto | Lo que pasa |
+|-------------|-------------|
+| "Quiero un efecto 3D como las páginas japonesas" | Activa el skill con patrones de breakout frame |
+| "Hacé que un objeto salga de la pantalla" | Aplica parallax 3D con depth layers |
+| "Animá este modelo 3D con el scroll" | GSAP ScrollTrigger + Three.js integration |
+| "Poné smooth scrolling" | Agrega Lenis con configuración óptima |
+| "Que la hamburguesa/auto se arme parte por parte" | Patrón de assembly animation con stagger |
+| "Optimizá esto 3D para mobile" | Cap de pixel ratio, LOD, fog adjustments |
+| "Cargá un modelo GLB y que reaccione al scroll" | GLTFLoader + ScrollTrigger onUpdate |
+| "Quiero una cámara que viaje por la escena" | Patrón cameraTravel con waypoints |
+| "Que las partículas se dispersen con el scroll" | Patrón particleScrollEffect |
+
+### Stack que usa
+
+| Tecnología | Para qué |
+|------------|----------|
+| **Three.js** | Renderizado 3D en el navegador |
+| **GSAP + ScrollTrigger** | Animaciones sincronizadas con scroll |
+| **Lenis** | Smooth scrolling a 60fps con física |
+
+### Templates disponibles
+
+| Template | Ruta |
+|----------|------|
+| 🚀 **Proyecto Vite listo para usar** | `~/.config/opencode/skills/immersive-3d-web/assets/breakout-project/` (corré `npm run dev`) |
+| 📄 Standalone HTML | `~/.config/opencode/skills/immersive-3d-web/assets/breakout-frame.html` (necesita server HTTP) |
+| 🔧 Setup reutilizable | `~/.config/opencode/skills/immersive-3d-web/assets/smooth-scroll-setup.ts` |
+| 🎬 8 patrones de animación | `~/.config/opencode/skills/immersive-3d-web/assets/scroll-3d-animation.ts` |
+
 > **Recordá:** No necesitás memorizarte esto. Cuando quieras consultarlo, decime "acordate del cheat sheet" y yo lo busco en memoria.
