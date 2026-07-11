@@ -29,12 +29,12 @@ import type {
 // ────────────────────────────────────
 export const fallbackHero: HeroResponse = {
   id: 3,
-  title: 'Desarrollador Full Stack',
-  subtitle: 'Hernan Arango Cortes',
+  title: 'Soluciones Digitales para tu Negocio',
+  subtitle: 'El <span class="text-amber-400">Rincom</span><br /><span class="text-cyan-400">de Harco</span>',
   description:
-    'Transformando 14+ años de experiencia en liderazgo y análisis en soluciones tecnológicas innovadoras. Mi familia es mi motor, la tecnología mi pasión, y el emprendimiento mi camino hacia el futuro.',
+    'Creo la web que tu negocio necesita para crecer.',
   background_image: null,
-  contact_button_text: 'Contactar',
+  contact_button_text: 'Contacto',
   cv_button_text: 'Descargar CV',
   image_url: null,
   cv_url:
