@@ -1,5 +1,16 @@
+---
+import type { SiteSettingsResponse } from '$lib/types';
+import { fetchSSR } from '$lib/api';
+import { fallbackSiteSettings } from '$lib/fallback-data';
+
+const apiData = await fetchSSR<SiteSettingsResponse>('/site-settings/latest/');
+const settings: SiteSettingsResponse = apiData ?? fallbackSiteSettings;
+
+const contactEmail = settings.contact_email || 'hernan.harco@gmail.com';
+const linkedinUrl = settings.social_networks?.linkedin || 'https://www.linkedin.com/in/hernan-harco/';
+---
+
 <section id="contacto" data-reveal="scale" class="py-24 bg-zinc-900 text-white relative overflow-hidden">
-  <!-- Fondo decorativo -->
   <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_rgba(251,191,36,0.08)_0%,_transparent_60%)] pointer-events-none"></div>
   <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_left,_rgba(251,191,36,0.04)_0%,_transparent_60%)] pointer-events-none"></div>
 
@@ -31,14 +42,14 @@
     <!-- CTAs -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
       <a
-        href="mailto:hernan.harco@gmail.com"
+        href={`mailto:${contactEmail}`}
         class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-black font-bold rounded-xl hover:from-amber-400 hover:to-orange-500 transition-all duration-300 shadow-lg hover:shadow-amber-500/25 text-lg group"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         Enviar Correo
       </a>
       <a
-        href="https://www.linkedin.com/in/hernan-harco/"
+        href={linkedinUrl}
         target="_blank"
         class="inline-flex items-center gap-3 px-6 py-4 border border-white/20 text-white font-medium rounded-xl hover:bg-white/5 transition-colors text-lg"
       >
@@ -48,7 +59,7 @@
     </div>
 
     <p class="text-gray-600 text-xs mt-8">
-      O escribime directo a <a href="mailto:hernan.harco@gmail.com" class="text-amber-400/60 hover:text-amber-400 transition-colors underline underline-offset-2">hernan.harco@gmail.com</a>
+      O escribime directo a <a href={`mailto:${contactEmail}`} class="text-amber-400/60 hover:text-amber-400 transition-colors underline underline-offset-2">{contactEmail}</a>
     </p>
   </div>
 </section>
