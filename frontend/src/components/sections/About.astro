@@ -169,5 +169,12 @@ const data: AboutResponse = apiData ?? fallbackAbout;
       const pct = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
       progress.style.width = pct + '%';
     });
+
+    // Scroll horizontal con rueda del mouse
+    container.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // ya es horizontal
+      e.preventDefault();
+      container.scrollBy({ left: e.deltaY, behavior: 'auto' });
+    }, { passive: false });
   })();
 </script>

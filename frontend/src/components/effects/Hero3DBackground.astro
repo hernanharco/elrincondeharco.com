@@ -3,114 +3,201 @@
 </div>
 
 <script>
-  (function init() {
-    const canvas = document.getElementById('hero-3d-canvas');
-    if (!canvas || !canvas.getContext) return;
+  import * as THREE from 'three';
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+  const canvas = document.getElementById('hero-3d-canvas');
+  if (canvas) {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 14;
 
-    let w, h;
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // ── Partículas brillantes ─────────────────────────────────
-    const particles = [];
-    const COUNT = 60;
+    // ── Luces ─────────────────────────────────────────────
+    const ambientLight = new THREE.AmbientLight(0xfbbf24, 0.3);
+    scene.add(ambientLight);
 
-    for (let i = 0; i < COUNT; i++) {
-      particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        r: 1.5 + Math.random() * 3,
-        alpha: 0.1 + Math.random() * 0.4,
-        alphaSpeed: 0.005 + Math.random() * 0.015,
-        alphaDir: 1,
+    const light = new THREE.PointLight(0xfbbf24, 1, 30);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+
+    const light2 = new THREE.PointLight(0xf59e0b, 0.5, 20);
+    light2.position.set(-5, -3, 5);
+    scene.add(light2);
+
+    // ── Geometrías principales ────────────────────────────
+    const meshes = [];
+    const golden = 0xf59e0b;
+    const amber = 0xfbbf24;
+    const warm = 0x92400e;
+
+    function createMesh(geo, color, wireColor, pos, rotSpeed, floatSpeed) {
+      const mat = new THREE.MeshPhysicalMaterial({
+        color: color,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.6,
+        metalness: 0.8,
+        roughness: 0.2,
+        emissive: color,
+        emissiveIntensity: 0.1,
       });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(pos[0], pos[1], pos[2]);
+      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+      mesh.scale.setScalar(0.8 + Math.random() * 0.6);
+      mesh.userData = {
+        rotX: rotSpeed * (0.3 + Math.random() * 0.3),
+        rotY: rotSpeed * (0.3 + Math.random() * 0.3),
+        floatAmp: 0.2 + Math.random() * 0.3,
+        floatSpeed: floatSpeed,
+        floatPhase: Math.random() * Math.PI * 2,
+        initY: pos[1],
+        initX: pos[0],
+        initZ: pos[2],
+      };
+      scene.add(mesh);
+      meshes.push(mesh);
+
+      // Brillo interno (punto pequeño emisivo)
+      const glowMat = new THREE.PointsMaterial({
+        color: amber,
+        size: 0.08,
+        transparent: true,
+        opacity: 0.4,
+      });
+      const glowGeo = new THREE.BufferGeometry();
+      const verts = new Float32Array(geo.attributes.position.array);
+      const glowPoints = new THREE.Points(glowGeo.clone(), glowMat);
+      mesh.add(glowPoints);
+
+      return mesh;
     }
 
-    // ── Conexiones ────────────────────────────────────────────
-    function drawLines() {
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+    // Torus Knot (el más llamativo)
+    const tk = new THREE.TorusKnotGeometry(0.8, 0.25, 64, 8, 2, 3);
+    createMesh(tk, golden, amber, [-3, 1, -2], 0.2, 0.3);
 
-          if (dist < 200) {
-            const alpha = (1 - dist / 200) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(251, 191, 36, ${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
+    // Icosaedros grandes
+    const ico = new THREE.IcosahedronGeometry(0.9, 0);
+    createMesh(ico, amber, golden, [3.5, -0.5, -1.5], 0.15, 0.25);
+    createMesh(ico, golden, amber, [-4, -1.5, -4], 0.25, 0.2);
+
+    // Octaedros
+    const oct = new THREE.OctahedronGeometry(0.7, 0);
+    createMesh(oct, warm, golden, [0, 2.5, -3], 0.3, 0.35);
+    createMesh(oct, amber, warm, [2, -2, -2.5], 0.2, 0.3);
+    createMesh(oct, golden, amber, [-2, -2.5, -3.5], 0.25, 0.2);
+
+    // Tetraedros pequeños
+    const tet = new THREE.TetrahedronGeometry(0.5, 0);
+    createMesh(tet, amber, golden, [5, 1.5, -1], 0.35, 0.4);
+    createMesh(tet, golden, warm, [-5, 2, -2], 0.3, 0.35);
+    createMesh(tet, warm, amber, [4, -1.5, -3], 0.2, 0.25);
+    createMesh(tet, golden, amber, [1.5, -1, -4], 0.4, 0.3);
+    createMesh(tet, amber, warm, [-1.5, 2, -4.5], 0.25, 0.35);
+
+    // ── Partículas de fondo ─────────────────────────────
+    const particleCount = 300;
+    const pPositions = new Float32Array(particleCount * 3);
+    const pSizes = new Float32Array(particleCount);
+    for (let i = 0; i < particleCount; i++) {
+      pPositions[i * 3] = (Math.random() - 0.5) * 30;
+      pPositions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      pPositions[i * 3 + 2] = (Math.random() - 0.5) * 15 - 5;
+      pSizes[i] = 0.02 + Math.random() * 0.04;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.Float32BufferAttribute(pPositions, 3));
+    pGeo.setAttribute('size', new THREE.Float32BufferAttribute(pSizes, 1));
+    const pMat = new THREE.PointsMaterial({
+      color: amber,
+      size: 0.03,
+      transparent: true,
+      opacity: 0.3,
+      blending: THREE.AdditiveBlending,
+    });
+    const particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    // ── Líneas de conexión ───────────────────────────────
+    const linePositions: number[] = [];
+    for (let i = 0; i < meshes.length; i++) {
+      for (let j = i + 1; j < meshes.length; j++) {
+        if (Math.random() < 0.4) {
+          const p1 = meshes[i].position;
+          const p2 = meshes[j].position;
+          linePositions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
         }
       }
     }
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+    const lineMat = new THREE.LineBasicMaterial({
+      color: amber,
+      transparent: true,
+      opacity: 0.06,
+    });
+    const lines = new THREE.LineSegments(lineGeo, lineMat);
+    scene.add(lines);
 
-    // ── Mouse tracking ────────────────────────────────────────
+    // ── Mouse ────────────────────────────────────────────
     let mouseX = 0, mouseY = 0;
     document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     });
 
-    // ── Animación ─────────────────────────────────────────────
+    // ── Resize ───────────────────────────────────────────
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ── Animación ────────────────────────────────────────
+    let startTime = performance.now();
     function animate() {
-      ctx.clearRect(0, 0, w, h);
+      const time = (performance.now() - startTime) / 1000;
 
-      // Actualizar partículas
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Rebote en bordes
-        if (p.x < 0 || p.x > w) p.vx *= -1;
-        if (p.y < 0 || p.y > h) p.vy *= -1;
-
-        // Pulso de brillo
-        p.alpha += p.alphaSpeed * p.alphaDir;
-        if (p.alpha > 0.5 || p.alpha < 0.05) p.alphaDir *= -1;
-
-        // Atracción suave al mouse
-        const dx = mouseX - p.x;
-        const dy = mouseY - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 300) {
-          p.vx += dx * 0.00005;
-          p.vy += dy * 0.00005;
-        }
+      meshes.forEach((mesh) => {
+        const ud = mesh.userData;
+        mesh.rotation.x += ud.rotX * 0.005;
+        mesh.rotation.y += ud.rotY * 0.005;
+        mesh.position.y = ud.initY + Math.sin(time * ud.floatSpeed + ud.floatPhase) * ud.floatAmp;
+        mesh.position.x = ud.initX + Math.sin(time * ud.floatSpeed * 0.7 + ud.floatPhase) * ud.floatAmp * 0.3;
       });
 
-      drawLines();
+      // Partículas suaves
+      const pPos = particles.geometry.attributes.position.array;
+      for (let i = 0; i < particleCount; i++) {
+        pPos[i * 3 + 1] += Math.sin(time * 0.1 + i) * 0.001;
+      }
+      particles.geometry.attributes.position.needsUpdate = true;
 
-      // Dibujar partículas
-      particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(251, 191, 36, ${p.alpha})`;
-        ctx.fill();
+      // Seguimiento mouse con parallax
+      const targetX = mouseX * 1.5;
+      const targetY = mouseY * 1;
+      camera.position.x += (targetX - camera.position.x) * 0.02;
+      camera.position.y += (-targetY - camera.position.y) * 0.02;
+      camera.lookAt(0, 0, -2);
 
-        // Glow
-        if (p.alpha > 0.2) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(251, 191, 36, ${p.alpha * 0.1})`;
-          ctx.fill();
-        }
-      });
-
+      renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
 
     animate();
-  })();
+  }
 </script>
+
+<style>
+  .hero-3d-bg canvas {
+    opacity: 0 !important;
+    animation: fadeInCanvas 2s ease forwards 0.5s;
+  }
+  @keyframes fadeInCanvas {
+    to { opacity: 0.7 !important; }
+  }
+</style>
