@@ -103,10 +103,10 @@
   });
 
   // ── Animación ──────────────────────────────────────────────
-  let clock = new THREE.Clock();
+  let startTime = performance.now();
 
   function animate() {
-    const time = clock.getElapsedTime();
+    const time = (performance.now() - startTime) / 1000;
 
     geometries.forEach((mesh, i) => {
       const ud = mesh.userData;
