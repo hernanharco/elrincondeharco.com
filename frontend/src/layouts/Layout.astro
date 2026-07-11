@@ -69,8 +69,9 @@ const ogImage = image && (image.startsWith('http') ? image : `https://elrinconde
 		<link rel="preload" as="image" href="/logo-opt.jpg" fetchpriority="high" />
 
 		<style>
-			html { scroll-behavior: auto; }
-			body { background: #060606; }
+			html { scroll-behavior: auto; overflow: hidden; height: 100%; }
+			body { background: #060606; overflow: hidden; height: 100%; }
+			#lenis-content { overflow: visible; }
 		</style>
 	</head>
 	<body class="font-[Inter] text-white">
@@ -81,8 +82,8 @@ const ogImage = image && (image.startsWith('http') ? image : `https://elrinconde
 		<!-- Smooth Scroll + GSAP animations -->
 		<SmoothScroll />
 
-		<!-- Contenido sobre el 3D (z-10) -->
-		<div class="relative z-10">
+		<!-- Contenido sobre el 3D (z-10). Lenis transforma solo esto, no el html -->
+		<div id="lenis-content" class="relative z-10">
 			<slot />
 		</div>
 	</body>
