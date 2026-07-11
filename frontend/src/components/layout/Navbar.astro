@@ -1,121 +1,44 @@
 ---
 const links = [
   { name: 'Inicio', href: '#inicio' },
-  { name: 'Trayectoria', href: '#sobre-mi' },
-  { name: 'Sectores', href: '#sectores' },
-  { name: 'Proceso', href: '#como-trabajo' },
   { name: 'Proyectos', href: '#proyectos' },
-  { name: 'Stack', href: '#stack' },
-  { name: 'Pasiones', href: '#pasiones' },
+  { name: 'Historia', href: '#historia' },
+  { name: 'Contacto', href: '#contacto' },
 ];
 ---
 
-<nav class="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10 text-white nav-root">
+<nav class="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10 text-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <input type="checkbox" id="menu-toggle" class="hidden peer" />
 
     <div class="flex items-center justify-between h-16">
-      <!-- Logo HAC -->
-      <div class="flex-shrink-0">
-        <a href="#inicio" class="text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent cursor-pointer hover:from-amber-300 hover:to-yellow-500 transition-all duration-300">
-          HAC
-        </a>
-      </div>
+      <a href="#inicio" class="text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent hover:from-amber-300 hover:to-yellow-500 transition-all duration-300">
+        HAC
+      </a>
 
-      <!-- Nav desktop -->
       <div class="hidden md:flex items-center gap-1">
         {links.map(link => (
-          <a
-            href={link.href}
-            class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-all duration-300 relative"
-          >
-            {link.name}
-          </a>
+          <a href={link.href} class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-all duration-300">{link.name}</a>
         ))}
-        <!-- CTA -->
-        <a
-          href="#contact"
-          class="ml-3 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-amber-500/25 active:scale-95"
-        >
-          Contactar
+        <a href="#contacto" class="ml-3 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-amber-500/25 active:scale-95">
+          Trabajemos
         </a>
       </div>
 
-      <!-- Hamburger mobile -->
       <div class="flex items-center gap-2 md:hidden">
-        <a
-          href="#contact"
-          class="px-3 py-1.5 bg-amber-500 text-black text-xs font-bold rounded-lg transition-all active:scale-95"
-        >
-          Contactar
-        </a>
-        <label
-          for="menu-toggle"
-          id="hamburger-btn"
-          class="menu-hamburger inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
-        >
-          <span class="sr-only">Abrir menú</span>
+        <a href="#contacto" class="px-3 py-1.5 bg-amber-500 text-black text-xs font-bold rounded-lg">Trabajemos</a>
+        <label for="menu-toggle" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-        </label>
-        <label
-          for="menu-toggle"
-          id="close-btn"
-          class="menu-close hidden items-center justify-center p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
-        >
-          <span class="sr-only">Cerrar menú</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </label>
       </div>
     </div>
 
-    <!-- Menú mobile slide-in -->
-    <div id="mobile-menu" class="hidden md:hidden">
+    <div id="mobile-menu" class="hidden peer-checked:block md:hidden">
       <div class="px-2 pt-2 pb-4 space-y-1 bg-black/95 backdrop-blur-xl border-t border-white/10 rounded-b-2xl">
         {links.map(link => (
-          <a
-            href={link.href}
-            onclick="document.getElementById('menu-toggle').checked = false"
-            class="nav-link block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-colors"
-          >
-            {link.name}
-          </a>
+          <a href={link.href} onclick="document.getElementById('menu-toggle').checked = false" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-colors">{link.name}</a>
         ))}
       </div>
     </div>
   </div>
 </nav>
-
-<style is:global>
-  #menu-toggle:checked ~ #mobile-menu { display: block; }
-  #menu-toggle:checked ~ div #hamburger-btn { display: none; }
-  #menu-toggle:checked ~ div #close-btn { display: inline-flex; }
-  #close-btn { display: none; }
-  #menu-toggle:not(:checked) ~ div #hamburger-btn { display: inline-flex; }
-  #menu-toggle:not(:checked) ~ div #close-btn { display: none; }
-
-  @media (min-width: 768px) {
-    #mobile-menu { display: none !important; }
-    #hamburger-btn { display: none !important; }
-    #close-btn { display: none !important; }
-  }
-
-  /* Active link highlight */
-  .nav-link {
-    position: relative;
-  }
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    transform: translateX(-50%) scaleX(0);
-    width: 60%;
-    height: 2px;
-    background: rgb(251 191 36);
-    border-radius: 1px;
-    transition: transform 0.3s ease;
-  }
-  .nav-link:hover::after {
-    transform: translateX(-50%) scaleX(1);
-  }
-</style>
