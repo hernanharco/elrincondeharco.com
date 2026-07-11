@@ -9,6 +9,9 @@ import { fallbackProjects, fallbackSectors, fallbackShowrooms } from '$lib/fallb
 // ── Usar datos de respaldo (siempre disponibles) ───────────
 const allProjects = fallbackProjects;
 
+// Template necesita sectores como variable para renderizar los botones
+const sectores = fallbackSectors;
+
 // ── Mapa: sector → títulos de proyectos ────────────────────
 // Como fallbackSectors no tiene project_ids reales, usamos
 // el mapeo por nombre de sector (compatible con el admin)

@@ -1,3 +1,4 @@
+export const prerender = false;
 import type { APIRoute } from 'astro';
 
 // En SSR (server-side dentro del contenedor Docker), usamos la URL interna

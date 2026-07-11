@@ -16,7 +16,7 @@ if (process.env.VERCEL) {
 }
 
 export default defineConfig({
-  output: 'server',
+  output: 'static',
   ...(adapter ? { adapter } : {}),
   integrations: [svelte()],
   server: {
