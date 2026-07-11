@@ -20,11 +20,10 @@ const getDownloadUrl = (url: string | null | undefined) => {
 ---
 
 <section id="inicio" class="relative min-h-screen flex items-center justify-center overflow-hidden bg-black text-white">
-  <div class="absolute inset-0">
+  <div class="absolute inset-0 z-0">
     <Hero3DBackground />
   </div>
-  <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/70 pointer-events-none"></div>
-
+  <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none z-[1]"></div>
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <div>
       <h2 class="text-amber-500 font-medium tracking-wide text-lg mb-4 uppercase">{data.title}</h2>
