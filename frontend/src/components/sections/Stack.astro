@@ -92,14 +92,14 @@ function powerGlow(power: number): string {
       </p>
     </div>
 
-    <!-- Inputs ocultos para expandir categorías -->
-    <input type="radio" name="stack-tier" id="tier-Frontend" class="hidden peer/tfront" checked>
-    <input type="radio" name="stack-tier" id="tier-Backend" class="hidden peer/tback">
-    <input type="radio" name="stack-tier" id="tier-DevOps" class="hidden peer/tdevops">
-    <input type="radio" name="stack-tier" id="tier-Herramientas" class="hidden peer/therr">
+    <!-- Inputs ocultos para selección de tier -->
+    <input type="radio" name="stack-tier" id="tier-Frontend" class="hidden" checked>
+    <input type="radio" name="stack-tier" id="tier-Backend" class="hidden">
+    <input type="radio" name="stack-tier" id="tier-DevOps" class="hidden">
+    <input type="radio" name="stack-tier" id="tier-Herramientas" class="hidden">
 
     <!-- Selector de Tabs -->
-    <div class="flex flex-wrap justify-center gap-3 mb-12">
+    <div class="stack-tabs flex flex-wrap justify-center gap-3 mb-12">
       {categories.map(cat => {
         const cfg = tierConfig[cat];
         return (
@@ -114,60 +114,57 @@ function powerGlow(power: number): string {
       })}
     </div>
 
-    <!-- Render por categoría seleccionada -->
-    {categories.map(cat => {
-      const cfg = tierConfig[cat];
-      const techs = items.filter(t => t.category === cat);
-      const totalPower = cfg.power;
-      return (
-        <div class="hidden peer-checked/t{cat.slice(0,1).toLowerCase()}{cat.slice(1)}:block">
-          <div class="mb-8 flex items-center gap-4">
-            <span class="text-5xl font-black bg-gradient-to-br {cfg.color} bg-clip-text text-transparent">{cfg.tier}</span>
-            <div>
-              <span class="text-sm text-gray-500 uppercase tracking-widest">{cfg.label}</span>
-              <div class="flex items-center gap-3 mt-1">
-                <div class="h-2 w-48 bg-zinc-800 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full bg-gradient-to-r {cfg.color} transition-all duration-1000" style={`width: ${totalPower}%`}></div>
+    <!-- Contenedor de tiers -->
+    <div class="stack-content">
+      {categories.map(cat => {
+        const cfg = tierConfig[cat];
+        const techs = items.filter(t => t.category === cat);
+        const totalPower = cfg.power;
+        return (
+          <div class={`tier-content tier-${cat}`}>
+            <div class="mb-8 flex items-center gap-4">
+              <span class="text-5xl font-black bg-gradient-to-br {cfg.color} bg-clip-text text-transparent">{cfg.tier}</span>
+              <div>
+                <span class="text-sm text-gray-500 uppercase tracking-widest">{cfg.label}</span>
+                <div class="flex items-center gap-3 mt-1">
+                  <div class="h-2 w-48 bg-zinc-800 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r {cfg.color}" style={`width: ${totalPower}%`}></div>
+                  </div>
+                  <span class="text-sm font-bold text-amber-400 tabular-nums">{totalPower}%</span>
                 </div>
-                <span class="text-sm font-bold text-amber-400 tabular-nums">{totalPower}%</span>
               </div>
             </div>
-          </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {techs.map(tech => {
-              const pw = getPower(tech);
-              const pColor = powerColor(pw);
-              const pGlow = powerGlow(pw);
-              return (
-                <div class="group relative bg-zinc-900/50 border border-white/5 rounded-xl p-4 hover:border-white/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg {`hover:${pGlow}`}">
-                  <div class="flex items-center gap-3 mb-3">
-                    <div class={`p-2 rounded-lg bg-white/5 ${tech.color}`}>
-                      <span set:html={getIconSvg(tech.icon, 20)} />
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center justify-between">
-                        <h3 class="font-bold text-white text-sm">{tech.name}</h3>
-                        <span class="text-xs font-mono text-amber-400/60 tabular-nums">{pw}%</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {techs.map(tech => {
+                const pw = getPower(tech);
+                const pColor = powerColor(pw);
+                const pGlow = powerGlow(pw);
+                return (
+                  <div class="group relative bg-zinc-900/50 border border-white/5 rounded-xl p-4 hover:border-white/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg {`hover:${pGlow}`}">
+                    <div class="flex items-center gap-3 mb-3">
+                      <div class={`p-2 rounded-lg bg-white/5 ${tech.color}`}>
+                        <span set:html={getIconSvg(tech.icon, 20)} />
                       </div>
-                      <p class="text-xs text-gray-500 truncate">{tech.description}</p>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                          <h3 class="font-bold text-white text-sm">{tech.name}</h3>
+                          <span class="text-xs font-mono text-amber-400/60 tabular-nums">{pw}%</span>
+                        </div>
+                        <p class="text-xs text-gray-500 truncate">{tech.description}</p>
+                      </div>
+                    </div>
+                    <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div class="h-full rounded-full bg-gradient-to-r {pColor} group-hover:shadow-[0_0_8px_rgba(251,191,36,0.3)]" style={`width: ${pw}%`}></div>
                     </div>
                   </div>
-
-                  <!-- Barra de poder individual -->
-                  <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                    <div
-                      class="h-full rounded-full bg-gradient-to-r {pColor} transition-all duration-1000 group-hover:shadow-[0_0_8px_rgba(251,191,36,0.3)]"
-                      style={`width: ${pw}%`}
-                    ></div>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      );
-    })}
+        );
+      })}
+    </div>
 
     <div class="text-center mt-12">
       <p class="text-zinc-500 text-sm">
@@ -178,11 +175,20 @@ function powerGlow(power: number): string {
 </section>
 
 <style is:global>
-  /* Mostrar/ocultar tiers */
-  #tier-Frontend:checked ~ .tier-tab[for="tier-Frontend"],
-  #tier-Backend:checked ~ .tier-tab[for="tier-Backend"],
-  #tier-DevOps:checked ~ .tier-tab[for="tier-DevOps"],
-  #tier-Herramientas:checked ~ .tier-tab[for="tier-Herramientas"] {
+  /* Ocultar todos los tiers por defecto */
+  .tier-content { display: none; }
+
+  /* Mostrar solo el tier seleccionado */
+  #tier-Frontend:checked ~ .stack-content .tier-Frontend { display: block; }
+  #tier-Backend:checked  ~ .stack-content .tier-Backend  { display: block; }
+  #tier-DevOps:checked   ~ .stack-content .tier-DevOps   { display: block; }
+  #tier-Herramientas:checked ~ .stack-content .tier-Herramientas { display: block; }
+
+  /* Tab activo */
+  #tier-Frontend:checked ~ .stack-tabs .tier-tab[for="tier-Frontend"],
+  #tier-Backend:checked ~ .stack-tabs .tier-tab[for="tier-Backend"],
+  #tier-DevOps:checked ~ .stack-tabs .tier-tab[for="tier-DevOps"],
+  #tier-Herramientas:checked ~ .stack-tabs .tier-tab[for="tier-Herramientas"] {
     background: rgb(251 191 36) !important;
     color: black !important;
     border-color: rgb(251 191 36) !important;
