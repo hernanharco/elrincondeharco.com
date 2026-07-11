@@ -1,7 +1,5 @@
 <div class="hero-3d-bg absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-  <!-- Fallback estático (se ve SIN JavaScript) -->
-  <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black opacity-100"></div>
-  <canvas id="hero-3d-canvas" class="absolute inset-0 w-full h-full opacity-40"></canvas>
+  <canvas id="hero-3d-canvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
 </div>
 
 <script>
@@ -41,7 +39,7 @@
       color: colors[i % colors.length],
       wireframe: true,
       transparent: true,
-      opacity: 0.15 + Math.random() * 0.15,
+      opacity: 0.3 + Math.random() * 0.2,
     });
     const mesh = new THREE.Mesh(t.geo, mat);
 
