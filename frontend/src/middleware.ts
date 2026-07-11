@@ -13,7 +13,7 @@ const SITE_ORIGIN = process.env.SITE_ORIGIN; // Opcional, fallback a context.url
 
 // URL del JWKS de authCore (para validar la firma del JWT)
 // Fallback: http://localhost:8000 (desarrollo local sin Docker)
-const AUTHCORE_URL = process.env.PUBLIC_AUTHCORE_URL || 'http://localhost:8000';
+const AUTHCORE_URL = process.env.PUBLIC_AUTHCORE_URL || 'https://api-authcore.elrincondeharco.com';
 const JWKS_URL = new URL(
   process.env.AUTHCORE_JWKS_URL || `${AUTHCORE_URL}/.well-known/jwks.json`
 );
