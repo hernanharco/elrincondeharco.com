@@ -1,8 +1,8 @@
 ---
 const links = [
   { name: 'Inicio', href: '#inicio' },
-  { name: 'Proyectos', href: '#proyectos' },
-  { name: 'Historia', href: '#historia' },
+  { name: 'Experiencia', href: '#experiencia' },
+  { name: 'Testimonios', href: '#testimonios' },
   { name: 'Contacto', href: '#contacto' },
 ];
 ---
@@ -12,13 +12,26 @@ const links = [
     <input type="checkbox" id="menu-toggle" class="hidden peer" />
 
     <div class="flex items-center justify-between h-16">
-      <a href="#inicio" class="text-xl font-bold bg-gradient-to-r from-amber-400 to-yellow-600 bg-clip-text text-transparent hover:from-amber-300 hover:to-yellow-500 transition-all duration-300">
-        HAC
+      <a href="#inicio" class="flex items-center gap-3 group">
+        <img
+          src="/logo-opt.jpg"
+          alt="El Rincom de Harco"
+          width="200"
+          height="298"
+          class="h-9 w-auto rounded-lg
+            ring-1 ring-white/5 group-hover:ring-cyan-400/30
+            transition-all duration-300"
+          style="object-fit: cover; object-position: center 70%;"
+        />
+        <span class="hidden sm:block text-sm font-semibold tracking-tight">
+          <span class="text-white/80">Rincom</span>
+          <span class="text-amber-400"> de Harco</span>
+        </span>
       </a>
 
       <div class="hidden md:flex items-center gap-1">
         {links.map(link => (
-          <a href={link.href} class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-all duration-300">{link.name}</a>
+          <a href={link.href} class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-cyan-400 hover:bg-white/5 transition-all duration-300">{link.name}</a>
         ))}
         <a href="#contacto" class="ml-3 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-amber-500/25 active:scale-95">
           Trabajemos
@@ -36,7 +49,7 @@ const links = [
     <div id="mobile-menu" class="hidden peer-checked:block md:hidden">
       <div class="px-2 pt-2 pb-4 space-y-1 bg-black/95 backdrop-blur-xl border-t border-white/10 rounded-b-2xl">
         {links.map(link => (
-          <a href={link.href} onclick="document.getElementById('menu-toggle').checked = false" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-colors">{link.name}</a>
+          <a href={link.href} onclick="document.getElementById('menu-toggle').checked = false" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-cyan-400 hover:bg-white/5 transition-colors">{link.name}</a>
         ))}
       </div>
     </div>

@@ -3,7 +3,9 @@ import type { ProjectResponse } from '$lib/types';
 import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackProjects } from '$lib/fallback-data';
 
-const onlyBest = ['Café Mi Tierra', 'Nanatha', 'miniCRM Ghogares'];
+// Para clientes: proyectos que muestran soluciones de negocio reales
+// (excluimos los muy técnicos como Módulo de Seguridad y Scrapers)
+const onlyBest = ['Café Mi Tierra', 'Nanatha', 'Tapicería Moderna', 'miniCRM Ghogares', 'CoreAppointment'];
 
 const apiItems = await fetchSSR<ProjectResponse[]>('/projects/');
 const apiTitles = new Set((apiItems ?? []).map(p => p.title));
@@ -11,7 +13,7 @@ const merged = [...(apiItems ?? []), ...fallbackProjects.filter(p => !apiTitles.
 const items = merged.filter(p => onlyBest.includes(p.title));
 ---
 
-<section id="proyectos" class="min-h-screen flex items-center py-24">
+<section id="proyectos" data-reveal class="min-h-screen flex items-center py-24">
   <div class="w-full max-w-6xl mx-auto px-6">
     <div class="text-center mb-20">
       <p class="text-amber-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Proyectos</p>
@@ -20,7 +22,7 @@ const items = merged.filter(p => onlyBest.includes(p.title));
       </h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div data-reveal-stagger data-reveal-dir="up" class="grid grid-cols-1 md:grid-cols-3 gap-5">
       {items.map(project => (
         <div class="group relative bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden hover:bg-white/[0.06] hover:border-amber-500/20 transition-all duration-500">
           <div class="relative h-52 overflow-hidden">

@@ -7,19 +7,44 @@ const apiData = await fetchSSR<HeroResponse>('/heroes/latest/');
 const data: HeroResponse = apiData ?? fallbackHero;
 ---
 
-<section id="inicio" class="relative min-h-screen flex items-center justify-center">
+<section id="inicio" data-reveal="fade" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Ribbon decorativo estilo logo (S 3D sutíl) -->
+  <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+    <svg class="w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] opacity-[0.04]" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ribbon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#06b6d4" />
+          <stop offset="50%" stop-color="#3b82f6" />
+          <stop offset="100%" stop-color="#fbbf24" />
+        </linearGradient>
+      </defs>
+      <path d="M 120 80 
+               C 200 30, 320 60, 280 160 
+               C 240 260, 80 200, 120 320 
+               C 160 440, 320 380, 280 330" 
+            stroke="url(#ribbon-grad)" 
+            stroke-width="12" 
+            stroke-linecap="round"
+            fill="none"
+            class="animate-ribbon-pulse" />
+    </svg>
+  </div>
+
   <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
-    <p class="text-amber-400 font-medium tracking-[0.25em] text-xs md:text-sm mb-6 uppercase">Full Stack Developer</p>
+    <p class="text-amber-400 font-medium tracking-[0.25em] text-xs md:text-sm mb-6 uppercase">
+      Soluciones Digitales para tu Negocio
+    </p>
     <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight text-white leading-[0.9] mb-4">
-      Hernan<br />
-      <span class="text-amber-400">Arango</span>
+      El <span class="text-amber-400">Rincom</span><br />
+      <span class="text-cyan-400">de Harco</span>
     </h1>
-    <p class="text-gray-500 text-base md:text-lg mt-6 max-w-md mx-auto">
-      Código que transforma
+    <p class="text-gray-400 text-base md:text-lg mt-6 max-w-lg mx-auto leading-relaxed">
+      Creo la web que tu negocio necesita para crecer. 
+      <span class="text-amber-400/60 block mt-1 text-sm">Sitios que venden · Sistemas que automatizan · Experiencias que enamoran</span>
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
-      <a href="#proyectos" class="group px-8 py-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-amber-500/20 text-sm tracking-wide">
-        Ver Proyectos
+      <a href="#experiencia" class="group px-8 py-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-amber-500/20 text-sm tracking-wide">
+        Ver mi rubro
         <span class="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
       </a>
       <a href="#contacto" class="px-8 py-4 border border-white/10 text-gray-300 hover:text-white hover:border-white/30 rounded-xl transition-all text-sm tracking-wide">
@@ -32,3 +57,13 @@ const data: HeroResponse = apiData ?? fallbackHero;
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400/30 animate-bounce"><path d="M7 13l5 5 5-5"/><path d="M7 6l5 5 5-5"/></svg>
   </div>
 </section>
+
+<style>
+  @keyframes ribbon-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+  }
+  .animate-ribbon-pulse {
+    animation: ribbon-pulse 6s ease-in-out infinite;
+  }
+</style>
