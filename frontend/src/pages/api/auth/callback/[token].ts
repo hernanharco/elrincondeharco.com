@@ -1,10 +1,15 @@
 export const prerender = false;
 import type { APIRoute } from 'astro';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
-// En SSR (server-side dentro del contenedor Docker), usamos la URL interna
-const API_BASE = import.meta.env.SSR
-  ? (process.env.SSR_API_URL || 'https://api.elrincondeharco.com')
-  : (import.meta.env.PUBLIC_API_URL || 'http://localhost:8001');
+// authCore URLs (fallback a producción si no hay env vars)
+const AUTHCORE_URL = process.env.PUBLIC_AUTHCORE_URL || 'https://api-authcore.elrincondeharco.com';
+const JWKS_URL = new URL(
+  process.env.AUTHCORE_JWKS_URL || `${AUTHCORE_URL}/.well-known/jwks.json`
+);
+
+// Cliente JWKS con caché automática
+const JWKS = createRemoteJWKSet(JWKS_URL);
 
 export const GET: APIRoute = async ({ params, cookies, redirect }) => {
   const token = params.token;
@@ -14,27 +19,17 @@ export const GET: APIRoute = async ({ params, cookies, redirect }) => {
   }
 
   try {
-    // Validar el token contra el backend de Portfolio
-    const response = await fetch(`${API_BASE}/api/v1/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    // Validar el JWT directamente contra authCore (JWKS)
+    // Esto verifica: firma RS256/ES256, expiración, issuer, audience
+    const { payload } = await jwtVerify(token, JWKS, {
+      algorithms: ['RS256', 'ES256'],
+      // issuer y audience son opcionales — authCore los setea
     });
-
-    if (!response.ok) {
-      console.error('❌ Token inválido en callback:', response.status);
-      return redirect('/login?error=invalid_token', 302);
-    }
 
     // Token válido — extraer exp del payload para el max_age de la cookie
     let maxAge = 86400; // default 24h
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.exp) {
-        maxAge = payload.exp - Math.floor(Date.now() / 1000);
-      }
-    } catch {
-      // ignorar, usar default
+    if (payload.exp) {
+      maxAge = Number(payload.exp) - Math.floor(Date.now() / 1000);
     }
 
     // Setear cookie httpOnly desde Astro (SSR)
@@ -48,7 +43,7 @@ export const GET: APIRoute = async ({ params, cookies, redirect }) => {
     return redirect('/admin', 302);
 
   } catch (error) {
-    console.error('❌ Error en callback Google OAuth:', error);
-    return redirect('/login?error=server_error', 302);
+    console.error('❌ Error validando token contra authCore:', error);
+    return redirect('/login?error=invalid_token', 302);
   }
 };
