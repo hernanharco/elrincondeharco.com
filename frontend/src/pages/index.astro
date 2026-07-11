@@ -2,17 +2,22 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/layout/Navbar.astro';
 import Hero from '../components/sections/Hero.astro';
-import Projects from '../components/sections/Projects.astro';
-import About from '../components/sections/About.astro';
-import Contact from '../components/sections/Contact.astro';
+import Stats from '../components/sections/Stats.astro';
+import SectorProjects from '../components/sections/SectorProjects.astro';
+import Testimonials from '../components/sections/Testimonials.astro';
+import CTA from '../components/sections/CTA.astro';
 ---
 
-<Layout title="Hernan Arango Cortes - Full Stack Developer" description="Desarrollador Full Stack con 14+ años de experiencia. Construyendo soluciones web modernas desde Asturias para el mundo.">
-	<main>
-		<Navbar />
-		<Hero />
-		<Projects />
-		<About />
-		<Contact />
-	</main>
+<Layout
+  title="El Rincom de Harco — Soluciones Digitales para tu Negocio"
+  description="Desarrollador web en Asturias. Creo sitios web profesionales, tiendas online y sistemas a medida para hostelería, inmobiliarias, clínicas y más. 14+ años de experiencia."
+>
+  <main>
+    <Navbar />
+    <Hero />
+    <Stats />
+    <SectorProjects />
+    <Testimonials />
+    <CTA />
+  </main>
 </Layout>
