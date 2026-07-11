@@ -4,11 +4,14 @@ import { fetchSSR, optimizeImage } from '$lib/api';
 import { fallbackProjects } from '$lib/fallback-data';
 import ProjectCard from '../ui/ProjectCard.astro';
 
+// Solo los mejores proyectos
+const onlyBest = ['Café Mi Tierra', 'Nanatha', 'miniCRM Ghogares'];
+
 // Merge: datos de API + fallback (evita duplicados por título)
 const apiItems = await fetchSSR<ProjectResponse[]>('/projects/');
 const apiTitles = new Set((apiItems ?? []).map(p => p.title));
 const merged = [...(apiItems ?? []), ...fallbackProjects.filter(p => !apiTitles.has(p.title))];
-const items = merged.length > 0 ? merged : fallbackProjects;
+const items = merged.filter(p => onlyBest.includes(p.title));
 
 // Helper para iconos (solo para el featured card inline)
 function getIconSvg(iconName: string, size: number = 24): string {
