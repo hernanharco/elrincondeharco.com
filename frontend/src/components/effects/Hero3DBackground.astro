@@ -1,122 +1,30 @@
-<div class="hero-3d-bg absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-  <canvas id="hero-3d-canvas" class="absolute inset-0 w-full h-full"></canvas>
+<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+  <!-- Gradiente base oscuro -->
+  <div class="absolute inset-0 bg-[#060606]"></div>
+  
+  <!-- Orbes de luz animados (sutiles) -->
+  <div class="absolute top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full bg-amber-500/5 blur-[120px] animate-pulse-slow"></div>
+  <div class="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] rounded-full bg-orange-600/5 blur-[100px] animate-pulse-slower"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-amber-400/3 blur-[150px] animate-pulse-slowest"></div>
+  
+  <!-- Grid líneas sutiles -->
+  <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(251,191,36,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(251,191,36,0.3) 1px, transparent 1px); background-size: 60px 60px;"></div>
 </div>
 
-<!-- Cargar THREE desde CDN (sin bundler) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<script>
-(function() {
-  var canvas = document.getElementById('hero-3d-canvas');
-  if (!canvas) return;
-  if (typeof THREE === 'undefined') { console.error('THREE no cargado'); return; }
-
-  var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 8);
-
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-
-  // Torus Knot central (brillante, GRANDE)
-  var knotGeo = new THREE.TorusKnotGeometry(1.2, 0.35, 128, 16);
-  var knotMat = new THREE.MeshStandardMaterial({
-    color: 0xf59e0b,
-    emissive: 0xf59e0b,
-    emissiveIntensity: 0.15,
-    metalness: 0.9,
-    roughness: 0.15,
-  });
-  var knot = new THREE.Mesh(knotGeo, knotMat);
-  scene.add(knot);
-
-  // Wireframe exterior (más grande, más brillante)
-  var wireMat = new THREE.MeshBasicMaterial({
-    color: 0xfbbf24,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.4,
-  });
-  var wireKnot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.4, 0.4, 128, 16), wireMat);
-  scene.add(wireKnot);
-
-  // Aros orbitales
-  var ringMat = new THREE.MeshBasicMaterial({
-    color: 0x92400e,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.15,
-  });
-  for (var i = 0; i < 3; i++) {
-    var ring = new THREE.Mesh(new THREE.TorusGeometry(2.2 + i * 0.4, 0.03, 32, 48), ringMat);
-    ring.rotation.x = Math.PI / 3 + i * 0.5;
-    ring.rotation.y = i * 0.3;
-    scene.add(ring);
+<style>
+  @keyframes pulse-slow {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
   }
-
-  // Luces
-  var ambient = new THREE.AmbientLight(0x404040);
-  scene.add(ambient);
-  var light = new THREE.DirectionalLight(0xfbbf24, 1);
-  light.position.set(5, 5, 5);
-  scene.add(light);
-  var light2 = new THREE.DirectionalLight(0xf59e0b, 0.5);
-  light2.position.set(-5, -3, 5);
-  scene.add(light2);
-
-  // Partículas orbitales
-  var pCount = 200;
-  var pGeo = new THREE.BufferGeometry();
-  var pPos = new Float32Array(pCount * 3);
-  for (var i = 0; i < pCount; i++) {
-    var angle = (i / pCount) * Math.PI * 2;
-    var radius = 2.8 + Math.random() * 1.5;
-    pPos[i*3] = Math.cos(angle) * radius;
-    pPos[i*3+1] = Math.sin(angle * 2) * radius * 0.3;
-    pPos[i*3+2] = Math.sin(angle) * radius;
+  @keyframes pulse-slower {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.15); opacity: 0.6; }
   }
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-  var pMat = new THREE.PointsMaterial({
-    color: 0xfbbf24,
-    size: 0.06,
-    transparent: true,
-    opacity: 0.5,
-    blending: THREE.AdditiveBlending,
-  });
-  var particles = new THREE.Points(pGeo, pMat);
-  scene.add(particles);
-
-  // Mouse tracking
-  var mouseX = 0, mouseY = 0;
-  document.addEventListener('mousemove', function(e) {
-    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-  });
-
-  window.addEventListener('resize', function() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-  // Animación
-  function animate() {
-    knot.rotation.x += 0.003;
-    knot.rotation.y += 0.008;
-    wireKnot.rotation.x += 0.003;
-    wireKnot.rotation.y += 0.008;
-    particles.rotation.y += 0.002;
-
-    // Parallax mouse
-    camera.position.x += (mouseX * 2 - camera.position.x) * 0.02;
-    camera.position.y += (-mouseY * 1.2 - camera.position.y) * 0.02;
-    camera.lookAt(0, 0, 0);
-
-    renderer.render(scene, camera);
-    requestAnimationFrame(animate);
+  @keyframes pulse-slowest {
+    0%, 100% { transform: translateX(-50%) translateY(-50%) scale(1); opacity: 0.2; }
+    50% { transform: translateX(-50%) translateY(-50%) scale(1.05); opacity: 0.4; }
   }
-  animate();
-})();
-</script>
+  .animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
+  .animate-pulse-slower { animation: pulse-slower 12s ease-in-out infinite; }
+  .animate-pulse-slowest { animation: pulse-slowest 15s ease-in-out infinite; }
+</style>
