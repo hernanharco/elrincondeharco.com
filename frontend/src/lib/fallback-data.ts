@@ -372,3 +372,42 @@ export const fallbackShowrooms: ShowroomResponse[] = [
       'https://res.cloudinary.com/dxyk76jhu/image/upload/v1778130965/elrincondelharco/Captura_desde_2026-05-07_07-15-54.png',
   },
 ];
+
+// ────────────────────────────────────
+// TESTIMONIALS
+// ────────────────────────────────────
+export const fallbackTestimonials: TestimonialResponse[] = [
+  {
+    id: 1,
+    name: 'Carlos Martínez',
+    role: 'Dueño',
+    company: 'Café Mi Tierra',
+    content: 'Hernán transformó por completo nuestra presencia online. Pasamos de tener una web que no funcionaba a una plataforma que nos genera clientes cada semana. Profesional total.',
+    rating: 5,
+    avatar_url: null,
+    is_active: true,
+    sort_order: 1,
+  },
+  {
+    id: 2,
+    name: 'María García',
+    role: 'Directora',
+    company: 'Grupo Hogares',
+    content: 'Necesitábamos un sistema para gestionar propiedades y contactos. Hernán no solo nos hizo la plataforma, sino que nos automatizó procesos que nos ahorran horas cada semana.',
+    rating: 5,
+    avatar_url: null,
+    is_active: true,
+    sort_order: 2,
+  },
+  {
+    id: 3,
+    name: 'Ana López',
+    role: 'Dueña',
+    company: 'Nanatha',
+    content: 'La web que me hizo no solo es hermosa, sino que MIS CLIENTES me dicen "qué página más profesional". Y lo mejor: ahora recibo pedidos online sin esfuerzo.',
+    rating: 5,
+    avatar_url: null,
+    is_active: true,
+    sort_order: 3,
+  },
+];

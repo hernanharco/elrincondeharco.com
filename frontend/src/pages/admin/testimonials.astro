@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import TestimonialEditor from '../../components/admin/TestimonialEditor.svelte';
+
+const currentPath = Astro.url.pathname;
+---
+
+<AdminLayout title="Testimonios" currentPath={currentPath}>
+  <TestimonialEditor client:load />
+</AdminLayout>

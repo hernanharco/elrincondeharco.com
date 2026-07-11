@@ -100,6 +100,18 @@ export interface ShowroomResponse {
   image_url: string | null;
 }
 
+export interface TestimonialResponse {
+  id: number;
+  name: string;
+  role: string | null;
+  company: string | null;
+  content: string;
+  rating: number;
+  avatar_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+}
+
 export interface SectorResponse {
   id: number;
   name: string;
