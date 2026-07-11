@@ -40,7 +40,7 @@
 
   // URL base de authCore (configurable via env)
   // En prod apunta a authCore en Hetzner, en dev a localhost:8000
-  const AUTHCORE_URL = import.meta.env.PUBLIC_AUTHCORE_URL || 'http://localhost:8000';
+  const AUTHCORE_URL = import.meta.env.PUBLIC_AUTHCORE_URL || 'https://api-authcore.elrincondeharco.com';
 
   function googleLoginUrl(): string {
     const base = `${AUTHCORE_URL}/api/v1/auth/google`;

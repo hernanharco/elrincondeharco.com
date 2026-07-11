@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 
 // En SSR (server-side dentro del contenedor Docker), usamos la URL interna
 const API_BASE = import.meta.env.SSR
-  ? (process.env.SSR_API_URL || 'http://portfolio-api:8000')
+  ? (process.env.SSR_API_URL || 'https://api.elrincondeharco.com')
   : (import.meta.env.PUBLIC_API_URL || 'http://localhost:8001');
 
 export const GET: APIRoute = async ({ params, cookies, redirect }) => {
