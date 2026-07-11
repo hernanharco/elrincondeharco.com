@@ -21,6 +21,7 @@ import type {
   FooterResponse,
   SiteSettingsResponse,
   ShowroomResponse,
+  SectorResponse,
 } from '$lib/types';
 
 // ────────────────────────────────────
@@ -172,6 +173,74 @@ export const fallbackProjects: ProjectResponse[] = [
   },
 ];
 
+// ────────────────────────────────────
+// SECTORS (6 rubros)
+// ────────────────────────────────────
+export const fallbackSectors: SectorResponse[] = [
+  {
+    id: 1,
+    name: 'Hostelería',
+    client_name: 'Café Mi Tierra',
+    description: 'Webs inmersivas con gestión de reservas y pedidos.',
+    icon_path: 'M17 8h1a4 4 0 1 1 0 8h-1 M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z',
+    color_gradient: 'from-amber-700/30 to-red-800/30',
+    sort_order: 1,
+    project_ids: [], // projects are matched by title in SectorProjects
+  },
+  {
+    id: 2,
+    name: 'Inmobiliaria',
+    client_name: 'Grupo Hogares',
+    description: 'CRM con matching automático y scrapers de portales.',
+    icon_path: 'M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2',
+    color_gradient: 'from-emerald-500/30 to-teal-600/30',
+    sort_order: 2,
+    project_ids: [],
+  },
+  {
+    id: 3,
+    name: 'Talleres',
+    client_name: 'Tapicería Moderna',
+    description: 'Plataformas de gestión de pedidos e inventario.',
+    icon_path: 'M12 2 2 7l10 5 10-5-10-5Z m2 17 10 5 10-5',
+    color_gradient: 'from-amber-500/20 to-orange-600/20',
+    sort_order: 3,
+    project_ids: [],
+  },
+  {
+    id: 4,
+    name: 'Salud',
+    client_name: 'Clínicas',
+    description: 'Sistemas de gestión de citas y pacientes.',
+    icon_path: 'M22 12h-4l-3 9L9 3l-3 9H2',
+    color_gradient: 'from-blue-500/20 to-cyan-600/20',
+    sort_order: 4,
+    project_ids: [],
+  },
+  {
+    id: 5,
+    name: 'Belleza',
+    client_name: 'Centros Estéticos',
+    description: 'Tiendas online y plataformas de gestión de servicios.',
+    icon_path: 'M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z',
+    color_gradient: 'from-blush-400/30 to-rose-500/30',
+    sort_order: 5,
+    project_ids: [],
+  },
+  {
+    id: 6,
+    name: 'Logística',
+    client_name: 'Distribución',
+    description: 'Sistemas modulares de control de envíos.',
+    icon_path: 'M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
+    color_gradient: 'from-violet-500/30 to-purple-700/30',
+    sort_order: 6,
+    project_ids: [],
+  },
+];
+
+// ────────────────────────────────────
+// SITE SETTINGS
 // ────────────────────────────────────
 // PASSIONS
 // ────────────────────────────────────

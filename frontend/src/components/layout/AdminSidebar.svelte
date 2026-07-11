@@ -25,6 +25,7 @@
     { href: '/admin/about', label: 'About', icon: 'lucide:user' },
     { href: '/admin/stack', label: 'Stack', icon: 'lucide:code-2' },
     { href: '/admin/projects', label: 'Proyectos', icon: 'lucide:folder-kanban' },
+    { href: '/admin/sectors', label: 'Sectores', icon: 'lucide:layout-list' },
     { href: '/admin/showroom', label: 'Showroom', icon: 'lucide:rocket' },
     { href: '/admin/passions', label: 'Pasiones', icon: 'lucide:heart' },
     { href: '/admin/footer', label: 'Footer', icon: 'lucide:mail' },

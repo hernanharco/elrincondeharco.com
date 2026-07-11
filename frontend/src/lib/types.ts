@@ -99,3 +99,14 @@ export interface ShowroomResponse {
   deploy_url: string | null;
   image_url: string | null;
 }
+
+export interface SectorResponse {
+  id: number;
+  name: string;
+  client_name: string;
+  description: string | null;
+  icon_path: string;
+  color_gradient: string;
+  sort_order: number;
+  project_ids: number[];
+}
