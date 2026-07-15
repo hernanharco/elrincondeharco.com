@@ -211,18 +211,6 @@ footer[id]:not(.hydrated) * {
   --recruiter-success: #22c55e;
 }
 
-.recruiter-content {
-  display: none;
-}
-
-body[data-mode="recruiter"] .client-content {
-  display: none;
-}
-
-body[data-mode="recruiter"] .recruiter-content {
-  display: block;
-}
-
 /* ── Texto justificado en secciones recruiter ──────────────── */
 .recruiter-section p {
   text-align: justify;

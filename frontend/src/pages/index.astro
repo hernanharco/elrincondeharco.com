@@ -39,6 +39,22 @@ import RecruiterInfra from '../components/sections/recruiter/RecruiterInfra.astr
   </div>
 </Layout>
 
+<style>
+  /* ── Dual Mode: ocultar recruiter por defecto ────────────── */
+  .recruiter-content {
+    display: none !important;
+  }
+  .client-content {
+    display: block;
+  }
+  body[data-mode="recruiter"] .client-content {
+    display: none !important;
+  }
+  body[data-mode="recruiter"] .recruiter-content {
+    display: block !important;
+  }
+</style>
+
 <script>
   // ── Router modo dual ──────────────────────────────────────
   // Escucha eventos del RobotAssistant y DestructionEffect
