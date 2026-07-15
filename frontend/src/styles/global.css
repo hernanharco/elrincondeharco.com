@@ -236,6 +236,4 @@ body[data-recruiter-theme="light"] .recruiter-section .text-gray-400 {
 body[data-recruiter-theme="light"] .recruiter-section .text-gray-500 {
   color: #64748b !important;
 }
-body[data-recruiter-theme="light"] .recruiter-section .bg-\\[var\\(--recruiter-bg\\)\\] {
-  background-color: #ffffff !important;
-}
+
