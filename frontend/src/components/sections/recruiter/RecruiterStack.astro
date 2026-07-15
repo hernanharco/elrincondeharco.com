@@ -28,7 +28,7 @@ import { RECRUITER_TECH_STACK } from '$lib/recruiter-data';
           'Tools': 'border-l-purple-500',
         }[tech.category] || 'border-l-gray-500';
         return (
-        <div class="group p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 hover:bg-white/[0.04] transition-all duration-300 border-l-2 {borderColor}">
+        <div class={"group p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 hover:bg-white/[0.04] transition-all duration-300 border-l-2 " + borderColor}>
           <div class="flex items-center gap-3 mb-2">
             <span class="text-xl">{tech.icon}</span>
             <div>
