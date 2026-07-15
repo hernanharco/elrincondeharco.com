@@ -1,0 +1,106 @@
+---
+// RecruiterLocation.astro — Mapa de presencia en Asturias
+---
+
+<section class="recruiter-section py-24 bg-[var(--recruiter-bg)] border-t border-[var(--recruiter-border)]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Ubicacion</p>
+      <h2 class="text-3xl md:text-5xl font-bold text-white">
+        Desde <span class="text-cyan-400">Asturias</span> para el mundo
+      </h2>
+      <p class="text-gray-500 max-w-xl mx-auto mt-4 text-lg">
+        Trabajo remoto desde Aviles. Presencia en toda la region.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <!-- Mapa de ubicaciones -->
+      <div class="relative aspect-square max-w-md mx-auto w-full">
+        <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-purple-500/5 border border-white/[0.06] overflow-hidden">
+          <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 20% 30%, #06b6d4 1px, transparent 1px), radial-gradient(circle at 80% 70%, #3b82f6 1px, transparent 1px); background-size: 30px 30px;"></div>
+        </div>
+
+        <!-- Aviles -->
+        <div class="absolute" style="left:42%;top:45%;">
+          <div class="w-5 h-5 bg-cyan-400 rounded-full animate-ping absolute opacity-30"></div>
+          <div class="w-4 h-4 bg-cyan-400 rounded-full relative z-10 shadow-lg shadow-cyan-500/50"></div>
+          <div class="absolute top-6 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+            <p class="text-white font-bold text-xs">Aviles</p>
+            <p class="text-gray-500 text-[9px]">Residencia</p>
+          </div>
+        </div>
+
+        <!-- Gijon -->
+        <div class="absolute" style="left:62%;top:38%;">
+          <div class="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-500/30"></div>
+          <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+            <p class="text-gray-300 text-[10px] font-medium">Gijon</p>
+            <p class="text-gray-600 text-[8px]">Presencia</p>
+          </div>
+        </div>
+
+        <!-- Oviedo -->
+        <div class="absolute" style="left:50%;top:55%;">
+          <div class="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-500/30"></div>
+          <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+            <p class="text-gray-300 text-[10px] font-medium">Oviedo</p>
+            <p class="text-gray-600 text-[8px]">Presencia</p>
+          </div>
+        </div>
+
+        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+          <line x1="42" y1="45" x2="62" y2="38" stroke="rgba(6,182,212,0.2)" stroke-width="0.3" stroke-dasharray="2,2"/>
+          <line x1="42" y1="45" x2="50" y2="55" stroke="rgba(6,182,212,0.2)" stroke-width="0.3" stroke-dasharray="2,2"/>
+        </svg>
+
+        <div class="absolute bottom-4 left-4 flex items-center gap-4">
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 bg-cyan-400 rounded-full"></div>
+            <span class="text-[8px] text-gray-600">Principal</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+            <span class="text-[8px] text-gray-600">Presencia</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="space-y-6">
+        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <h3 class="text-white font-bold text-base mb-3">Trabajo remoto</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Vivo en Aviles, Asturias, y trabajo de forma remota con clientes de toda Espana y Latinoamerica. 
+            Mi zona de influencia cubre todo el centro de Asturias, con presencia regular en Gijon y Oviedo.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <h3 class="text-white font-bold text-base mb-3">Disponibilidad</h3>
+          <div class="space-y-2">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-green-400"></span>
+              <span class="text-gray-400 text-sm">Full-time remoto</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span class="text-gray-400 text-sm">Freelance por proyecto</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span class="text-gray-400 text-sm">Disponible para reuniones presenciales en Asturias</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Espana</span>
+          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Colombia</span>
+          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Latinoamerica</span>
+          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Remoto global</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
