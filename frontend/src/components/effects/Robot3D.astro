@@ -221,26 +221,17 @@
       targetRotX = (-(t.clientY / window.innerHeight) * 2 + 1) * 0.18;
     });
 
-    // ── Double-click → switch style ────────────────────────
-    let lastClick = 0;
+    // ── Right-click → switch style ─────────────────────────
+    container.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      const next = currentStyle === "orbit" ? "chibi" : "orbit";
+      switchStyle(next);
+    });
+
+    // ── Left-click → open modal ─────────────────────────────
     container.addEventListener("click", () => {
-      const now = Date.now();
-      if (now - lastClick < 400) {
-        // Double click: switch style
-        const next = currentStyle === "orbit" ? "chibi" : "orbit";
-        switchStyle(next);
-        lastClick = 0;
-      } else {
-        lastClick = now;
-        // Single click: open modal after delay (to allow double-click)
-        setTimeout(() => {
-          if (lastClick !== 0) {
-            const robotBtn = document.getElementById("robot-btn");
-            if (robotBtn) robotBtn.click();
-            lastClick = 0;
-          }
-        }, 250);
-      }
+      const robotBtn = document.getElementById("robot-btn");
+      if (robotBtn) robotBtn.click();
     });
 
     // ── Animation ────────────────────────────────────────────
