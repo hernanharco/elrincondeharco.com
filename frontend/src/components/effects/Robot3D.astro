@@ -230,22 +230,33 @@
         currentGroup.rotation.x += (targetRotX - currentGroup.rotation.x) * 0.08;
         currentGroup.position.y = Math.sin(Date.now() * 0.0015) * 0.08;
 
-        // Pupilas siguen el mouse (independiente de la rotacion del grupo)
+        // Pupilas siguen el mouse con suavizado (lerp) para efecto realista
         if (animData.pupils) {
-          const px = targetRotY * 0.08;
-          const py = targetRotX * 0.08;
-          animData.pupils.forEach(p => { p.position.x += (px - (p.position.x - (p.userData?.baseX || p.position.x))) * 0.1; if (!p.userData) p.userData = {}; p.userData.baseX = p.position.x; });
-          // Simplified: just move pupils left/right based on mouse
-          animData.pupils[0].position.x = -0.5 + targetRotY * 0.12;
-          animData.pupils[1].position.x = 0.5 + targetRotY * 0.12;
-          animData.pupils[0].position.y = 0.35 + targetRotX * 0.08;
-          animData.pupils[1].position.y = 0.35 + targetRotX * 0.08;
-          // Also move irises slightly
+          // Target positions based on mouse
+          const rangeX = 0.18; // max horizontal pupil offset
+          const rangeY = 0.12; // max vertical pupil offset
+
+          // Left pupil base: -0.55, Right pupil base: 0.55
+          const baseXL = currentStyle === "chibi" ? -0.55 : -0.45;
+          const baseXR = currentStyle === "chibi" ? 0.55 : 0.45;
+          const baseY = currentStyle === "chibi" ? 0.35 : 0.2;
+
+          const tX = targetRotY * rangeX;
+          const tY = targetRotX * rangeY;
+
+          // Smooth lerp: move 15% of the way each frame
+          const lerp = 0.15;
+          animData.pupils[0].position.x += ((baseXL + tX) - animData.pupils[0].position.x) * lerp;
+          animData.pupils[1].position.x += ((baseXR + tX) - animData.pupils[1].position.x) * lerp;
+          animData.pupils[0].position.y += ((baseY + tY) - animData.pupils[0].position.y) * lerp;
+          animData.pupils[1].position.y += ((baseY + tY) - animData.pupils[1].position.y) * lerp;
+
+          // Also move irises slightly for depth effect
           if (animData.irises) {
-            animData.irises[0].position.x = -0.5 + targetRotY * 0.06;
-            animData.irises[1].position.x = 0.5 + targetRotY * 0.06;
-            animData.irises[0].position.y = 0.35 + targetRotX * 0.04;
-            animData.irises[1].position.y = 0.35 + targetRotX * 0.04;
+            animData.irises[0].position.x += ((baseXL + tX * 0.5) - animData.irises[0].position.x) * lerp;
+            animData.irises[1].position.x += ((baseXR + tX * 0.5) - animData.irises[1].position.x) * lerp;
+            animData.irises[0].position.y += ((baseY + tY * 0.3) - animData.irises[0].position.y) * lerp;
+            animData.irises[1].position.y += ((baseY + tY * 0.3) - animData.irises[1].position.y) * lerp;
           }
         }
       }
