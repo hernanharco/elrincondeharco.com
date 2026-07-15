@@ -36,6 +36,11 @@ import RecruiterMethod from '../components/sections/recruiter/RecruiterMethod.as
 
   <!-- ═══ MODO RECRUITER ═══ -->
   <div class="recruiter-content">
+    <!-- Theme toggle -->
+    <div style="position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;gap:0.5rem;" id="recruiter-theme-toggle">
+      <button id="theme-btn" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(8px);transition:all 0.2s;" title="Cambiar tema">🌙</button>
+    </div>
+
     <RecruiterHero />
     <RecruiterStack />
     <RecruiterProjects />
@@ -84,5 +89,27 @@ import RecruiterMethod from '../components/sections/recruiter/RecruiterMethod.as
     document.addEventListener("mode:switch-to-client", () => {
       document.body.removeAttribute("data-mode");
     });
+
+    // ── Theme toggle ──────────────────────────────────────────
+    const themeBtn = document.getElementById("theme-btn");
+    const savedTheme = localStorage.getItem("recruiter-theme");
+    if (savedTheme === "light") {
+      document.body.setAttribute("data-recruiter-theme", "light");
+      if (themeBtn) themeBtn.textContent = "☀️";
+    }
+    if (themeBtn) {
+      themeBtn.addEventListener("click", () => {
+        const current = document.body.getAttribute("data-recruiter-theme");
+        if (current === "light") {
+          document.body.removeAttribute("data-recruiter-theme");
+          localStorage.setItem("recruiter-theme", "dark");
+          themeBtn.textContent = "🌙";
+        } else {
+          document.body.setAttribute("data-recruiter-theme", "light");
+          localStorage.setItem("recruiter-theme", "light");
+          themeBtn.textContent = "☀️";
+        }
+      });
+    }
   })();
 </script>

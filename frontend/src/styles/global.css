@@ -215,3 +215,27 @@ footer[id]:not(.hydrated) * {
 .recruiter-section p {
   text-align: justify;
 }
+
+/* ── Tema oscuro/claro recruiter ──────────────────────────── */
+.recruiter-section {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+body[data-recruiter-theme="light"] .recruiter-section {
+  --recruiter-bg: #ffffff;
+  --recruiter-card: #f8fafc;
+  --recruiter-border: rgba(6, 182, 212, 0.1);
+  --recruiter-text: #0f172a;
+  --recruiter-muted: #475569;
+}
+body[data-recruiter-theme="light"] .recruiter-section .text-white {
+  color: #0f172a !important;
+}
+body[data-recruiter-theme="light"] .recruiter-section .text-gray-400 {
+  color: #475569 !important;
+}
+body[data-recruiter-theme="light"] .recruiter-section .text-gray-500 {
+  color: #64748b !important;
+}
+body[data-recruiter-theme="light"] .recruiter-section .bg-\\[var\\(--recruiter-bg\\)\\] {
+  background-color: #ffffff !important;
+}
