@@ -148,6 +148,6 @@ describe('RECRUITER_METRICS', () => {
 
   it('includes key metrics', () => {
     const labels = RECRUITER_METRICS.map((m) => m.label);
-    expect(labels).toContain('Anos de experiencia');
+    expect(labels).toContain('Años de experiencia');
   });
 });
