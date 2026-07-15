@@ -1,0 +1,55 @@
+---
+// RecruiterCertifications.astro — Certificaciones y badges
+
+import { RECRUITER_CERTIFICATIONS } from '$lib/recruiter-data';
+---
+
+<section class="recruiter-section py-24 bg-[var(--recruiter-bg)] border-t border-[var(--recruiter-border)]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Formación</p>
+      <h2 class="text-3xl md:text-5xl font-bold text-white">
+        <span class="text-cyan-400">23</span> certificaciones
+      </h2>
+      <p class="text-gray-500 max-w-xl mx-auto mt-4 text-lg">
+        Formación continua en Python, IA, Data Analytics y desarrollo web.
+      </p>
+    </div>
+
+    <!-- Badges por área -->
+    @{
+      const areas = [...new Set(RECRUITER_CERTIFICATIONS.map(c => c.area))];
+      const areaColors: Record<string, string> = {
+        'Python': 'border-l-cyan-500',
+        'Django': 'border-l-blue-500',
+        'Angular': 'border-l-red-500',
+        'CSS/Web': 'border-l-amber-500',
+        'Testing': 'border-l-green-500',
+        'Data': 'border-l-purple-500',
+        'IA': 'border-l-indigo-500',
+        'Ofimática': 'border-l-gray-500',
+      };
+    }
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {RECRUITER_CERTIFICATIONS.map((cert) => (
+        <div class={"flex items-center gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all duration-300 border-l-2 " + (areaColors[cert.area] || 'border-l-gray-500')}>
+          <span class="text-xl shrink-0">{cert.icon}</span>
+          <div class="min-w-0">
+            <p class="text-white text-sm font-medium truncate">{cert.name}</p>
+            <p class="text-[10px] text-gray-600 uppercase tracking-wider">{cert.area}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Resumen -->
+    <div class="mt-12 flex flex-wrap justify-center gap-3">
+      <span class="text-xs px-3 py-1.5 rounded-full bg-cyan-500/5 border border-cyan-500/10 text-cyan-400">🐍 Python · 3 cert</span>
+      <span class="text-xs px-3 py-1.5 rounded-full bg-blue-500/5 border border-blue-500/10 text-blue-400">🤖 IA · 4 cert</span>
+      <span class="text-xs px-3 py-1.5 rounded-full bg-purple-500/5 border border-purple-500/10 text-purple-400">📊 Data Analytics · 2 cert</span>
+      <span class="text-xs px-3 py-1.5 rounded-full bg-amber-500/5 border border-amber-500/10 text-amber-400">🌐 Django · 2 cert</span>
+    </div>
+  </div>
+</section>

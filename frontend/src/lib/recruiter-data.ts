@@ -21,6 +21,21 @@ export interface RecruiterProject {
   type: 'freelance' | 'personal' | 'empresa';
 }
 
+export interface TimelineEntry {
+  year: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  type: 'trabajo' | 'estudio' | 'logro' | 'hito';
+  tags?: string[];
+}
+
+export interface Certification {
+  name: string;
+  area: string;
+  icon: string;
+}
+
 export interface ServerSpec {
   name: string;
   provider: string;
@@ -42,6 +57,8 @@ export interface RecruiterData {
   projects: RecruiterProject[];
   servers: ServerSpec[];
   metrics: { label: string; value: string }[];
+  timeline: TimelineEntry[];
+  certifications: Certification[];
 }
 
 // ── Stack Tecnológico ────────────────────────────────────────
@@ -139,6 +156,36 @@ export const RECRUITER_PROJECTS: RecruiterProject[] = [
   },
 ];
 
+// ── Timeline profesional ─────────────────────────────────────
+export const RECRUITER_TIMELINE: TimelineEntry[] = [
+  { year: '1998', title: 'Descubrí la programación', subtitle: 'Visual Basic', description: 'Mi profesor John Freddy Tamayo me enseñó hardware y Visual Basic. A los 12 años ya hacía mis primeros programitas.', type: 'hito', tags: ['Visual Basic'] },
+  { year: '2004', title: 'Profesor de informática', subtitle: 'Colegio, Colombia', description: 'El colegio me contrató para enseñar bachillerato acelerado. 4-6 meses dando clase a otros estudiantes.', type: 'trabajo', tags: ['Educación'] },
+  { year: '2007', title: 'Ingeniero de Sistemas', subtitle: 'Univ. San Buenaventura / Unicomfacauca', description: 'Ingresé a la Universidad San Buenaventura de Cali (prestigiosa) y terminé en la Antonio José Camacho por economía familiar.', type: 'estudio', tags: ['Ingeniería'] },
+  { year: '2007', title: 'Ingreso a DICEL', subtitle: 'Analista de datos', description: 'Entré como sistemas y pasé a analista de datos. Creé un programa en Java que redujo jornadas de 15h a 9h.', type: 'trabajo', tags: ['Java', 'SQL', 'Excel'] },
+  { year: '2015', title: 'Analista 1 / Semijefe', subtitle: 'DICEL, Colombia', description: 'Mano derecha del jefe, poder de decisión. Formé el "equipo de oro". Resultados ISO >90%. Mejoré el área más del 50%.', type: 'logro', tags: ['Liderazgo', 'Gestión'] },
+  { year: '2021', title: 'Emigración a España', subtitle: 'Avilés, Asturias', description: 'Llegué a España en octubre. Sin papeles, trabajé en construcción mientras buscaba oportunidades.', type: 'hito', tags: ['Adaptación'] },
+  { year: '2023', title: 'Primer empleo formal en España', subtitle: 'SEKELY CASAS SL', description: 'Primer contrato formal. Luego SUMESA S.A. (294 días) como mozo de almacén.', type: 'trabajo', tags: ['Logística'] },
+  { year: '2024', title: 'Desarrollo de software freelance', subtitle: 'Bayiva + proyectos propios', description: 'Pruebas técnicas con Bayiva: scrapers de Idealista y Fotocasa, dashboard, mini CRM. Empecé a construir mi portfolio.', type: 'trabajo', tags: ['Python', 'Scraping', 'React', 'FastAPI'] },
+  { year: '2025', title: 'Autónomo en Asturias', subtitle: 'Reparto + desarrollo', description: 'Trabajé como autónomo mientras seguía desarrollando. AuthCore, Appointment, Nanatha, Café Mi Tierra.', type: 'trabajo', tags: ['FastAPI', 'Astro', 'Svelte', 'Docker'] },
+  { year: '2026', title: 'Arquitecto en formación', subtitle: 'elRincondeHarco.com', description: 'Portfolio dual con CRM, panel admin, efectos 3D, CI/CD. Administro mis propios servidores Hetzner + Netcup.', type: 'logro', tags: ['FullStack', 'DevOps', 'Arquitectura'] },
+];
+
+// ── Certificaciones ───────────────────────────────────────────
+export const RECRUITER_CERTIFICATIONS: Certification[] = [
+  { name: 'Universidad Python sin Límites', area: 'Python', icon: '🐍' },
+  { name: 'Universidad Python con IA de ChatGPT', area: 'Python', icon: '🐍' },
+  { name: 'Curso Práctico de Django', area: 'Django', icon: '🌐' },
+  { name: 'Angular - Tomas Ruiz Diaz', area: 'Angular', icon: '🅰️' },
+  { name: 'Desarrollo de Páginas Web CSS y Joomla', area: 'CSS/Web', icon: '🎨' },
+  { name: 'Testing y Debugging de Software', area: 'Testing', icon: '🧪' },
+  { name: 'Fundamentos de Data Analytics', area: 'Data', icon: '📊' },
+  { name: 'ChatGPT 5 - Marketing y Branding con IA', area: 'IA', icon: '🤖' },
+  { name: 'Prompt Engineering para IA Generativa', area: 'IA', icon: '🤖' },
+  { name: 'Curso n8n - Crea Agentes de IA', area: 'IA', icon: '⚡' },
+  { name: 'Inteligencia Artificial TOTAL', area: 'IA', icon: '🧠' },
+  { name: 'Facturación Electrónica', area: 'Ofimática', icon: '📄' },
+];
+
 // ── Servidores ────────────────────────────────────────────────
 
 export const RECRUITER_SERVERS: ServerSpec[] = [
@@ -188,4 +235,6 @@ export const recruiterData: RecruiterData = {
   projects: RECRUITER_PROJECTS,
   servers: RECRUITER_SERVERS,
   metrics: RECRUITER_METRICS,
+  timeline: RECRUITER_TIMELINE,
+  certifications: RECRUITER_CERTIFICATIONS,
 };
