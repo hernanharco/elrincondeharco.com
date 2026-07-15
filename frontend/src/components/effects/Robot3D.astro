@@ -113,60 +113,66 @@
     // ── Build: Chibi ─────────────────────────────────────────
     function buildChibi() {
       const g = new THREE.Group();
+      const gHead = new THREE.Group();
 
-      // Cabeza grande
+      // Cabeza grande (mas grande que orbit)
       const headMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.2, metalness: 0.05 });
-      const head = new THREE.Mesh(new THREE.SphereGeometry(1.1, 28, 28), headMat);
-      head.scale.set(1.1, 1.0, 0.9); g.add(head);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(1.3, 28, 28), headMat);
+      head.scale.set(1.1, 1.0, 0.9); gHead.add(head);
 
       // Cuerpo chico
       const bodyMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.3 });
       const body = new THREE.Mesh(new THREE.SphereGeometry(0.7, 20, 20), bodyMat);
-      body.position.y = -1.2; body.scale.set(1.0, 0.8, 0.7); g.add(body);
+      body.position.y = -1.3; body.scale.set(1.1, 0.8, 0.7); g.add(body);
 
-      // Bufanda azul
-      const bufMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 0.1, roughness: 0.4 });
-      const buf = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.12, 8, 20), bufMat);
-      buf.position.y = -0.35; buf.rotation.x = Math.PI / 2.2; buf.scale.set(1, 1, 0.5); g.add(buf);
-      const buf2 = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.08, 8, 18), bufMat);
-      buf2.position.y = -0.5; buf2.rotation.x = Math.PI / 2; buf2.scale.set(1, 1, 0.4); g.add(buf2);
+      // Bufanda azul gordita
+      const bufMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 0.15, roughness: 0.4 });
+      const buf = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.14, 10, 22), bufMat);
+      buf.position.y = -0.4; buf.rotation.x = Math.PI / 2.2; buf.scale.set(1, 1, 0.5); g.add(buf);
+      const buf2 = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.1, 8, 20), bufMat);
+      buf2.position.y = -0.55; buf2.rotation.x = Math.PI / 1.8; buf2.scale.set(1, 1, 0.4); g.add(buf2);
 
-      // Ojos grandes
-      const eMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.5 });
-      const eMat2 = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      // Ojos grandes (blanco + amarillo + pupila independientes)
+      const eyeWMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 });
+      const irisMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.6, roughness: 0.1 });
       const pMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f });
 
-      function addEye(x, y, z) {
-        const w = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), eMat2);
-        w.position.set(x, y, z); w.scale.set(1.2, 0.8, 0.3); g.add(w);
-        const iris = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), eMat);
-        iris.position.set(x, y, z + 0.05); iris.scale.set(1, 0.8, 0.2); g.add(iris);
+      function addEye(px, py) {
+        const white = new THREE.Mesh(new THREE.SphereGeometry(0.32, 20, 20), eyeWMat);
+        white.position.set(px, py, 0.95); white.scale.set(1.3, 1, 0.3); gHead.add(white);
+        const iris = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), irisMat);
+        iris.position.set(px, py, 1.0); iris.scale.set(1.1, 0.9, 0.15); gHead.add(iris);
         const pup = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), pMat);
-        pup.position.set(x, y, z + 0.08); g.add(pup);
-        return { lens: w, pup };
+        pup.position.set(px, py, 1.05); gHead.add(pup);
+        return { white, iris, pup };
       }
-      const el = addEye(-0.45, 0.3, 0.9);
-      const er = addEye(0.45, 0.3, 0.9);
-      const lLens = el.lens, rLens = er.lens;
-      const lPup = el.pup, rPup = er.pup;
+      const el = addEye(-0.5, 0.35);
+      const er = addEye(0.5, 0.35);
 
-      // Mejillas sonrosadas
-      const bMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.15, emissive: 0xfbbf24, emissiveIntensity: 0.05 });
-      const bl = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 12), bMat);
-      bl.position.set(-0.7, -0.1, 0.75); bl.scale.set(1, 0.5, 0.3); g.add(bl);
-      const br = bl.clone(); br.position.set(0.7, -0.1, 0.75); g.add(br);
+      // Guardar pupilas para tracking independiente
+      const pupils = [el.pup, er.pup];
+      const irises = [el.iris, er.iris];
 
-      // Boquita
+      // Mejillas sonrosadas mas notorias
+      const bMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.2, emissive: 0xfbbf24, emissiveIntensity: 0.08 });
+      const bl = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), bMat);
+      bl.position.set(-0.8, -0.05, 0.75); bl.scale.set(1, 0.5, 0.3); gHead.add(bl);
+      const br = bl.clone(); br.position.set(0.8, -0.05, 0.75); gHead.add(br);
+
+      // Boquita sonrisa
       const mMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4 });
       const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 6, 10), mMat);
-      mouth.position.set(0, -0.2, 0.95); mouth.rotation.x = Math.PI / 3; mouth.rotation.z = Math.PI; g.add(mouth);
+      mouth.position.set(0, -0.2, 0.95); mouth.rotation.x = Math.PI / 3; mouth.rotation.z = Math.PI; gHead.add(mouth);
 
-      // Estrellita decorativa
+      // Estrella decorativa
       const stMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.3, transparent: true, opacity: 0.5 });
-      const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.12, 0), stMat);
-      star.position.set(0.7, 0.8, 0.4); g.add(star);
+      const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.14, 0), stMat);
+      star.position.set(0.8, 0.9, 0.4); gHead.add(star);
 
-      animData = { lLens, rLens, lPup, rPup, star, blinkTargets: [lLens, rLens, lPup, rPup] };
+      gHead.position.y = 0.05;
+      g.add(gHead);
+
+      animData = { lLens: el.white, rLens: er.white, lPup: el.pup, rPup: er.pup, pupils, irises, star, blinkTargets: [el.white, er.white, el.pup, er.pup] };
       return g;
     }
 
@@ -243,6 +249,25 @@
         currentGroup.rotation.y += (targetRotY - currentGroup.rotation.y) * 0.08;
         currentGroup.rotation.x += (targetRotX - currentGroup.rotation.x) * 0.08;
         currentGroup.position.y = Math.sin(Date.now() * 0.0015) * 0.08;
+
+        // Pupilas siguen el mouse (independiente de la rotacion del grupo)
+        if (animData.pupils) {
+          const px = targetRotY * 0.08;
+          const py = targetRotX * 0.08;
+          animData.pupils.forEach(p => { p.position.x += (px - (p.position.x - (p.userData?.baseX || p.position.x))) * 0.1; if (!p.userData) p.userData = {}; p.userData.baseX = p.position.x; });
+          // Simplified: just move pupils left/right based on mouse
+          animData.pupils[0].position.x = -0.5 + targetRotY * 0.12;
+          animData.pupils[1].position.x = 0.5 + targetRotY * 0.12;
+          animData.pupils[0].position.y = 0.35 + targetRotX * 0.08;
+          animData.pupils[1].position.y = 0.35 + targetRotX * 0.08;
+          // Also move irises slightly
+          if (animData.irises) {
+            animData.irises[0].position.x = -0.5 + targetRotY * 0.06;
+            animData.irises[1].position.x = 0.5 + targetRotY * 0.06;
+            animData.irises[0].position.y = 0.35 + targetRotX * 0.04;
+            animData.irises[1].position.y = 0.35 + targetRotX * 0.04;
+          }
+        }
       }
 
       // Orbit-specific animations
