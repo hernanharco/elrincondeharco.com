@@ -47,6 +47,11 @@
       return;
     }
 
+    // ── Si está en modo recruiter, no activar ──────────────
+    if (localStorage.getItem("portfolio-mode") === "recruiter") {
+      return;
+    }
+
     // ── Scene Setup ─────────────────────────────────────────
     const scene = new THREE.Scene();
 

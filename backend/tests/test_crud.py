@@ -183,7 +183,8 @@ class TestCRUD:
             site_url="https://test.com",
             legal_name="Test Legal",
             slogan="Test Slogan",
-            copyright_notice="© 2024 Test"
+            copyright_notice="© 2024 Test",
+            contact_email="test@test.com"
         )
         
         db_session.add(settings)

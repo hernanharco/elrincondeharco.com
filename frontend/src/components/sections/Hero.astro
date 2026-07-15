@@ -36,7 +36,7 @@ const data: HeroResponse = apiData ?? fallbackHero;
     </p>
     <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight text-white leading-[0.9] mb-4">
       {data.subtitle ? (
-        data.subtitle
+        <Fragment set:html={data.subtitle} />
       ) : (
         <>El <span class="text-amber-400">Rincom</span><br /><span class="text-cyan-400">de Harco</span></>
       )}

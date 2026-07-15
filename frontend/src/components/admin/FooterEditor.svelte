@@ -269,7 +269,7 @@
                 <input
                   type="text"
                   bind:value={link.href}
-                  placeholder="#seccion o /ruta"
+                  placeholder="#sección o /ruta"
                   class="flex-1 px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700
                          text-zinc-100 placeholder-zinc-500
                          focus:outline-none focus:border-amber-400 focus:ring-1

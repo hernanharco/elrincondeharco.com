@@ -198,3 +198,32 @@ footer[id]:not(.hydrated) * {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Recruiter Mode ────────────────────────────────────────── */
+:root {
+  --recruiter-bg: #0a0a0f;
+  --recruiter-card: #13131a;
+  --recruiter-border: rgba(6, 182, 212, 0.15);
+  --recruiter-accent: #06b6d4;
+  --recruiter-accent2: #fbbf24;
+  --recruiter-text: #e2e8f0;
+  --recruiter-muted: #64748b;
+  --recruiter-success: #22c55e;
+}
+
+.recruiter-content {
+  display: none;
+}
+
+body[data-mode="recruiter"] .client-content {
+  display: none;
+}
+
+body[data-mode="recruiter"] .recruiter-content {
+  display: block;
+}
+
+/* ── Texto justificado en secciones recruiter ──────────────── */
+.recruiter-section p {
+  text-align: justify;
+}

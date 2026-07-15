@@ -58,19 +58,25 @@ class TestAPI:
             assert "icon" in stack
             assert "description" in stack
     
-    async def test_get_site_settings(self, client: AsyncClient):
+    async def test_get_site_settings(self, client: AsyncClient, sample_site_settings):
         """Test getting site settings."""
         response = await client.get("/api/v1/site-settings/")
         assert response.status_code == 200
         data = response.json()
+        # The endpoint returns a list, get the first item
+        if isinstance(data, list):
+            data = data[0]
         assert "brand_name" in data
         assert "site_url" in data
         assert "legal_name" in data
         assert "slogan" in data
     
-    async def test_cors_headers(self, client: AsyncClient):
-        """Test CORS headers are present."""
-        response = await client.options("/api/v1/projects/")
+    async def test_cors_headers(self, client: AsyncClient, sample_project):
+        """Test CORS headers are present on responses with Origin header."""
+        response = await client.get(
+            "/api/v1/projects/",
+            headers={"Origin": "http://localhost:4321"}
+        )
         assert response.status_code == 200
         # Check for CORS headers
         assert "access-control-allow-origin" in response.headers

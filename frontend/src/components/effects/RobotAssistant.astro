@@ -1,0 +1,374 @@
+---
+// RobotAssistant.astro — Asistente flotante para modo recruiter
+// Botón en esquina inferior derecha → modal pregunta → destrucción
+// Sigue el patrón de CaosOrden.astro (HTML + CSS + script nativo)
+---
+
+<div id="robot-assistant" aria-label="Asistente">
+  <!-- Botón flotante robot -->
+  <button id="robot-btn" class="robot-btn" aria-label="Abrir asistente" title="¿Ver diseño para programador?">
+    <svg class="robot-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Cabeza robot -->
+      <rect x="12" y="12" width="24" height="20" rx="4" fill="currentColor"/>
+      <!-- Antenas -->
+      <line x1="24" y1="8" x2="24" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="24" cy="3" r="2" fill="#06b6d4"/>
+      <!-- Ojos -->
+      <circle cx="20" cy="20" r="3" fill="#060606"/>
+      <circle cx="28" cy="20" r="3" fill="#060606"/>
+      <!-- Pupilas -->
+      <circle cx="20" cy="20" r="1.5" fill="#06b6d4"/>
+      <circle cx="28" cy="20" r="1.5" fill="#06b6d4"/>
+      <!-- Boca (sonrisa) -->
+      <path d="M18 28 Q24 33 30 28" stroke="#06b6d4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- Cuerpo -->
+      <rect x="16" y="32" width="16" height="4" rx="2" fill="currentColor" opacity="0.6"/>
+    </svg>
+  </button>
+
+  <!-- Modal overlay -->
+  <div id="robot-modal" class="robot-modal" aria-hidden="true">
+    <div class="robot-modal-backdrop"></div>
+    <div class="robot-modal-card" role="dialog" aria-modal="true">
+      <!-- Avatar robot -->
+      <div class="robot-modal-avatar">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="10" width="24" height="20" rx="4" fill="#06b6d4"/>
+          <circle cx="20" cy="18" r="3" fill="#060606"/>
+          <circle cx="28" cy="18" r="3" fill="#060606"/>
+          <circle cx="20" cy="18" r="1.5" fill="#06b6d4"/>
+          <circle cx="28" cy="18" r="1.5" fill="#06b6d4"/>
+          <path d="M18 26 Q24 31 30 26" stroke="#06b6d4" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <rect x="16" y="30" width="16" height="4" rx="2" fill="#06b6d4" opacity="0.6"/>
+        </svg>
+      </div>
+
+      <!-- Texto según modo -->
+      <p id="modal-text" class="robot-modal-text">
+        ¿Querés ver el diseño para <span class="text-cyan-400 font-semibold">programador</span>?
+      </p>
+      <p id="modal-sub" class="robot-modal-sub">
+        Stack real, proyectos técnicos, servidores, infraestructura...
+      </p>
+
+      <!-- Botones -->
+      <div class="robot-modal-buttons">
+        <button id="btn-yes" class="btn-primary">
+          <span id="btn-yes-text">Sí</span>
+          <svg id="btn-yes-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </button>
+        <button id="btn-no" class="btn-secondary">No</button>
+      </div>
+
+      <!-- Badge close -->
+      <button id="modal-close" class="robot-modal-close" aria-label="Cerrar">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Botón "Volver" (visible solo en modo recruiter) -->
+  <button id="btn-back" class="robot-back" aria-label="Volver al modo cliente" style="display:none;">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+  </button>
+</div>
+
+<style>
+  /* ── Botón flotante ─────────────────────────────────────── */
+  .robot-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: robot-bob 3s ease-in-out infinite;
+  }
+  .robot-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(6, 182, 212, 0.5);
+  }
+  .robot-btn .robot-icon {
+    width: 28px;
+    height: 28px;
+  }
+  @keyframes robot-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* ── Modal ───────────────────────────────────────────────── */
+  .robot-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+  }
+  .robot-modal.open {
+    display: flex;
+  }
+  .robot-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+  .robot-modal-card {
+    position: relative;
+    background: #13131a;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: modal-in 0.3s ease-out;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  @keyframes modal-in {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .robot-modal-avatar {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    color: #06b6d4;
+  }
+  .robot-modal-text {
+    color: #e2e8f0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+  .robot-modal-sub {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+  .robot-modal-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+  }
+  .btn-secondary {
+    padding: 0.75rem 2rem;
+    background: transparent;
+    color: #64748b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .robot-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .robot-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+  }
+
+  /* ── Botón Volver ────────────────────────────────────────── */
+  .robot-back {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 5rem;
+    z-index: 9999;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(6, 182, 212, 0.15);
+    color: #06b6d4;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .robot-back:hover {
+    background: rgba(6, 182, 212, 0.25);
+    transform: scale(1.1);
+  }
+
+  /* ── Responsive ──────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .robot-btn {
+      bottom: 1rem;
+      right: 1rem;
+      width: 48px;
+      height: 48px;
+    }
+    .robot-btn .robot-icon {
+      width: 24px;
+      height: 24px;
+    }
+    .robot-back {
+      bottom: 1rem;
+      right: 4rem;
+      width: 40px;
+      height: 40px;
+    }
+    .robot-modal-card {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const STORAGE_KEY = "portfolio-mode";
+    const MODE_RECRUITER = "recruiter";
+
+    const btn = document.getElementById("robot-btn");
+    const modal = document.getElementById("robot-modal");
+    const btnYes = document.getElementById("btn-yes");
+    const btnNo = document.getElementById("btn-no");
+    const btnClose = document.getElementById("modal-close");
+    const btnBack = document.getElementById("btn-back");
+    const modalText = document.getElementById("modal-text");
+    const modalSub = document.getElementById("modal-sub");
+    const btnYesText = document.getElementById("btn-yes-text");
+    const btnYesIcon = document.getElementById("btn-yes-icon");
+
+    if (!btn || !modal || !btnYes || !btnNo) return;
+
+    // ── Estado del modal ─────────────────────────────────────
+    let modalMode = "to-recruiter"; // "to-recruiter" | "to-client"
+
+    // ── Abrir modal ──────────────────────────────────────────
+    function openModal(mode) {
+      mode = mode || "to-recruiter";
+      modalMode = mode;
+
+      if (mode === "to-client") {
+        modalText.innerHTML = '¿Volver al diseño para <span class="text-amber-400 font-semibold">clientes</span>?';
+        modalSub.textContent = "Landing page original con tu negocio.";
+        btnYesText.textContent = "Volver";
+        btnYesIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>';
+      } else {
+        modalText.innerHTML = '¿Querés ver el diseño para <span class="text-cyan-400 font-semibold">programador</span>?';
+        modalSub.textContent = "Stack real, proyectos técnicos, servidores, infraestructura...";
+        btnYesText.textContent = "Sí";
+        btnYesIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>';
+      }
+
+      modal.setAttribute("aria-hidden", "false");
+      modal.classList.add("open");
+    }
+
+    // ── Cerrar modal ─────────────────────────────────────────
+    function closeModal() {
+      modal.setAttribute("aria-hidden", "true");
+      modal.classList.remove("open");
+    }
+
+    // ── Cambiar a modo recruiter ──────────────────────────────
+    function switchToRecruiter() {
+      localStorage.setItem(STORAGE_KEY, MODE_RECRUITER);
+      closeModal();
+      btn.style.display = "none";
+      btnBack.style.display = "flex";
+      document.dispatchEvent(new CustomEvent("mode:switch-to-recruiter"));
+    }
+
+    // ── Volver a modo cliente ────────────────────────────────
+    function switchToClient() {
+      localStorage.removeItem(STORAGE_KEY);
+      btnBack.style.display = "none";
+      btn.style.display = "flex";
+      document.dispatchEvent(new CustomEvent("mode:switch-to-client"));
+      // Recargar para restaurar estado original
+      window.location.reload();
+    }
+
+    // ── Click en botón robot ─────────────────────────────────
+    btn.addEventListener("click", () => openModal("to-recruiter"));
+
+    // ── Click en Sí / Volver ─────────────────────────────────
+    btnYes.addEventListener("click", () => {
+      if (modalMode === "to-client") {
+        switchToClient();
+      } else {
+        switchToRecruiter();
+      }
+    });
+
+    // ── Click en No / Cerrar ─────────────────────────────────
+    btnNo.addEventListener("click", closeModal);
+    btnClose.addEventListener("click", closeModal);
+
+    // ── Click en backdrop ────────────────────────────────────
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal || e.target.classList.contains("robot-modal-backdrop")) {
+        closeModal();
+      }
+    });
+
+    // ── Botón Volver (modo recruiter) ────────────────────────
+    btnBack.addEventListener("click", () => openModal("to-client"));
+
+    // ── Tecla Escape ─────────────────────────────────────────
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+
+    // ── Check localStorage al cargar ─────────────────────────
+    const savedMode = localStorage.getItem(STORAGE_KEY);
+    if (savedMode === MODE_RECRUITER) {
+      // Ya está en modo recruiter, mostrar botón volver y ocultar robot
+      btn.style.display = "none";
+      btnBack.style.display = "flex";
+      // Disparar evento para que las secciones se muestren
+      document.dispatchEvent(new CustomEvent("mode:switch-to-recruiter", { detail: { silent: true } }));
+    }
+  })();
+</script>

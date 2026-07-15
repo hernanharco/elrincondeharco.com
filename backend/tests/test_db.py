@@ -30,10 +30,11 @@ class TestDatabase:
             # Create all tables
             await conn.run_sync(Base.metadata.create_all)
         
-        # Verify tables exist
+        # Verify tables exist in the project schema
+        schema = settings.pg_schema
         async with test_engine.begin() as conn:
             result = await conn.execute(
-                text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
+                text(f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema}'")
             )
             tables = [row[0] for row in result.fetchall()]
             
@@ -140,9 +141,9 @@ class TestDatabase:
             
             # Check site settings
             result = await session.execute(select(SiteSettings))
-            settings = result.scalar_one_or_none()
-            assert settings is not None
-            assert settings.brand_name == "elRincondelHarco.com"
+            site_settings = result.scalar_one_or_none()
+            assert site_settings is not None
+            assert site_settings.brand_name == "elRincondelHarco.com"
             
             # Check heroes
             result = await session.execute(select(Hero))
@@ -158,5 +159,10 @@ class TestDatabase:
             result = await session.execute(select(Stack))
             stacks = result.scalars().all()
             assert len(stacks) > 0
+        
+        # Clean up seed data for subsequent fixture-based tests
+        async with test_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.create_all)
         
         await test_engine.dispose()

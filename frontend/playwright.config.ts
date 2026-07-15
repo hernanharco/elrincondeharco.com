@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL: 'http://localhost:4322',
     trace: 'on-first-retry',
   },
   projects: [
@@ -34,8 +34,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm run dev',
-    url: 'http://localhost:4321',
+    command: 'PORT=4322 SSR_API_URL=http://localhost:8001 pnpm run dev',
+    url: 'http://localhost:4322/favicon.ico',
     reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   },
 });
