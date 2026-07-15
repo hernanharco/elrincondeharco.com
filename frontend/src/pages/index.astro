@@ -17,6 +17,7 @@ import RecruiterCertifications from '../components/sections/recruiter/RecruiterC
 import RecruiterGitHub from '../components/sections/recruiter/RecruiterGitHub.astro';
 import RecruiterMethod from '../components/sections/recruiter/RecruiterMethod.astro';
 import RecruiterLocation from '../components/sections/recruiter/RecruiterLocation.astro';
+import RecruiterAdmin from '../components/sections/recruiter/RecruiterAdmin.astro';
 ---
 
 <Layout
@@ -50,6 +51,7 @@ import RecruiterLocation from '../components/sections/recruiter/RecruiterLocatio
     <RecruiterGitHub />
     <RecruiterLocation />
     <RecruiterCertifications />
+    <RecruiterAdmin />
     <RecruiterInfra />
   </div>
 </Layout>
@@ -67,6 +69,11 @@ import RecruiterLocation from '../components/sections/recruiter/RecruiterLocatio
   }
   body[data-mode="recruiter"] .recruiter-content {
     display: block !important;
+  }
+
+  /* ── Performance mode: ocultar Three.js ─────────────────── */
+  body[data-perf-mode="1"] #caos-orden-container {
+    display: none !important;
   }
 </style>
 
@@ -90,6 +97,20 @@ import RecruiterLocation from '../components/sections/recruiter/RecruiterLocatio
     // Cuando vuelve a modo cliente
     document.addEventListener("mode:switch-to-client", () => {
       document.body.removeAttribute("data-mode");
+    });
+
+    // ── Performance mode toggle ───────────────────────────────
+    // Doble click en el logo desactiva Three.js
+    document.addEventListener("dblclick", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a[href="#inicio"]') || target.closest('img[alt*="Rincom"]')) {
+        const current = document.body.getAttribute("data-perf-mode");
+        if (current === "1") {
+          document.body.removeAttribute("data-perf-mode");
+        } else {
+          document.body.setAttribute("data-perf-mode", "1");
+        }
+      }
     });
 
     // ── Theme toggle ──────────────────────────────────────────

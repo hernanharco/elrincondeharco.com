@@ -1,0 +1,86 @@
+---
+// RecruiterAdmin.astro — Preview del panel de administracion
+---
+
+<section class="recruiter-section py-24 bg-[var(--recruiter-bg)] border-t border-[var(--recruiter-border)]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Admin</p>
+      <h2 class="text-3xl md:text-5xl font-bold text-white">
+        Tambien hago <span class="text-cyan-400">herramientas</span>
+      </h2>
+      <p class="text-gray-500 max-w-xl mx-auto mt-4 text-lg">
+        Este portfolio tiene un panel de administracion completo detras.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-3">📝</div>
+        <h3 class="text-white font-bold text-base mb-2">Editor de Hero</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Modifica titulo, subtitulo, descripcion y botones de la pagina principal desde un formulario.</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Svelte</span>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">FastAPI</span>
+        </div>
+      </div>
+
+      <div class="p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-3">📂</div>
+        <h3 class="text-white font-bold text-base mb-2">Editor de Proyectos</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">CRUD completo de proyectos con subida de imagenes a Cloudinary, tags, colores y enlaces.</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Svelte</span>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Cloudinary</span>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">REST API</span>
+        </div>
+      </div>
+
+      <div class="p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-3">🏷️</div>
+        <h3 class="text-white font-bold text-base mb-2">Editor de Sectores</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Gestion de rubros con asignacion de proyectos por sector. Arrastrar y asignar.</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">CRUD</span>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Relaciones</span>
+        </div>
+      </div>
+
+      <div class="p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-3">📊</div>
+        <h3 class="text-white font-bold text-base mb-2">Dashboard</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Panel con metricas, acceso rapido a cada editor y vista general del contenido.</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Svelte</span>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Metricas</span>
+        </div>
+      </div>
+
+      <div class="p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-3">📧</div>
+        <h3 class="text-white font-bold text-base mb-2">Editor de Footer</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Configuracion de redes sociales, enlaces rapidos y datos de contacto.</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">CRUD</span>
+        </div>
+      </div>
+
+      <div class="p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-3">⭐</div>
+        <h3 class="text-white font-bold text-base mb-2">Editor de Testimonios</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Testimonios de clientes con rating, empresas y orden personalizable.</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Svelte</span>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-600">Drag & Drop</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-10">
+      <a href="/admin" class="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-xl text-sm font-medium hover:bg-cyan-500/20 transition-all">
+        Ir al panel admin
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
