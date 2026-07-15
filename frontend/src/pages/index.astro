@@ -8,18 +8,57 @@ import Stats from '../components/sections/Stats.astro';
 import SectorProjects from '../components/sections/SectorProjects.astro';
 import Testimonials from '../components/sections/Testimonials.astro';
 import CTA from '../components/sections/CTA.astro';
+import RecruiterHero from '../components/sections/recruiter/RecruiterHero.astro';
+import RecruiterStack from '../components/sections/recruiter/RecruiterStack.astro';
+import RecruiterProjects from '../components/sections/recruiter/RecruiterProjects.astro';
+import RecruiterInfra from '../components/sections/recruiter/RecruiterInfra.astro';
 ---
 
 <Layout
   title="El Rincom de Harco — Soluciones Digitales para tu Negocio"
   description="Desarrollador web en Asturias. Creo sitios web profesionales, tiendas online y sistemas a medida para hostelería, inmobiliarias, clínicas y más. 14+ años de experiencia."
 >
-  <main>
-    <Navbar />
-    <Hero />
-    <Stats />
-    <SectorProjects />
-    <Testimonials />
-    <CTA />
-  </main>
+  <!-- ═══ MODO CLIENTE ═══ -->
+  <div class="client-content">
+    <main>
+      <Navbar />
+      <Hero />
+      <Stats />
+      <SectorProjects />
+      <Testimonials />
+      <CTA />
+    </main>
+  </div>
+
+  <!-- ═══ MODO RECRUITER ═══ -->
+  <div class="recruiter-content">
+    <RecruiterHero />
+    <RecruiterStack />
+    <RecruiterProjects />
+    <RecruiterInfra />
+  </div>
 </Layout>
+
+<script>
+  // ── Router modo dual ──────────────────────────────────────
+  // Escucha eventos del RobotAssistant y DestructionEffect
+  // para togglear entre modo cliente y recruiter
+
+  (function () {
+    // Al cargar, verificar si ya está en modo recruiter
+    const savedMode = localStorage.getItem("portfolio-mode");
+    if (savedMode === "recruiter") {
+      document.body.setAttribute("data-mode", "recruiter");
+    }
+
+    // Cuando la destrucción termina, activar modo recruiter
+    document.addEventListener("mode:transition-complete", () => {
+      document.body.setAttribute("data-mode", "recruiter");
+    });
+
+    // Cuando vuelve a modo cliente
+    document.addEventListener("mode:switch-to-client", () => {
+      document.body.removeAttribute("data-mode");
+    });
+  })();
+</script>

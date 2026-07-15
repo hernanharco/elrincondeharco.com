@@ -1,0 +1,45 @@
+---
+// RecruiterStack.astro — Stack tecnológico agrupado por categorías
+
+import { RECRUITER_TECH_STACK } from '$lib/recruiter-data';
+---
+
+<section class="recruiter-section py-24 bg-[var(--recruiter-bg)] border-t border-[var(--recruiter-border)]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Stack</p>
+      <h2 class="text-3xl md:text-5xl font-bold text-white">
+        Tecnologías que <span class="text-cyan-400">domino</span>
+      </h2>
+      <p class="text-gray-500 max-w-xl mx-auto mt-4 text-lg">
+        Stack completo con el que construyo soluciones reales.
+      </p>
+    </div>
+
+    <!-- Stack por categoría -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {RECRUITER_TECH_STACK.map((tech) => {
+        const borderColor = {
+          'Backend': 'border-l-cyan-500',
+          'Frontend': 'border-l-blue-500',
+          'Infra': 'border-l-amber-500',
+          'BD': 'border-l-green-500',
+          'Tools': 'border-l-purple-500',
+        }[tech.category] || 'border-l-gray-500';
+        return (
+        <div class="group p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 hover:bg-white/[0.04] transition-all duration-300 border-l-2 {borderColor}">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xl">{tech.icon}</span>
+            <div>
+              <p class="text-white font-semibold text-sm">{tech.name}</p>
+              <p class="text-[10px] text-gray-600 uppercase tracking-wider">{tech.category}</p>
+            </div>
+          </div>
+          <p class="text-gray-500 text-xs leading-relaxed">{tech.description}</p>
+        </div>
+        );
+      })}
+    </div>
+  </div>
+</section>

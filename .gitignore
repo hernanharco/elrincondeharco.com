@@ -1,2 +1,17 @@
 .vercel
 .env*
+.env.local
+node_modules/
+dist/
+.astro/
+*.log
+playwright-report/
+test-results/
+coverage/
+htmlcov/
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.vercel
+vendor/

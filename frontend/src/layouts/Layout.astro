@@ -3,6 +3,8 @@ import '../styles/global.css';
 import Hero3DBackground from '../components/effects/Hero3DBackground.astro';
 import CaosOrden from '../components/effects/CaosOrden.astro';
 import SmoothScroll from '../components/effects/SmoothScroll.astro';
+import RobotAssistant from '../components/effects/RobotAssistant.astro';
+import DestructionEffect from '../components/effects/DestructionEffect.astro';
 
 export interface Props {
   title?: string;
@@ -80,6 +82,10 @@ const ogImage = image && (image.startsWith('http') ? image : `https://elrinconde
 
 		<!-- Smooth Scroll + GSAP animations -->
 		<SmoothScroll />
+
+		<!-- Robot Assistant + Destruction Effect -->
+		<RobotAssistant />
+		<DestructionEffect />
 
 		<!-- Contenido sobre el 3D (z-10) -->
 		<div class="relative z-10">

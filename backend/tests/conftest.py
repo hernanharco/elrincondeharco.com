@@ -50,6 +50,12 @@ async def db_session(test_db):
     """Create a fresh database session for each test."""
     async with test_db() as session:
         yield session
+        # Rollback any uncommitted changes and clean up
+        await session.rollback()
+        # Clean all tables after each test
+        for table in reversed(Base.metadata.sorted_tables):
+            await session.execute(table.delete())
+        await session.commit()
 
 
 @pytest.fixture
@@ -109,3 +115,26 @@ async def sample_project(db_session):
     await db_session.refresh(project)
     
     return project
+
+
+@pytest.fixture
+async def sample_site_settings(db_session):
+    """Create sample site settings for testing."""
+    from app.models.site_settings import SiteSettings
+    
+    settings = SiteSettings(
+        brand_name="Test Brand",
+        site_url="https://test.com",
+        legal_name="Test Legal",
+        slogan="Test Slogan",
+        copyright_notice="© Test",
+        contact_email="test@test.com",
+        social_networks={},
+        is_active=True
+    )
+    
+    db_session.add(settings)
+    await db_session.commit()
+    await db_session.refresh(settings)
+    
+    return settings

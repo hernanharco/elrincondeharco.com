@@ -1,0 +1,293 @@
+---
+// DestructionEffect.astro — Efecto Thanos Snap
+// Pantalla completa con partículas que cubren TODO el viewport
+// y se desintegran flotando hacia arriba, revelando el nuevo modo.
+// Canvas va ENCIMA del contenido (z-index alto).
+// Mobile: canvas reducido + menos partículas.
+---
+
+<canvas id="destruction-canvas"></canvas>
+<div id="destruction-overlay"></div>
+
+<style>
+  #destruction-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  #destruction-canvas.active {
+    opacity: 1;
+  }
+  #destruction-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #060606;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  #destruction-overlay.show {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  import * as THREE from "three";
+
+  (function () {
+    const canvas = document.getElementById("destruction-canvas");
+    const overlay = document.getElementById("destruction-overlay");
+    if (!canvas || !overlay) return;
+
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+    document.addEventListener("mode:switch-to-recruiter", function (e) {
+      const silent = e.detail && e.detail.silent;
+      if (silent) {
+        document.body.setAttribute("data-mode", "recruiter");
+        document.dispatchEvent(new CustomEvent("mode:transition-complete"));
+        return;
+      }
+      if (isMobile) {
+        startMobile();
+      } else {
+        startDesktop();
+      }
+    });
+
+    // ── MOBILE: CSS block fallback ──────────────────────────
+    function startMobile() {
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      const ctx2d = canvas.getContext("2d");
+      canvas.width = W;
+      canvas.height = H;
+
+      // Pintar el canvas de oscuro con bloques de color marca
+      ctx2d.fillStyle = "#060606";
+      ctx2d.fillRect(0, 0, W, H);
+
+      const colors = ["#06b6d480", "#3b82f680", "#fbbf2480", "#f59e0b80", "#0ea5e980"];
+      const blockSize = 30;
+
+      // Grid de bloques
+      const blocks = [];
+      for (let y = 0; y < H; y += blockSize) {
+        for (let x = 0; x < W; x += blockSize) {
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          ctx2d.fillStyle = color;
+          ctx2d.fillRect(x, y, blockSize - 1, blockSize - 1);
+          blocks.push({
+            x, y, w: blockSize, h: blockSize,
+            delay: Math.random() * 0.5,
+            opacity: 1, vy: -(1 + Math.random() * 3),
+          });
+        }
+      }
+
+      canvas.classList.add("active");
+      const startTime = performance.now();
+      let completed = false;
+
+      function animate() {
+        if (completed) return;
+        const elapsed = (performance.now() - startTime) / 1000;
+        ctx2d.clearRect(0, 0, W, H);
+
+        let allDone = true;
+        blocks.forEach(b => {
+          if (b.opacity <= 0) return;
+          allDone = false;
+          const t = Math.max(0, elapsed - b.delay);
+          if (t > 0 && t < 1.5) {
+            const progress = t / 1.5;
+            const eased = 1 - Math.pow(1 - progress, 2);
+            b.opacity = 1 - eased;
+            const dy = b.vy * t * 3;
+            ctx2d.globalAlpha = Math.max(0, b.opacity);
+            ctx2d.fillStyle = colors[0];
+            ctx2d.fillRect(b.x, b.y + dy, b.w, b.h);
+            ctx2d.globalAlpha = 1;
+          } else if (t >= 1.5) {
+            b.opacity = 0;
+          } else {
+            ctx2d.fillStyle = colors[0];
+            ctx2d.fillRect(b.x, b.y, b.w, b.h);
+          }
+        });
+
+        if (allDone && !completed) {
+          completed = true;
+          overlay.classList.add("show");
+          setTimeout(() => {
+            canvas.classList.remove("active");
+            overlay.classList.remove("show");
+            finish();
+          }, 400);
+          return;
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    // ── DESKTOP: Three.js particle disintegration ──────────
+    function startDesktop() {
+      canvas.classList.add("active");
+
+      // Ocultar contenido cliente
+      const clientContent = document.querySelector(".client-content") as HTMLElement;
+      if (clientContent) clientContent.style.opacity = "0.15";
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 0, 8);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: false,
+        antialias: false,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setClearColor(0x060606);
+
+      // ── Partículas que cubren toda la pantalla ────────────
+      const count = isMobile ? 1500 : 5000;
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
+      const velocities = new Float32Array(count * 3);
+      const delays = new Float32Array(count);
+
+      const palette = [
+        [0.03, 0.71, 0.83],  // cyan
+        [0.23, 0.51, 0.96],  // blue
+        [0.98, 0.75, 0.14],  // amber
+        [0.96, 0.60, 0.04],  // orange
+        [0.05, 0.65, 0.91],  // sky
+        [0.13, 0.77, 0.37],  // green
+        [0.55, 0.36, 0.96],  // purple
+      ];
+
+      const spreadX = (window.innerWidth / window.innerHeight) * 7;
+
+      for (let i = 0; i < count; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * spreadX * 2;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 3;
+
+        const c = palette[i % palette.length];
+        colors[i * 3] = c[0];
+        colors[i * 3 + 1] = c[1];
+        colors[i * 3 + 2] = c[2];
+
+        sizes[i] = 0.08 + Math.random() * 0.15;
+
+        // Velocidad: hacia arriba con dispersión
+        velocities[i * 3] = (Math.random() - 0.5) * 0.04;
+        velocities[i * 3 + 1] = 0.02 + Math.random() * 0.08;
+        velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.03;
+
+        delays[i] = Math.random() * 1.0;
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+
+      // Textura circular suave
+      const texCanvas = document.createElement("canvas");
+      texCanvas.width = 32;
+      texCanvas.height = 32;
+      const tCtx = texCanvas.getContext("2d");
+      const grad = tCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, "rgba(255,255,255,1)");
+      grad.addColorStop(0.4, "rgba(255,255,255,0.7)");
+      grad.addColorStop(1, "rgba(255,255,255,0)");
+      tCtx.fillStyle = grad;
+      tCtx.fillRect(0, 0, 32, 32);
+      const texture = new THREE.CanvasTexture(texCanvas);
+
+      const material = new THREE.PointsMaterial({
+        size: 0.35,
+        map: texture,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        transparent: true,
+        opacity: 1,
+        vertexColors: true,
+      });
+
+      const particles = new THREE.Points(geometry, material);
+      scene.add(particles);
+
+      // ── Animation ─────────────────────────────────────────
+      const startTime = performance.now();
+      let completed = false;
+      const posArr = geometry.attributes.position.array;
+      const sizeArr = geometry.attributes.size.array;
+
+      function animate() {
+        if (completed) return;
+        const elapsed = (performance.now() - startTime) / 1000;
+
+        for (let i = 0; i < count; i++) {
+          const delay = delays[i];
+          if (elapsed < delay) continue;
+          const t = elapsed - delay;
+          const life = Math.max(0, 1 - t / 2.5);
+
+          posArr[i * 3] += velocities[i * 3] * life;
+          posArr[i * 3 + 1] += velocities[i * 3 + 1] * life * 2;
+          posArr[i * 3 + 2] += velocities[i * 3 + 2] * life;
+
+          const scale = life * life;
+          sizeArr[i] = (0.08 + (i % 10) * 0.015) * Math.max(0.01, scale);
+        }
+
+        geometry.attributes.position.needsUpdate = true;
+        geometry.attributes.size.needsUpdate = true;
+
+        material.opacity = Math.max(0, Math.min(1, (2.8 - elapsed) / 1.0));
+
+        renderer.render(scene, camera);
+
+        if (elapsed > 2.5 && !completed) {
+          completed = true;
+          overlay.classList.add("show");
+          setTimeout(() => {
+            canvas.classList.remove("active");
+            overlay.classList.remove("show");
+            geometry.dispose();
+            material.dispose();
+            renderer.dispose();
+            scene.clear();
+            finish();
+          }, 500);
+          return;
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
+    function finish() {
+      // Restaurar contenido cliente (data-mode lo ocultará)
+      const clientContent = document.querySelector(".client-content") as HTMLElement;
+      if (clientContent) clientContent.style.opacity = "1";
+      document.body.setAttribute("data-mode", "recruiter");
+      document.dispatchEvent(new CustomEvent("mode:transition-complete"));
+    }
+  })();
+</script>

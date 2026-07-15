@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "backend/**/*.py": [
+      "black --check --quiet",
+      "flake8 --max-line-length=100 --quiet"
+    ],
+    "frontend/src/**/*.{ts,svelte,astro}": [
+      "echo 'Tip: run pnpm exec tsc --noEmit for type checking'"
+    ]
+  }
+}
