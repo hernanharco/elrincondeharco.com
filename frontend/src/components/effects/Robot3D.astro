@@ -251,12 +251,12 @@
           animData.pupils[0].position.y += ((baseY + tY) - animData.pupils[0].position.y) * lerp;
           animData.pupils[1].position.y += ((baseY + tY) - animData.pupils[1].position.y) * lerp;
 
-          // Also move irises slightly for depth effect
+          // Iris se mueve con el mouse (mismo rango que pupilas pero mas sutil)
           if (animData.irises) {
-            animData.irises[0].position.x += ((baseXL + tX * 0.5) - animData.irises[0].position.x) * lerp;
-            animData.irises[1].position.x += ((baseXR + tX * 0.5) - animData.irises[1].position.x) * lerp;
-            animData.irises[0].position.y += ((baseY + tY * 0.3) - animData.irises[0].position.y) * lerp;
-            animData.irises[1].position.y += ((baseY + tY * 0.3) - animData.irises[1].position.y) * lerp;
+            animData.irises[0].position.x += ((baseXL + tX * 0.8) - animData.irises[0].position.x) * lerp;
+            animData.irises[1].position.x += ((baseXR + tX * 0.8) - animData.irises[1].position.x) * lerp;
+            animData.irises[0].position.y += ((baseY + tY * 0.6) - animData.irises[0].position.y) * lerp;
+            animData.irises[1].position.y += ((baseY + tY * 0.6) - animData.irises[1].position.y) * lerp;
           }
         }
       }
