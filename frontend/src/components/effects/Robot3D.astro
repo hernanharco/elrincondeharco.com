@@ -1,7 +1,6 @@
 ---
-// Robot3D.astro — Robot 3D que sigue el cursor
-// Three.js con geometrías básicas: cubo cabeza, esferas ojos, antena
-// Reemplaza el SVG del RobotAssistant
+// Robot3D.astro — Orbit: esfera blanca + aros orbitales azules
+// Ojos amarillos tipo cámara que parpadean, sigue el mouse, click abre modal
 ---
 
 <div id="robot-3d-container" aria-hidden="true">
@@ -13,21 +12,26 @@
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     z-index: 9999;
-    pointer-events: none;
     cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+  #robot-3d-container:hover {
+    transform: scale(1.08);
   }
   #robot-3d-canvas {
     width: 100%;
     height: 100%;
     display: block;
+    border-radius: 50%;
   }
   @media (max-width: 640px) {
     #robot-3d-container {
-      width: 60px;
-      height: 60px;
+      width: 65px;
+      height: 65px;
       bottom: 0.75rem;
       right: 0.75rem;
     }
@@ -42,248 +46,211 @@
     const canvas = document.getElementById("robot-3d-canvas");
     if (!container || !canvas) return;
 
-    // ── Scene ────────────────────────────────────────────────
-    const scene = new THREE.Scene();
+    const W = 90;
+    const H = 90;
 
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.set(0, 0, 5);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+    camera.position.set(0, 0.3, 5);
     camera.lookAt(0, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      alpha: true,
-      antialias: true,
-    });
-    renderer.setSize(80, 80);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
 
     // ── Lights ───────────────────────────────────────────────
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambient);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dl = new THREE.DirectionalLight(0xffffff, 1.2);
+    dl.position.set(4, 6, 6);
+    scene.add(dl);
+    const bl = new THREE.DirectionalLight(0x06b6d4, 0.3);
+    bl.position.set(-4, -3, -5);
+    scene.add(bl);
 
-    const dirLight = new THREE.DirectionalLight(0x06b6d4, 0.8);
-    dirLight.position.set(3, 5, 5);
-    scene.add(dirLight);
+    // ── Orbit Group ──────────────────────────────────────────
+    const orbit = new THREE.Group();
 
-    const backLight = new THREE.DirectionalLight(0x3b82f6, 0.3);
-    backLight.position.set(-3, -3, -3);
-    scene.add(backLight);
-
-    // ── Creature Group (mascota estilo logo) ────────────────
-    const creature = new THREE.Group();
-
-    // Cuerpo principal (blob suave, estirado)
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x0a0a1a,
-      roughness: 0.3,
-      metalness: 0.1,
-      transparent: true,
-      opacity: 0.92,
+    // Esfera principal (blanco suave)
+    const sphereMat = new THREE.MeshStandardMaterial({
+      color: 0xf0f4f8,
+      roughness: 0.15,
+      metalness: 0.05,
     });
-    const body = new THREE.Mesh(new THREE.SphereGeometry(1.1, 24, 24), bodyMat);
-    body.scale.set(1.3, 1.1, 0.9);
-    body.position.y = -0.1;
-    creature.add(body);
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), sphereMat);
+    orbit.add(sphere);
 
-    // Ribbon decorativo (como el logo) - toroide que rodea el cuerpo
-    const ribbonMat = new THREE.MeshStandardMaterial({
+    // Aro orbital principal (azul cyan)
+    const ringMat = new THREE.MeshStandardMaterial({
       color: 0x06b6d4,
       emissive: 0x06b6d4,
       emissiveIntensity: 0.15,
-      roughness: 0.2,
-      metalness: 0.3,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.5,
+      roughness: 0.2,
+      metalness: 0.4,
+      side: THREE.DoubleSide,
     });
-    const ribbon = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.08, 12, 32), ribbonMat);
-    ribbon.rotation.x = Math.PI / 2.5;
-    ribbon.rotation.z = 0.3;
-    ribbon.position.y = 0.1;
-    creature.add(ribbon);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.05, 16, 48), ringMat);
+    ring.rotation.x = Math.PI / 2.8;
+    ring.rotation.z = 0.4;
+    orbit.add(ring);
 
-    const ribbon2 = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.06, 10, 28), ribbonMat);
-    ribbon2.material = ribbonMat.clone();
-    ribbon2.material.color.setHex(0xfbbf24);
-    ribbon2.material.emissive.setHex(0xfbbf24);
-    ribbon2.rotation.x = Math.PI / 1.8;
-    ribbon2.rotation.z = -0.4;
-    ribbon2.position.y = -0.1;
-    creature.add(ribbon2);
+    // Aro secundario (azul más claro)
+    const ring2Mat = ringMat.clone();
+    ring2Mat.color.setHex(0x38bdf8);
+    ring2Mat.emissive.setHex(0x38bdf8);
+    ring2Mat.opacity = 0.3;
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.45, 0.03, 12, 40), ring2Mat);
+    ring2.rotation.x = Math.PI / 1.6;
+    ring2.rotation.z = -0.6;
+    orbit.add(ring2);
 
-    // Ojos grandes (kawaii)
+    // Ojo izquierdo (amarillo cámara)
+    const eyeMat = new THREE.MeshStandardMaterial({
+      color: 0xfbbf24,
+      emissive: 0xfbbf24,
+      emissiveIntensity: 0.5,
+      roughness: 0.2,
+      metalness: 0.1,
+    });
     const eyeWhiteMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.1,
-      metalness: 0.0,
+      color: 0x1a1a2e,
+      roughness: 0.3,
     });
-    const pupilMat = new THREE.MeshStandardMaterial({
-      color: 0x0a0a1a,
-      roughness: 0.0,
-    });
-    const irisMat = new THREE.MeshStandardMaterial({
+
+    // Anillo exterior ojo izquierdo
+    const lRing = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.06, 12, 20), eyeWhiteMat);
+    lRing.position.set(-0.45, 0.2, 1.05);
+    orbit.add(lRing);
+
+    // Lente amarillo izquierdo
+    const lLens = new THREE.Mesh(new THREE.CircleGeometry(0.22, 20), eyeMat);
+    lLens.position.set(-0.45, 0.2, 1.08);
+    orbit.add(lLens);
+
+    // Pupila izquierda
+    const pupilMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f });
+    const lPupil = new THREE.Mesh(new THREE.CircleGeometry(0.08, 16), pupilMat);
+    lPupil.position.set(-0.45, 0.2, 1.12);
+    orbit.add(lPupil);
+
+    // Anillo exterior ojo derecho
+    const rRing = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.06, 12, 20), eyeWhiteMat);
+    rRing.position.set(0.45, 0.2, 1.05);
+    orbit.add(rRing);
+
+    // Lente amarillo derecho
+    const rLens = new THREE.Mesh(new THREE.CircleGeometry(0.22, 20), eyeMat);
+    rLens.position.set(0.45, 0.2, 1.08);
+    orbit.add(rLens);
+
+    // Pupila derecha
+    const rPupil = new THREE.Mesh(new THREE.CircleGeometry(0.08, 16), pupilMat);
+    rPupil.position.set(0.45, 0.2, 1.12);
+    orbit.add(rPupil);
+
+    // LED indicador base (punto azul)
+    const ledMat = new THREE.MeshStandardMaterial({
       color: 0x06b6d4,
       emissive: 0x06b6d4,
       emissiveIntensity: 0.6,
-      roughness: 0.1,
     });
+    const led = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), ledMat);
+    led.position.set(0, -1.2, 1.2);
+    orbit.add(led);
 
-    // Ojo izquierdo
-    const lEye = new THREE.Mesh(new THREE.SphereGeometry(0.4, 20, 20), eyeWhiteMat);
-    lEye.position.set(-0.55, 0.35, 0.95);
-    lEye.scale.set(0.9, 1, 0.5);
-    creature.add(lEye);
+    scene.add(orbit);
 
-    const lIris = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), irisMat);
-    lIris.position.set(-0.55, 0.35, 1.05);
-    lIris.scale.set(0.8, 0.8, 0.3);
-    creature.add(lIris);
+    // ── Parpadeo ────────────────────────────────────────────
+    let isBlinking = false;
+    let blinkTimer = 3000 + Math.random() * 2000;
 
-    const lPupil = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), pupilMat);
-    lPupil.position.set(-0.55, 0.35, 1.1);
-    creature.add(lPupil);
-
-    // Ojo derecho
-    const rEye = new THREE.Mesh(new THREE.SphereGeometry(0.4, 20, 20), eyeWhiteMat);
-    rEye.position.set(0.55, 0.35, 0.95);
-    rEye.scale.set(0.9, 1, 0.5);
-    creature.add(rEye);
-
-    const rIris = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), irisMat);
-    rIris.position.set(0.55, 0.35, 1.05);
-    rIris.scale.set(0.8, 0.8, 0.3);
-    creature.add(rIris);
-
-    const rPupil = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), pupilMat);
-    rPupil.position.set(0.55, 0.35, 1.1);
-    creature.add(rPupil);
-
-    // Mejillas sonrosadas
-    const blushMat = new THREE.MeshStandardMaterial({
-      color: 0xfbbf24,
-      transparent: true,
-      opacity: 0.2,
-      emissive: 0xfbbf24,
-      emissiveIntensity: 0.1,
-    });
-    const blushL = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), blushMat);
-    blushL.position.set(-0.75, -0.1, 0.8);
-    blushL.scale.set(1, 0.6, 0.4);
-    creature.add(blushL);
-
-    const blushR = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), blushMat);
-    blushR.position.set(0.75, -0.1, 0.8);
-    blushR.scale.set(1, 0.6, 0.4);
-    creature.add(blushR);
-
-    // Boquita sonrisa (toro pequeño)
-    const mouthMat = new THREE.MeshStandardMaterial({
-      color: 0xfbbf24,
-      emissive: 0xfbbf24,
-      emissiveIntensity: 0.2,
-    });
-    const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.04, 6, 12), mouthMat);
-    mouth.position.set(0, -0.25, 1.0);
-    mouth.rotation.x = Math.PI / 3;
-    mouth.rotation.z = Math.PI;
-    creature.add(mouth);
-
-    // Estrella flotante (accesorio)
-    const starMat = new THREE.MeshStandardMaterial({
-      color: 0xfbbf24,
-      emissive: 0xfbbf24,
-      emissiveIntensity: 0.4,
-      transparent: true,
-      opacity: 0.6,
-    });
-    const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.15, 0), starMat);
-    star.position.set(0.7, 0.9, 0.4);
-    creature.add(star);
-
-    const star2 = star.clone();
-    star2.material = starMat.clone();
-    star2.material.color.setHex(0x06b6d4);
-    star2.material.emissive.setHex(0x06b6d4);
-    star2.position.set(-0.8, 0.7, 0.5);
-    star2.scale.set(0.6, 0.6, 0.6);
-    creature.add(star2);
-
-    scene.add(creature);
+    function blink() {
+      if (isBlinking) return;
+      isBlinking = true;
+      lLens.scale.y = 0.01;
+      rLens.scale.y = 0.01;
+      lPupil.scale.y = 0.01;
+      rPupil.scale.y = 0.01;
+      setTimeout(() => {
+        lLens.scale.y = 1;
+        rLens.scale.y = 1;
+        lPupil.scale.y = 1;
+        rPupil.scale.y = 1;
+        isBlinking = false;
+        blinkTimer = 2500 + Math.random() * 3000;
+      }, 120);
+    }
 
     // ── Mouse tracking ──────────────────────────────────────
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetRotX = 0;
     let targetRotY = 0;
+    let targetRotX = 0;
 
     document.addEventListener("mousemove", (e) => {
-      // Normalizar coordenadas del mouse relativo al viewport
-      mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-
-      // Mapear a ángulos de rotación suaves
-      targetRotY = mouseX * 0.4;  //左右 rotation (y axis)
-      targetRotX = mouseY * 0.2;  //上下 rotation (x axis)
+      const mx = (e.clientX / window.innerWidth) * 2 - 1;
+      const my = -(e.clientY / window.innerHeight) * 2 + 1;
+      targetRotY = mx * 0.35;
+      targetRotX = my * 0.18;
     });
-
-    // Tambien seguir el mouse en mobile (touch)
     document.addEventListener("touchmove", (e) => {
-      const touch = e.touches[0];
-      if (!touch) return;
-      mouseX = (touch.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(touch.clientY / window.innerHeight) * 2 + 1;
-      targetRotY = mouseX * 0.4;
-      targetRotX = mouseY * 0.2;
+      const t = e.touches[0];
+      if (!t) return;
+      targetRotY = ((t.clientX / window.innerWidth) * 2 - 1) * 0.35;
+      targetRotX = (-(t.clientY / window.innerHeight) * 2 + 1) * 0.18;
     });
 
-    // ── Animation loop ───────────────────────────────────────
+    // ── Animation ────────────────────────────────────────────
+    let blinkAcc = 0;
+
     function animate() {
-      // Interpolación suave (lerp) hacia la posición del mouse
-      creature.rotation.y += (targetRotY - creature.rotation.y) * 0.08;
-      creature.rotation.x += (targetRotX - creature.rotation.x) * 0.08;
+      const dt = 0.016;
+      blinkAcc += dt * 1000;
 
-      // Floating suave
-      const floatY = Math.sin(Date.now() * 0.002) * 0.1;
-      creature.position.y = floatY;
+      // Parpadeo automático
+      if (blinkAcc > blinkTimer && !isBlinking) {
+        blinkAcc = 0;
+        blink();
+      }
 
-      // Estrellas rotan
-      star.rotation.x += 0.02;
-      star.rotation.y += 0.03;
-      star2.rotation.x -= 0.03;
-      star2.rotation.z += 0.02;
+      // Rotación suave hacia el mouse
+      orbit.rotation.y += (targetRotY - orbit.rotation.y) * 0.08;
+      orbit.rotation.x += (targetRotX - orbit.rotation.x) * 0.08;
 
-      // Ribbon pulsa
-      ribbon.scale.setScalar(1 + Math.sin(Date.now() * 0.001) * 0.02);
-      ribbon2.scale.setScalar(1 + Math.sin(Date.now() * 0.001 + 1) * 0.02);
+      // Flotación
+      orbit.position.y = Math.sin(Date.now() * 0.0015) * 0.08;
+
+      // Aros rotan
+      ring.rotation.x += 0.003;
+      ring.rotation.z += 0.002;
+      ring2.rotation.x -= 0.004;
+      ring2.rotation.z += 0.003;
+
+      // LED pulsa
+      ledMat.emissiveIntensity = 0.4 + Math.sin(Date.now() * 0.004) * 0.2;
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
-
     animate();
 
-    // ── Click on robot opens the modal ──────────────────────
+    // ── Click → modal ──────────────────────────────────────
     container.addEventListener("click", () => {
-      const modal = document.getElementById("robot-modal");
-      if (modal) {
-        const openModal = () => {
-          modal.setAttribute("aria-hidden", "false");
-          modal.classList.add("open");
-        };
-        // Abrir modal con "to-recruiter"
-        // Disparamos click en el botón oculto
-        const robotBtn = document.getElementById("robot-btn");
-        if (robotBtn) {
-          robotBtn.click();
-        } else {
-          openModal();
-        }
-      }
+      const robotBtn = document.getElementById("robot-btn");
+      if (robotBtn) robotBtn.click();
     });
 
-    // ── Cleanup on page unload ─────────────────────────────
-    window.addEventListener("beforeunload", () => {
-      renderer.dispose();
-    });
+    // ── Resize ───────────────────────────────────────────────
+    function onResize() {
+      const size = Math.min(window.innerWidth * 0.12, 90);
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      container.style.width = size + "px";
+      container.style.height = size + "px";
+      renderer.setSize(size, size);
+      renderer.setPixelRatio(dpr);
+    }
+    window.addEventListener("resize", onResize);
+
+    window.addEventListener("beforeunload", () => renderer.dispose());
   })();
 </script>
