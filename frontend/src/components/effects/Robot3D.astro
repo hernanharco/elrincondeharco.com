@@ -110,69 +110,49 @@
       return g;
     }
 
-    // ── Build: Chibi ─────────────────────────────────────────
+    // ── Build: Chibi (como el SVG: cabeza enorme, cuerpo chico, bufanda) ──
     function buildChibi() {
       const g = new THREE.Group();
-      const gHead = new THREE.Group();
 
-      // Cabeza grande (mas grande que orbit)
-      const headMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.2, metalness: 0.05 });
-      const head = new THREE.Mesh(new THREE.SphereGeometry(1.3, 28, 28), headMat);
-      head.scale.set(1.1, 1.0, 0.9); gHead.add(head);
-
-      // Cuerpo chico
+      // Cuerpo chico (elipse abajo)
       const bodyMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.3 });
-      const body = new THREE.Mesh(new THREE.SphereGeometry(0.7, 20, 20), bodyMat);
-      body.position.y = -1.3; body.scale.set(1.1, 0.8, 0.7); g.add(body);
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), bodyMat);
+      body.position.y = -1.2; body.scale.set(1.3, 0.7, 0.6); g.add(body);
 
-      // Bufanda azul gordita
-      const bufMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 0.15, roughness: 0.4 });
-      const buf = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.14, 10, 22), bufMat);
-      buf.position.y = -0.4; buf.rotation.x = Math.PI / 2.2; buf.scale.set(1, 1, 0.5); g.add(buf);
-      const buf2 = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.1, 8, 20), bufMat);
-      buf2.position.y = -0.55; buf2.rotation.x = Math.PI / 1.8; buf2.scale.set(1, 1, 0.4); g.add(buf2);
+      // Cabeza GRANDE (como el SVG: cx=60 cy=40 r=32 en 120x120 = ~53% del alto)
+      const headMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.15, metalness: 0.02 });
+      const head = new THREE.Mesh(new THREE.SphereGeometry(1.25, 28, 28), headMat);
+      head.scale.set(1.15, 0.95, 0.85); g.add(head);
 
-      // Ojos grandes (blanco + amarillo + pupila independientes)
-      const eyeWMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 });
-      const irisMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.6, roughness: 0.1 });
+      // Bufanda azul (rectangulo en SVG: x=42 y=75 w=36 h=8)
+      const bufMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 0.1, roughness: 0.5 });
+      const buf = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.25, 0.5), bufMat);
+      buf.position.set(0, -0.7, 0.65); g.add(buf);
+      const buf2 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.15, 0.4), bufMat);
+      buf2.position.set(0, -0.85, 0.6); g.add(buf2);
+
+      // Ojos amarillos GRANDES (como SVG: r=10 en 120px -> ~17% del viewBox)
+      const irisMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.5, roughness: 0.1 });
       const pMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f });
 
       function addEye(px, py) {
-        const white = new THREE.Mesh(new THREE.SphereGeometry(0.32, 20, 20), eyeWMat);
-        white.position.set(px, py, 0.95); white.scale.set(1.3, 1, 0.3); gHead.add(white);
-        const iris = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), irisMat);
-        iris.position.set(px, py, 1.0); iris.scale.set(1.1, 0.9, 0.15); gHead.add(iris);
-        const pup = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), pMat);
-        pup.position.set(px, py, 1.05); gHead.add(pup);
-        return { white, iris, pup };
+        const iris = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 16), irisMat);
+        iris.position.set(px, py, 0.95); iris.scale.set(1.2, 0.9, 0.12); g.add(iris);
+        const pup = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), pMat);
+        pup.position.set(px, py, 1.0); g.add(pup);
+        return { iris, pup };
       }
-      const el = addEye(-0.5, 0.35);
-      const er = addEye(0.5, 0.35);
-
-      // Guardar pupilas para tracking independiente
+      const el = addEye(-0.55, 0.35);
+      const er = addEye(0.55, 0.35);
       const pupils = [el.pup, er.pup];
       const irises = [el.iris, er.iris];
 
-      // Mejillas sonrosadas mas notorias
-      const bMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.2, emissive: 0xfbbf24, emissiveIntensity: 0.08 });
-      const bl = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), bMat);
-      bl.position.set(-0.8, -0.05, 0.75); bl.scale.set(1, 0.5, 0.3); gHead.add(bl);
-      const br = bl.clone(); br.position.set(0.8, -0.05, 0.75); gHead.add(br);
+      // Sonrisa (path SVG: M50 52 Q60 58 70 52)
+      const mMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f });
+      const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.03, 6, 12), mMat);
+      mouth.position.set(0, -0.15, 0.95); mouth.rotation.x = Math.PI / 4; mouth.rotation.z = Math.PI; g.add(mouth);
 
-      // Boquita sonrisa
-      const mMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4 });
-      const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 6, 10), mMat);
-      mouth.position.set(0, -0.2, 0.95); mouth.rotation.x = Math.PI / 3; mouth.rotation.z = Math.PI; gHead.add(mouth);
-
-      // Estrella decorativa
-      const stMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.3, transparent: true, opacity: 0.5 });
-      const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.14, 0), stMat);
-      star.position.set(0.8, 0.9, 0.4); gHead.add(star);
-
-      gHead.position.y = 0.05;
-      g.add(gHead);
-
-      animData = { lLens: el.white, rLens: er.white, lPup: el.pup, rPup: er.pup, pupils, irises, star, blinkTargets: [el.white, er.white, el.pup, er.pup] };
+      animData = { lLens: el.iris, rLens: er.iris, lPup: el.pup, rPup: er.pup, pupils, irises, blinkTargets: [el.iris, er.iris, el.pup, er.pup] };
       return g;
     }
 
