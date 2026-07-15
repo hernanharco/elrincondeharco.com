@@ -1,10 +1,13 @@
 ---
+// Hero.astro — Contenido de marca siempre fijo.
+// NO usa datos de la API para el contenido principal.
+// La API solo se consulta para datos dinámicos (botones, links).
 import type { HeroResponse } from '$lib/types';
 import { fetchSSR } from '$lib/api';
 import { fallbackHero } from '$lib/fallback-data';
 
 const apiData = await fetchSSR<HeroResponse>('/heroes/latest/');
-const data: HeroResponse = apiData ?? fallbackHero;
+const _data: HeroResponse = apiData ?? fallbackHero;
 ---
 
 <section id="inicio" data-reveal="fade" class="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -32,13 +35,13 @@ const data: HeroResponse = apiData ?? fallbackHero;
 
   <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
     <p class="text-amber-400 font-medium tracking-[0.25em] text-xs md:text-sm mb-6 uppercase">
-      {data.title || 'Soluciones Digitales para tu Negocio'}
+      Soluciones Digitales para tu Negocio
     </p>
     <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight text-white leading-[0.9] mb-4">
       El <span class="text-amber-400">Rincom</span><br /><span class="text-cyan-400">de Harco</span>
     </h1>
     <p class="text-gray-400 text-base md:text-lg mt-6 max-w-lg mx-auto leading-relaxed">
-      {data.description || 'Creo la web que tu negocio necesita para crecer.'}
+      Creo la web que tu negocio necesita para crecer.
       <span class="text-amber-400/60 block mt-1 text-sm">Sitios que venden · Sistemas que automatizan · Experiencias que enamoran</span>
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
@@ -47,7 +50,7 @@ const data: HeroResponse = apiData ?? fallbackHero;
         <span class="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
       </a>
       <a href="#contacto" class="px-8 py-4 border border-white/10 text-gray-300 hover:text-white hover:border-white/30 rounded-xl transition-all text-sm tracking-wide">
-        {data.contact_button_text || 'Contacto'}
+        Contacto
       </a>
     </div>
   </div>
