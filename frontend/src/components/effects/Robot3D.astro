@@ -1,6 +1,7 @@
 ---
-// Robot3D.astro — Orbit: esfera blanca + aros orbitales azules
-// Ojos amarillos tipo cámara que parpadean, sigue el mouse, click abre modal
+// Robot3D.astro — Mascota 3D interactiva
+// Estilos: orbit (esfera + aros) | chibi (cabezón + bufanda)
+// Double-click cambia de estilo. Click abre modal. Sigue el mouse.
 ---
 
 <div id="robot-3d-container" aria-hidden="true">
@@ -46,8 +47,10 @@
     const canvas = document.getElementById("robot-3d-canvas");
     if (!container || !canvas) return;
 
-    const W = 90;
-    const H = 90;
+    const STYLE_KEY = "robot-style";
+    let currentStyle = localStorage.getItem(STYLE_KEY) || "orbit";
+    let currentGroup = null;
+    let animData = {};
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
@@ -55,202 +58,220 @@
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    renderer.setSize(W, H);
+    const size = Math.min(window.innerWidth * 0.12, 90);
+    renderer.setSize(size, size);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
 
     // ── Lights ───────────────────────────────────────────────
     scene.add(new THREE.AmbientLight(0xffffff, 0.7));
     const dl = new THREE.DirectionalLight(0xffffff, 1.2);
-    dl.position.set(4, 6, 6);
-    scene.add(dl);
+    dl.position.set(4, 6, 6); scene.add(dl);
     const bl = new THREE.DirectionalLight(0x06b6d4, 0.3);
-    bl.position.set(-4, -3, -5);
-    scene.add(bl);
+    bl.position.set(-4, -3, -5); scene.add(bl);
 
-    // ── Orbit Group ──────────────────────────────────────────
-    const orbit = new THREE.Group();
+    // ── Build: Orbit ─────────────────────────────────────────
+    function buildOrbit() {
+      const g = new THREE.Group();
+      const sMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.15, metalness: 0.05 });
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), sMat));
 
-    // Esfera principal (blanco suave)
-    const sphereMat = new THREE.MeshStandardMaterial({
-      color: 0xf0f4f8,
-      roughness: 0.15,
-      metalness: 0.05,
-    });
-    const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), sphereMat);
-    orbit.add(sphere);
+      const rMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 0.15, transparent: true, opacity: 0.5, roughness: 0.2, metalness: 0.4, side: THREE.DoubleSide });
+      const r1 = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.05, 16, 48), rMat);
+      r1.rotation.x = Math.PI / 2.8; r1.rotation.z = 0.4; g.add(r1);
 
-    // Aro orbital principal (azul cyan)
-    const ringMat = new THREE.MeshStandardMaterial({
-      color: 0x06b6d4,
-      emissive: 0x06b6d4,
-      emissiveIntensity: 0.15,
-      transparent: true,
-      opacity: 0.5,
-      roughness: 0.2,
-      metalness: 0.4,
-      side: THREE.DoubleSide,
-    });
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.05, 16, 48), ringMat);
-    ring.rotation.x = Math.PI / 2.8;
-    ring.rotation.z = 0.4;
-    orbit.add(ring);
+      const r2Mat = rMat.clone(); r2Mat.color.setHex(0x38bdf8); r2Mat.emissive.setHex(0x38bdf8); r2Mat.opacity = 0.3;
+      const r2 = new THREE.Mesh(new THREE.TorusGeometry(1.45, 0.03, 12, 40), r2Mat);
+      r2.rotation.x = Math.PI / 1.6; r2.rotation.z = -0.6; g.add(r2);
 
-    // Aro secundario (azul más claro)
-    const ring2Mat = ringMat.clone();
-    ring2Mat.color.setHex(0x38bdf8);
-    ring2Mat.emissive.setHex(0x38bdf8);
-    ring2Mat.opacity = 0.3;
-    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.45, 0.03, 12, 40), ring2Mat);
-    ring2.rotation.x = Math.PI / 1.6;
-    ring2.rotation.z = -0.6;
-    orbit.add(ring2);
+      // Ojos
+      const eMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.5, roughness: 0.2 });
+      const eMat2 = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 0.3 });
+      const pMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f });
 
-    // Ojo izquierdo (amarillo cámara)
-    const eyeMat = new THREE.MeshStandardMaterial({
-      color: 0xfbbf24,
-      emissive: 0xfbbf24,
-      emissiveIntensity: 0.5,
-      roughness: 0.2,
-      metalness: 0.1,
-    });
-    const eyeWhiteMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1a2e,
-      roughness: 0.3,
-    });
+      function addEye(x) {
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.06, 12, 20), eMat2);
+        rim.position.set(x, 0.2, 1.05); g.add(rim);
+        const lens = new THREE.Mesh(new THREE.CircleGeometry(0.22, 20), eMat);
+        lens.position.set(x, 0.2, 1.08); g.add(lens);
+        const pup = new THREE.Mesh(new THREE.CircleGeometry(0.08, 16), pMat);
+        pup.position.set(x, 0.2, 1.12); g.add(pup);
+        return { lens, pup };
+      }
+      const eyes = [addEye(-0.45), addEye(0.45)];
+      const lLens = eyes[0].lens, rLens = eyes[1].lens;
+      const lPup = eyes[0].pup, rPup = eyes[1].pup;
 
-    // Anillo exterior ojo izquierdo
-    const lRing = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.06, 12, 20), eyeWhiteMat);
-    lRing.position.set(-0.45, 0.2, 1.05);
-    orbit.add(lRing);
+      const ledMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 0.6 });
+      const led = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), ledMat);
+      led.position.set(0, -1.2, 1.2); g.add(led);
 
-    // Lente amarillo izquierdo
-    const lLens = new THREE.Mesh(new THREE.CircleGeometry(0.22, 20), eyeMat);
-    lLens.position.set(-0.45, 0.2, 1.08);
-    orbit.add(lLens);
+      animData = { lLens, rLens, lPup, rPup, ring: r1, ring2: r2, ledMat, blinkTargets: [lLens, rLens, lPup, rPup] };
+      return g;
+    }
 
-    // Pupila izquierda
-    const pupilMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f });
-    const lPupil = new THREE.Mesh(new THREE.CircleGeometry(0.08, 16), pupilMat);
-    lPupil.position.set(-0.45, 0.2, 1.12);
-    orbit.add(lPupil);
+    // ── Build: Chibi ─────────────────────────────────────────
+    function buildChibi() {
+      const g = new THREE.Group();
 
-    // Anillo exterior ojo derecho
-    const rRing = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.06, 12, 20), eyeWhiteMat);
-    rRing.position.set(0.45, 0.2, 1.05);
-    orbit.add(rRing);
+      // Cabeza grande
+      const headMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.2, metalness: 0.05 });
+      const head = new THREE.Mesh(new THREE.SphereGeometry(1.1, 28, 28), headMat);
+      head.scale.set(1.1, 1.0, 0.9); g.add(head);
 
-    // Lente amarillo derecho
-    const rLens = new THREE.Mesh(new THREE.CircleGeometry(0.22, 20), eyeMat);
-    rLens.position.set(0.45, 0.2, 1.08);
-    orbit.add(rLens);
+      // Cuerpo chico
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0xf0f4f8, roughness: 0.3 });
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.7, 20, 20), bodyMat);
+      body.position.y = -1.2; body.scale.set(1.0, 0.8, 0.7); g.add(body);
 
-    // Pupila derecha
-    const rPupil = new THREE.Mesh(new THREE.CircleGeometry(0.08, 16), pupilMat);
-    rPupil.position.set(0.45, 0.2, 1.12);
-    orbit.add(rPupil);
+      // Bufanda azul
+      const bufMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 0.1, roughness: 0.4 });
+      const buf = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.12, 8, 20), bufMat);
+      buf.position.y = -0.35; buf.rotation.x = Math.PI / 2.2; buf.scale.set(1, 1, 0.5); g.add(buf);
+      const buf2 = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.08, 8, 18), bufMat);
+      buf2.position.y = -0.5; buf2.rotation.x = Math.PI / 2; buf2.scale.set(1, 1, 0.4); g.add(buf2);
 
-    // LED indicador base (punto azul)
-    const ledMat = new THREE.MeshStandardMaterial({
-      color: 0x06b6d4,
-      emissive: 0x06b6d4,
-      emissiveIntensity: 0.6,
-    });
-    const led = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), ledMat);
-    led.position.set(0, -1.2, 1.2);
-    orbit.add(led);
+      // Ojos grandes
+      const eMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.5 });
+      const eMat2 = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      const pMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0f });
 
-    scene.add(orbit);
+      function addEye(x, y, z) {
+        const w = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), eMat2);
+        w.position.set(x, y, z); w.scale.set(1.2, 0.8, 0.3); g.add(w);
+        const iris = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), eMat);
+        iris.position.set(x, y, z + 0.05); iris.scale.set(1, 0.8, 0.2); g.add(iris);
+        const pup = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), pMat);
+        pup.position.set(x, y, z + 0.08); g.add(pup);
+        return { lens: w, pup };
+      }
+      const el = addEye(-0.45, 0.3, 0.9);
+      const er = addEye(0.45, 0.3, 0.9);
+      const lLens = el.lens, rLens = er.lens;
+      const lPup = el.pup, rPup = er.pup;
 
-    // ── Parpadeo ────────────────────────────────────────────
+      // Mejillas sonrosadas
+      const bMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.15, emissive: 0xfbbf24, emissiveIntensity: 0.05 });
+      const bl = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 12), bMat);
+      bl.position.set(-0.7, -0.1, 0.75); bl.scale.set(1, 0.5, 0.3); g.add(bl);
+      const br = bl.clone(); br.position.set(0.7, -0.1, 0.75); g.add(br);
+
+      // Boquita
+      const mMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4 });
+      const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 6, 10), mMat);
+      mouth.position.set(0, -0.2, 0.95); mouth.rotation.x = Math.PI / 3; mouth.rotation.z = Math.PI; g.add(mouth);
+
+      // Estrellita decorativa
+      const stMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 0.3, transparent: true, opacity: 0.5 });
+      const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.12, 0), stMat);
+      star.position.set(0.7, 0.8, 0.4); g.add(star);
+
+      animData = { lLens, rLens, lPup, rPup, star, blinkTargets: [lLens, rLens, lPup, rPup] };
+      return g;
+    }
+
+    // ── Switch style ─────────────────────────────────────────
+    function switchStyle(style) {
+      if (currentGroup) {
+        scene.remove(currentGroup);
+        // Dispose geometry and materials
+        currentGroup.traverse((child) => {
+          if (child.isMesh) {
+            child.geometry?.dispose();
+            if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+            else child.material?.dispose();
+          }
+        });
+      }
+      currentStyle = style;
+      localStorage.setItem(STYLE_KEY, style);
+      currentGroup = style === "chibi" ? buildChibi() : buildOrbit();
+      scene.add(currentGroup);
+    }
+
+    // ── Init ─────────────────────────────────────────────────
+    switchStyle(currentStyle);
+
+    // ── Blink ────────────────────────────────────────────────
     let isBlinking = false;
     let blinkTimer = 3000 + Math.random() * 2000;
+    let blinkAcc = 0;
 
     function blink() {
-      if (isBlinking) return;
+      if (isBlinking || !animData.blinkTargets) return;
       isBlinking = true;
-      lLens.scale.y = 0.01;
-      rLens.scale.y = 0.01;
-      lPupil.scale.y = 0.01;
-      rPupil.scale.y = 0.01;
+      animData.blinkTargets.forEach(t => { t.scale.y = 0.01; });
       setTimeout(() => {
-        lLens.scale.y = 1;
-        rLens.scale.y = 1;
-        lPupil.scale.y = 1;
-        rPupil.scale.y = 1;
+        animData.blinkTargets.forEach(t => { t.scale.y = 1; });
         isBlinking = false;
         blinkTimer = 2500 + Math.random() * 3000;
+        blinkAcc = 0;
       }, 120);
     }
 
     // ── Mouse tracking ──────────────────────────────────────
-    let targetRotY = 0;
-    let targetRotX = 0;
-
+    let targetRotY = 0, targetRotX = 0;
     document.addEventListener("mousemove", (e) => {
-      const mx = (e.clientX / window.innerWidth) * 2 - 1;
-      const my = -(e.clientY / window.innerHeight) * 2 + 1;
-      targetRotY = mx * 0.35;
-      targetRotX = my * 0.18;
+      targetRotY = ((e.clientX / window.innerWidth) * 2 - 1) * 0.35;
+      targetRotX = (-(e.clientY / window.innerHeight) * 2 + 1) * 0.18;
     });
     document.addEventListener("touchmove", (e) => {
-      const t = e.touches[0];
-      if (!t) return;
+      const t = e.touches[0]; if (!t) return;
       targetRotY = ((t.clientX / window.innerWidth) * 2 - 1) * 0.35;
       targetRotX = (-(t.clientY / window.innerHeight) * 2 + 1) * 0.18;
     });
 
+    // ── Double-click → switch style ────────────────────────
+    let lastClick = 0;
+    container.addEventListener("click", () => {
+      const now = Date.now();
+      if (now - lastClick < 400) {
+        // Double click: switch style
+        const next = currentStyle === "orbit" ? "chibi" : "orbit";
+        switchStyle(next);
+        lastClick = 0;
+      } else {
+        lastClick = now;
+        // Single click: open modal after delay (to allow double-click)
+        setTimeout(() => {
+          if (lastClick !== 0) {
+            const robotBtn = document.getElementById("robot-btn");
+            if (robotBtn) robotBtn.click();
+            lastClick = 0;
+          }
+        }, 250);
+      }
+    });
+
     // ── Animation ────────────────────────────────────────────
-    let blinkAcc = 0;
-
     function animate() {
-      const dt = 0.016;
-      blinkAcc += dt * 1000;
+      blinkAcc += 16;
+      if (blinkAcc > blinkTimer && !isBlinking) { blinkAcc = 0; blink(); }
 
-      // Parpadeo automático
-      if (blinkAcc > blinkTimer && !isBlinking) {
-        blinkAcc = 0;
-        blink();
+      if (currentGroup) {
+        currentGroup.rotation.y += (targetRotY - currentGroup.rotation.y) * 0.08;
+        currentGroup.rotation.x += (targetRotX - currentGroup.rotation.x) * 0.08;
+        currentGroup.position.y = Math.sin(Date.now() * 0.0015) * 0.08;
       }
 
-      // Rotación suave hacia el mouse
-      orbit.rotation.y += (targetRotY - orbit.rotation.y) * 0.08;
-      orbit.rotation.x += (targetRotX - orbit.rotation.x) * 0.08;
-
-      // Flotación
-      orbit.position.y = Math.sin(Date.now() * 0.0015) * 0.08;
-
-      // Aros rotan
-      ring.rotation.x += 0.003;
-      ring.rotation.z += 0.002;
-      ring2.rotation.x -= 0.004;
-      ring2.rotation.z += 0.003;
-
-      // LED pulsa
-      ledMat.emissiveIntensity = 0.4 + Math.sin(Date.now() * 0.004) * 0.2;
+      // Orbit-specific animations
+      if (animData.ring) { animData.ring.rotation.x += 0.003; animData.ring.rotation.z += 0.002; }
+      if (animData.ring2) { animData.ring2.rotation.x -= 0.004; animData.ring2.rotation.z += 0.003; }
+      if (animData.ledMat) animData.ledMat.emissiveIntensity = 0.4 + Math.sin(Date.now() * 0.004) * 0.2;
+      if (animData.star) { animData.star.rotation.x += 0.03; animData.star.rotation.y += 0.02; }
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
     animate();
 
-    // ── Click → modal ──────────────────────────────────────
-    container.addEventListener("click", () => {
-      const robotBtn = document.getElementById("robot-btn");
-      if (robotBtn) robotBtn.click();
-    });
-
     // ── Resize ───────────────────────────────────────────────
     function onResize() {
-      const size = Math.min(window.innerWidth * 0.12, 90);
-      const dpr = Math.min(window.devicePixelRatio, 2);
-      container.style.width = size + "px";
-      container.style.height = size + "px";
-      renderer.setSize(size, size);
-      renderer.setPixelRatio(dpr);
+      const s = Math.min(window.innerWidth * 0.12, 90);
+      container.style.width = s + "px"; container.style.height = s + "px";
+      renderer.setSize(s, s);
     }
     window.addEventListener("resize", onResize);
-
     window.addEventListener("beforeunload", () => renderer.dispose());
   })();
 </script>
