@@ -18,30 +18,28 @@ import { RECRUITER_CERTIFICATIONS } from '$lib/recruiter-data';
     </div>
 
     <!-- Badges por área -->
-    @{
-      const areas = [...new Set(RECRUITER_CERTIFICATIONS.map(c => c.area))];
-      const areaColors: Record<string, string> = {
-        'Python': 'border-l-cyan-500',
-        'Django': 'border-l-blue-500',
-        'Angular': 'border-l-red-500',
-        'CSS/Web': 'border-l-amber-500',
-        'Testing': 'border-l-green-500',
-        'Data': 'border-l-purple-500',
-        'IA': 'border-l-indigo-500',
-        'Ofimática': 'border-l-gray-500',
-      };
-    }
-
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {RECRUITER_CERTIFICATIONS.map((cert) => (
-        <div class={"flex items-center gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all duration-300 border-l-2 " + (areaColors[cert.area] || 'border-l-gray-500')}>
+      {RECRUITER_CERTIFICATIONS.map((cert) => {
+        const areaColor = {
+          'Python': 'border-l-cyan-500',
+          'Django': 'border-l-blue-500',
+          'Angular': 'border-l-red-500',
+          'CSS/Web': 'border-l-amber-500',
+          'Testing': 'border-l-green-500',
+          'Data': 'border-l-purple-500',
+          'IA': 'border-l-indigo-500',
+          'Ofimática': 'border-l-gray-500',
+        }[cert.area] || 'border-l-gray-500';
+        return (
+        <div class={"flex items-center gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all duration-300 border-l-2 " + areaColor}>
           <span class="text-xl shrink-0">{cert.icon}</span>
           <div class="min-w-0">
             <p class="text-white text-sm font-medium truncate">{cert.name}</p>
             <p class="text-[10px] text-gray-600 uppercase tracking-wider">{cert.area}</p>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
 
     <!-- Resumen -->
