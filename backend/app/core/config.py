@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     # Radar — API key para que el servicio Radar pueda consultar datos
     radar_api_key: str = Field("", alias="RADAR_API_KEY")
 
+    # WhatsApp Cloud API — token de verificación del webhook
+    webhook_verify_token: str = Field("", alias="WEBHOOK_VERIFY_TOKEN")
+
     @computed_field
     @property
     def database_url(self) -> str:

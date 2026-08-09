@@ -65,6 +65,9 @@ services:
       AUTHCORE_JWKS_URL: http://authcore-api:8000/.well-known/jwks.json
       COMPANY_USER_ID: "1"
 
+      # WhatsApp Cloud API — token de verificación del webhook
+      WEBHOOK_VERIFY_TOKEN: ${WEBHOOK_VERIFY_TOKEN}
+
       # CORS — frontend en Vercel
       CORS_ORIGINS: ${CORS_ORIGINS}
     depends_on:

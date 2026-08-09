@@ -68,6 +68,8 @@ services:
       COMPANY_USER_ID: "1"
       # Radar — clave para que el servicio Radar consulte datos
       RADAR_API_KEY: "radar_dev_key_2026"
+      # WhatsApp Cloud API — token de verificación del webhook (dev)
+      WEBHOOK_VERIFY_TOKEN: "radar_harco_dev_2026"
     volumes:
       - ./backend/app:/app/app
       - ./backend/scripts:/app/scripts

@@ -12,12 +12,11 @@ from typing import Optional
 from fastapi import APIRouter, Request, Query
 from fastapi.responses import PlainTextResponse
 
+from app.core.config import settings
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-# Token de verificación configurable via entorno
-VERIFY_TOKEN = "***REMOVED***"
 
 # URL del Radar backend para reenviar mensajes
 # En Docker: radar-harco-api:3005 (misma red)
@@ -37,7 +36,7 @@ async def verify_webhook(
     """
     logger.info(f"Webhook verification: mode={hub_mode}, token={hub_verify_token}")
 
-    if hub_mode == "subscribe" and hub_verify_token == VERIFY_TOKEN:
+    if hub_mode == "subscribe" and hub_verify_token == settings.webhook_verify_token:
         logger.info("Webhook verificado correctamente")
         return PlainTextResponse(hub_challenge)
 
