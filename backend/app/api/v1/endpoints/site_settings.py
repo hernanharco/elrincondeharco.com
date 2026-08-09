@@ -15,6 +15,7 @@ from typing import Any, Dict
 
 # --- Helpers de Limpieza ---
 
+
 def clean_none_values(data: dict) -> dict:
     """Convierte strings 'None', 'null' o vacíos en None reales de Python."""
     if not data:
@@ -27,6 +28,7 @@ def clean_none_values(data: dict) -> dict:
             clean_data[k] = v
     return clean_data
 
+
 async def get_site_settings_form(
     brand_name: str = Form(...),
     site_url: str = Form(...),
@@ -36,13 +38,24 @@ async def get_site_settings_form(
     contact_email: str = Form(...),
     social_networks: Optional[str] = Form(None),
     is_active: bool = Form(True),
+    cta_title: Optional[str] = Form(None),
+    cta_description: Optional[str] = Form(None),
+    cta_features: Optional[str] = Form(None),
+    cta_primary_text: Optional[str] = Form(None),
+    cta_secondary_text: Optional[str] = Form(None),
 ) -> SiteSettingsCreate:
-    # Procesar JSON de redes sociales
     try:
         sn_dict = json.loads(social_networks) if social_networks else {}
         sn_dict = clean_none_values(sn_dict)
     except (json.JSONDecodeError, TypeError):
         sn_dict = {}
+
+    parsed_features = None
+    if cta_features:
+        try:
+            parsed_features = json.loads(cta_features)
+        except json.JSONDecodeError:
+            parsed_features = None
 
     return SiteSettingsCreate(
         brand_name=brand_name,
@@ -53,7 +66,13 @@ async def get_site_settings_form(
         contact_email=contact_email,
         social_networks=sn_dict,
         is_active=is_active,
+        cta_title=cta_title,
+        cta_description=cta_description,
+        cta_features=parsed_features,
+        cta_primary_text=cta_primary_text,
+        cta_secondary_text=cta_secondary_text,
     )
+
 
 async def get_site_settings_update_form(
     brand_name: Optional[str] = Form(None),
@@ -64,8 +83,12 @@ async def get_site_settings_update_form(
     contact_email: Optional[str] = Form(None),
     social_networks: Optional[str] = Form(None),
     is_active: Optional[bool] = Form(None),
+    cta_title: Optional[str] = Form(None),
+    cta_description: Optional[str] = Form(None),
+    cta_features: Optional[str] = Form(None),
+    cta_primary_text: Optional[str] = Form(None),
+    cta_secondary_text: Optional[str] = Form(None),
 ) -> SiteSettingsUpdate:
-    # Procesar JSON de redes sociales para actualización
     sn_dict = None
     if social_networks:
         try:
@@ -73,6 +96,13 @@ async def get_site_settings_update_form(
             sn_dict = clean_none_values(sn_dict)
         except (json.JSONDecodeError, TypeError):
             sn_dict = None
+
+    parsed_features = None
+    if cta_features:
+        try:
+            parsed_features = json.loads(cta_features)
+        except json.JSONDecodeError:
+            parsed_features = None
 
     return SiteSettingsUpdate(
         brand_name=brand_name,
@@ -83,18 +113,25 @@ async def get_site_settings_update_form(
         contact_email=contact_email,
         social_networks=sn_dict,
         is_active=is_active,
+        cta_title=cta_title,
+        cta_description=cta_description,
+        cta_features=parsed_features,
+        cta_primary_text=cta_primary_text,
+        cta_secondary_text=cta_secondary_text,
     )
+
 
 # --- Router y Endpoints ---
 
 router = APIRouter()
+
 
 # 1. RUTA CRÍTICA: /latest/ va primero para evitar que coincida con /{id}
 @router.get("/latest/", response_model=SiteSettingsResponse)
 async def get_latest(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(SiteSettings)
-        .where(SiteSettings.is_active == True)
+        .where(SiteSettings.is_active.is_(True))
         .order_by(SiteSettings.id.desc())
         .limit(1)
     )
@@ -103,10 +140,12 @@ async def get_latest(db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No hay configuraciones activas")
     return obj
 
+
 @router.get("/", response_model=List[SiteSettingsResponse])
 async def get_all(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(SiteSettings))
     return result.scalars().all()
+
 
 # 2. RUTA DINÁMICA: /{id} va después de las estáticas
 @router.get("/{id}", response_model=SiteSettingsResponse)
@@ -115,6 +154,7 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
     if not obj:
         raise HTTPException(status_code=404, detail="SiteSettings no encontrado")
     return obj
+
 
 @router.post("/", response_model=SiteSettingsResponse)
 async def create(
@@ -128,6 +168,7 @@ async def create(
     await db.commit()
     await db.refresh(db_obj)
     return db_obj
+
 
 @router.put("/{id}", response_model=SiteSettingsResponse)
 async def update(
@@ -143,7 +184,7 @@ async def update(
     # Al usar mode='json', Pydantic convierte automáticamente:
     # 1. HttpUrl -> str (Esto arregla el error de psycopg/SQLAlchemy)
     # 2. Submodelos -> dict (Esto evita el AttributeError)
-    update_data = form_data.model_dump(exclude_none=True, mode='json')
+    update_data = form_data.model_dump(exclude_none=True, mode="json")
 
     for key, value in update_data.items():
         setattr(obj, key, value)
@@ -154,11 +195,14 @@ async def update(
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al actualizar: {str(e)}")
-        
+
     return obj
 
+
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db),
+async def delete(
+    id: int,
+    db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(SiteSettings, id)

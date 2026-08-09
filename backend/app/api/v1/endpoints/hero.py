@@ -9,11 +9,13 @@ from app.schemas.hero import HeroCreate, HeroUpdate, HeroResponse
 from app.core.security import get_current_admin_user
 from typing import Any, Dict
 
+
 async def get_hero_form(
     title: str = Form(...),
     subtitle: str = Form(...),
     description: str = Form(...),
     background_image: Optional[str] = Form(None),
+    primary_button_text: Optional[str] = Form(None),
     contact_button_text: str = Form(...),
     cv_button_text: str = Form(...),
 ) -> HeroCreate:
@@ -22,15 +24,18 @@ async def get_hero_form(
         subtitle=subtitle,
         description=description,
         background_image=background_image,
+        primary_button_text=primary_button_text,
         contact_button_text=contact_button_text,
-        cv_button_text=cv_button_text
+        cv_button_text=cv_button_text,
     )
+
 
 async def get_hero_update_form(
     title: Optional[str] = Form(None),
     subtitle: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
     background_image: Optional[str] = Form(None),
+    primary_button_text: Optional[str] = Form(None),
     contact_button_text: Optional[str] = Form(None),
     cv_button_text: Optional[str] = Form(None),
 ) -> HeroUpdate:
@@ -39,26 +44,29 @@ async def get_hero_update_form(
         subtitle=subtitle,
         description=description,
         background_image=background_image,
+        primary_button_text=primary_button_text,
         contact_button_text=contact_button_text,
-        cv_button_text=cv_button_text
+        cv_button_text=cv_button_text,
     )
 
+
 router = APIRouter()
+
 
 @router.get("/", response_model=list[HeroResponse])
 async def get_all(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Hero))
     return result.scalars().all()
 
+
 @router.get("/latest/", response_model=HeroResponse)
 async def get_latest(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(Hero).order_by(Hero.id.desc()).limit(1)
-    )
+    result = await db.execute(select(Hero).order_by(Hero.id.desc()).limit(1))
     obj = result.scalars().first()
     if not obj:
         raise HTTPException(status_code=404, detail="No hay registros")
     return obj
+
 
 @router.get("/{id}", response_model=HeroResponse)
 async def get_one(id: int, db: AsyncSession = Depends(get_db)):
@@ -66,6 +74,7 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
     if not obj:
         raise HTTPException(status_code=404, detail="Hero no encontrado")
     return obj
+
 
 @router.post("/", response_model=HeroResponse)
 async def create(
@@ -84,22 +93,23 @@ async def create(
     await db.refresh(db_obj)
     return db_obj
 
+
 @router.put("/{id}", response_model=HeroResponse)
 async def update(
     id: int,
     form_data: HeroUpdate = Depends(get_hero_update_form),
     image: Optional[UploadFile] = File(None),
-    cv_file: Optional[UploadFile] = File(None), # <-- Nuevo parámetro
+    cv_file: Optional[UploadFile] = File(None),  # <-- Nuevo parámetro
     db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(Hero, id)
     if not obj:
         raise HTTPException(status_code=404, detail="Hero no encontrado")
-    
+
     for key, value in form_data.model_dump(exclude_none=True).items():
         setattr(obj, key, value)
-    
+
     # Manejo de archivos (imagen y CV)
     image_url = await process_file_upload(image)
     if image_url:
@@ -108,13 +118,16 @@ async def update(
     cv_url = await process_file_upload(cv_file)
     if cv_url:
         obj.cv_url = cv_url
-        
+
     await db.commit()
     await db.refresh(obj)
     return obj
 
+
 @router.delete("/{id}")
-async def delete(id: int, db: AsyncSession = Depends(get_db),
+async def delete(
+    id: int,
+    db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
     obj = await db.get(Hero, id)

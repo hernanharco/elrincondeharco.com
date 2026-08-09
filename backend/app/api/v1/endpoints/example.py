@@ -1,45 +1,65 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
+from sqlalchemy import select
 from typing import List
 
 from app.db.session import get_db
 from app.models.example import Example
+from app.schemas.example import ExampleCreate, ExampleUpdate, ExampleResponse
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[dict])
+@router.get("/", response_model=List[ExampleResponse])
 async def get_examples(db: AsyncSession = Depends(get_db)):
     """Get all examples from the database."""
-    result = await db.execute(text("SELECT * FROM examples"))
-    examples = result.fetchall()
-    return [
-        {"id": row[0], "name": row[1], "description": row[2], "created_at": row[3]}
-        for row in examples
-    ]
+    result = await db.execute(select(Example).order_by(Example.id))
+    return result.scalars().all()
 
 
-@router.post("/", response_model=dict)
-async def create_example(
-    name: str,
-    description: str = None,
-    db: AsyncSession = Depends(get_db)
-):
+@router.post("/", response_model=ExampleResponse, status_code=201)
+async def create_example(data: ExampleCreate, db: AsyncSession = Depends(get_db)):
     """Create a new example."""
-    from sqlalchemy import text
-    query = text(
-        "INSERT INTO examples (name, description) VALUES (:name, :description) RETURNING id, name, description, created_at"
-    )
-    result = await db.execute(query, {"name": name, "description": description})
+    db_obj = Example(**data.model_dump())
+    db.add(db_obj)
     await db.commit()
-    row = result.fetchone()
-    return {
-        "id": row[0],
-        "name": row[1],
-        "description": row[2],
-        "created_at": row[3]
-    }
+    await db.refresh(db_obj)
+    return db_obj
+
+
+@router.get("/{id}", response_model=ExampleResponse)
+async def get_example(id: int, db: AsyncSession = Depends(get_db)):
+    """Get a single example by ID."""
+    obj = await db.get(Example, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Example no encontrado")
+    return obj
+
+
+@router.put("/{id}", response_model=ExampleResponse)
+async def update_example(
+    id: int, data: ExampleUpdate, db: AsyncSession = Depends(get_db)
+):
+    """Update an existing example."""
+    obj = await db.get(Example, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Example no encontrado")
+    for key, value in data.model_dump(exclude_none=True).items():
+        setattr(obj, key, value)
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+
+@router.delete("/{id}")
+async def delete_example(id: int, db: AsyncSession = Depends(get_db)):
+    """Delete an example."""
+    obj = await db.get(Example, id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Example no encontrado")
+    await db.delete(obj)
+    await db.commit()
+    return {"detail": "Example eliminado"}
 
 
 @router.get("/health")

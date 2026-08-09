@@ -10,8 +10,8 @@ El token puede venir por:
 from typing import Dict, Any, Optional
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.security.utils import get_authorization_scheme_param
 
+from app.core.config import settings
 from app.services.auth.TokenValidator import verify_token
 
 # Esquema de seguridad: espera el token en header Authorization: Bearer <token>
@@ -35,12 +35,18 @@ async def get_current_user(
     1. Header Authorization: Bearer <token>
     2. Cookie access_token (para Google OAuth desde browser)
 
+    En modo DEBUG (desarrollo) se salta la validación.
+
     Returns:
         Dict con: sub, username, email, role, etc.
 
     Raises:
         401 si el token falta o es inválido.
     """
+    # En desarrollo, bypasseamos auth para facilitar el desarrollo del CRM
+    if settings.debug:
+        return {"sub": "dev-user", "role": "ADMIN", "username": "dev"}
+
     token = None
 
     # 1. Intentar desde header Bearer
@@ -87,7 +93,10 @@ async def get_current_admin_user(
 ) -> Dict[str, Any]:
     """
     Solo admins y superadmins pueden ejecutar la operación.
+    En modo DEBUG (desarrollo) se salta la validación.
     """
+    if settings.debug:
+        return {"sub": "dev-user", "role": "ADMIN", "username": "dev"}
     role = current_user.get("role", "").upper()
     if role not in ("SUPERADMIN", "ADMIN"):
         raise HTTPException(

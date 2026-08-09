@@ -3,6 +3,7 @@ from typing import Any, List
 from pydantic import Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     """Configuración agnóstica para elRincondeHarco."""
 
@@ -30,6 +31,12 @@ class Settings(BaseSettings):
         alias="AUTHCORE_JWKS_URL",
     )
 
+    # Qué usuario de authCore es el dueño de esta landing page
+    company_user_id: str = Field("1", alias="COMPANY_USER_ID")
+
+    # Radar — API key para que el servicio Radar pueda consultar datos
+    radar_api_key: str = Field("", alias="RADAR_API_KEY")
+
     @computed_field
     @property
     def database_url(self) -> str:
@@ -48,9 +55,11 @@ class Settings(BaseSettings):
     @field_validator("cors_origins", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> List[str]:
-        if isinstance(v, list): return v
+        if isinstance(v, list):
+            return v
         if isinstance(v, str):
-            if v.startswith("["): return json.loads(v)
+            if v.startswith("["):
+                return json.loads(v)
             return [i.strip() for i in v.split(",")]
         return []
 
@@ -60,6 +69,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
 
 # Instancia global
 settings = Settings()

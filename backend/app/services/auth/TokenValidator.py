@@ -28,6 +28,7 @@ async def _fetch_jwks() -> dict:
     Lanza RuntimeError si no puede conectar (ej: authCore no está corriendo).
     """
     import httpx
+
     async with httpx.AsyncClient(timeout=5.0) as client:
         logger.info("🔑 Fetching JWKS desde %s", settings.authcore_jwks_url)
         try:
@@ -71,16 +72,38 @@ async def verify_token(token: str) -> Optional[Dict[str, Any]]:
     """
     Verifica un JWT firmado por authCore.
 
+    En desarrollo (DEBUG=true), si authCore no está disponible,
+    intenta verificar el token con la SECRET_KEY local (HS256).
+
     Returns:
         Dict con los claims del token (sub, username, role, etc.)
         o None si el token es inválido/expirado.
     """
+    # 1. Intentar con authCore (JWKS) — producción
     try:
         key = await get_rsa_key()
         payload = jwt.decode(token, key, algorithms=["RS256"])
         return payload
+    except (RuntimeError, JWTError) as e:
+        if not settings.debug:
+            logger.warning("Token inválido y no estamos en debug: %s", e)
+            return None
+        logger.info("authCore no disponible, probando verificación local (debug)")
+
+    # 2. Fallback local (solo debug) — HS256 con SECRET_KEY
+    try:
+        from jose import jwt as jose_jwt
+
+        payload = jose_jwt.decode(
+            token,
+            settings.secret_key,
+            algorithms=["HS256"],
+            options={"verify_exp": True},
+        )
+        logger.info("✅ Token verificado localmente (debug mode)")
+        return payload
     except JWTError as e:
-        logger.warning("Token inválido: %s", e)
+        logger.warning("Token inválido incluso con fallback local: %s", e)
         return None
 
 
