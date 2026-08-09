@@ -61,14 +61,17 @@ services:
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
 
-      # authCore — validación JWT
+      # authCore — validación JWT (vía red compartida)
       AUTHCORE_JWKS_URL: http://authcore-api:8000/.well-known/jwks.json
+      COMPANY_USER_ID: "1"
 
       # CORS — frontend en Vercel
       CORS_ORIGINS: ${CORS_ORIGINS}
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - elrincondeharco_net
     deploy:
       resources:
         limits:
@@ -77,3 +80,8 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  elrincondeharco_net:
+    external: true
+    name: elrincondeharco_net

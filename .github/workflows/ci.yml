@@ -55,17 +55,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install dependencies (Poetry — usa lockfile para builds reproducibles)
         working-directory: ./backend
         run: |
           python -m venv .venv
           source .venv/bin/activate
-          pip install -q fastapi uvicorn sqlalchemy psycopg[binary,pool] pydantic-settings pydantic python-dotenv cloudinary python-multipart alembic python-jose[cryptography] httpx
-          pip install -q pytest pytest-cov pytest-asyncio
+          pip install -q poetry
+          poetry install --no-root
 
       - name: Lint with flake8
         working-directory: ./backend
-        continue-on-error: true
         run: |
           source .venv/bin/activate
           pip install flake8
@@ -73,15 +72,15 @@ jobs:
 
       - name: Check formatting with black
         working-directory: ./backend
-        continue-on-error: true
         run: |
+          source .venv/bin/activate
           pip install black
           black app/ --check --diff || true
 
       - name: Type check with mypy
         working-directory: ./backend
-        continue-on-error: true
         run: |
+          source .venv/bin/activate
           pip install mypy
           mypy app/ --ignore-missing-imports --no-strict-optional || true
 
@@ -91,10 +90,9 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: ./backend
-        continue-on-error: true
         run: |
           source .venv/bin/activate
-          python -m pytest -v --tb=short --cov=app --cov-report=term-missing || echo "Coverage below threshold, check report"
+          python -m pytest -v --tb=short --cov=app --cov-report=term-missing
 
   # ── FRONTEND: Tests + Type Check + Build ─────────────────────
   frontend:

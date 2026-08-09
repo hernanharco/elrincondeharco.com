@@ -10,6 +10,8 @@ ENV PUBLIC_API_URL=$PUBLIC_API_URL
 
 # Install pnpm
 RUN npm install -g pnpm
+ENV PNPM_HOME=/root/.local/share/pnpm
+ENV PATH=$PNPM_HOME:$PATH
 
 WORKDIR /app
 
@@ -17,8 +19,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies (--ignore-scripts porque el host global lo tiene)
-# NOTA: sin --frozen-lockfile porque es Dockerfile.dev, los locks pueden diferir
-RUN pnpm install --ignore-scripts
+# --config.minimum-release-age=0 desactiva la política de seguridad de pnpm v10
+RUN pnpm install --ignore-scripts --config.minimum-release-age=0
 
 # Copy the rest of the source code
 COPY . .
