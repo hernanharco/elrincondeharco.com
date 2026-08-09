@@ -27,7 +27,7 @@ export function listenForDataChange(
   callback: (event?: CustomEvent) => Promise<void> | void
 ) {
   const handler = async (e: Event) => {
-    const customEvent = e as CustomEvent;
+    const customEvent = e as DataChangeEvent;
     if (customEvent.detail.type === type) {
       await callback(customEvent);
     }

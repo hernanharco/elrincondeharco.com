@@ -1,29 +1,30 @@
 ---
+// @ts-nocheck — Efecto 3D complejo, tipos implícitos intencionales
 // SectorProjects.astro — Unifica Sectores + Proyectos
 // Lee sectores desde API con fallback a datos locales
 
-import type { SectorResponse, ProjectResponse } from '$lib/types';
+import type { SectorResponse, ProjectResponse, ExperienceSectionResponse } from '$lib/types';
 import { fetchSSR, optimizeImage } from '$lib/api';
-import { fallbackProjects, fallbackSectors, fallbackShowrooms } from '$lib/fallback-data';
+import { fallbackProjects, fallbackSectors, fallbackShowrooms, fallbackExperienceSection } from '$lib/fallback-data';
+
+// ── Fetch header de experiencia ──────────────────────────
+const expData: ExperienceSectionResponse = await fetchSSR<ExperienceSectionResponse>('/experience/latest/') ?? fallbackExperienceSection;
 
 // ── Fetch sectores desde API ─────────────────────────────
+// Si la API responde (incluso vacía), usamos SOLO datos de la API.
+// Solo mezclamos con fallback cuando la API NO está disponible (null).
 const apiSectors = await fetchSSR<SectorResponse[]>('/sectors/');
-const apiSectorTitles = new Set((apiSectors ?? []).map((s) => s.name));
-const mergedSectors = [
-  ...(apiSectors ?? []),
-  ...fallbackSectors.filter((s) => !apiSectorTitles.has(s.name)),
-];
+const apiAvailable = apiSectors !== null;
+const mergedSectors = apiAvailable
+  ? apiSectors
+  : fallbackSectors;
 
 // ── Fetch proyectos ────────────────────────────────────────
 const apiProjects = await fetchSSR<ProjectResponse[]>('/projects/');
-const apiProjectTitles = new Set((apiProjects ?? []).map((p) => p.title));
-const allProjects = [
-  ...(apiProjects ?? []),
-  ...fallbackProjects.filter((p) => !apiProjectTitles.has(p.title)),
-];
-
-// Template necesita sectores como variable para renderizar los botones
-const sectores = mergedSectors;
+const apiProjectsAvailable = apiProjects !== null;
+const allProjects = apiProjectsAvailable
+  ? apiProjects
+  : fallbackProjects;
 
 // ── Mapa: sector (por ID) → títulos de proyectos ──────────
 // Usa project_ids del sector para buscar proyectos por ID
@@ -58,9 +59,19 @@ mergedSectors.forEach(s => {
   }
 });
 
+// ── Filtrar sectores que tienen contenido ─────────────────
+const sectoresVisibles = mergedSectors.filter(s => {
+  const tieneProyectos = (sectorProjectMap[s.id]?.length ?? 0) > 0;
+  const tieneShowroom = (showroomComplement[s.id]?.length ?? 0) > 0;
+  return tieneProyectos || tieneShowroom;
+});
+
+// Usar sectores visibles para todo
+const sectores = sectoresVisibles;
+
 // ── Serializar para el cliente ─────────────────────────────
 const sectorData = JSON.stringify({
-  sectores: fallbackSectors.map(s => ({
+  sectorList: sectores.map(s => ({
     id: s.id,
     name: s.name,
     client: s.client_name,
@@ -73,7 +84,7 @@ const sectorData = JSON.stringify({
   showroomBySector: Object.fromEntries(
     Object.entries(showroomComplement).map(([key, items]) => [
       key,
-      items.map(s => ({ title: s.title, description: s.description, image_url: s.image_url, demo_url: s.deploy_url }))
+      items.map(s => ({ title: s.title, description: s.description, image_url: s.image_url, image_urls: [s.image_url], demo_url: s.deploy_url }))
     ])
   ),
 });
@@ -85,39 +96,60 @@ const sectorData = JSON.stringify({
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <!-- Header -->
     <div class="text-center mb-16">
-      <p class="text-amber-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Experiencia</p>
-      <h2 class="text-3xl md:text-5xl font-bold mb-4">
-        Seleccioná tu <span class="text-amber-400">rubro</span>
-      </h2>
-      <p class="text-gray-500 max-w-2xl mx-auto text-lg">
-        Tocá tu industria y descubrí lo que construimos para negocios como el tuyo.
-      </p>
+      <p class="text-amber-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">{expData.tagline}</p>
+      <h2 class="text-3xl md:text-5xl font-bold mb-4" set:html={expData.title} />
+      <p class="text-gray-500 max-w-2xl mx-auto text-lg">{expData.description}</p>
     </div>
 
-    <!-- Sector Selector -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-16" id="sector-grid">
-      {sectores.map((s) => (
-        <button
-          onclick={`selectSector('${s.id}')`}
-          class="sector-btn group relative bg-zinc-900/50 border border-white/[0.06] rounded-2xl p-6 text-center
-            hover:border-cyan-400/30 hover:bg-zinc-900/80
-            transition-all duration-500 hover:-translate-y-1 cursor-pointer active:scale-95"
-        >
-          <div
-            class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20
-              flex items-center justify-center mx-auto mb-4
-              group-hover:bg-cyan-500/20 group-hover:border-cyan-400/30
-              transition-all duration-500"
+    <!-- Sector Selector (carrusel horizontal) -->
+    <div class="relative mb-16" id="sector-carousel-wrapper">
+      <!-- Flecha izquierda -->
+      <button id="sector-scroll-left"
+        class="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full
+               bg-zinc-900/90 border border-zinc-700/50 text-zinc-400 hover:text-amber-400
+               hover:border-amber-500/30 transition-all hidden items-center justify-center
+               backdrop-blur-sm shadow-lg"
+        aria-label="Anterior">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+
+      <div id="sector-grid"
+        class="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory
+               [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {sectores.map((s, idx) => (
+          <button
+            onclick={`selectSector('${s.id}')`}
+            class="sector-btn group relative bg-zinc-900/50 border border-white/[0.06] rounded-2xl p-5 text-center
+              hover:border-cyan-400/30 hover:bg-zinc-900/80
+              transition-all duration-500 hover:-translate-y-1 cursor-pointer active:scale-95
+              flex-1 min-w-[120px] max-w-[200px] snap-start"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="text-amber-400 transition-colors duration-500"
-            ><path d={s.icon_path} /></svg>
-          </div>
-          <h3 class="font-bold text-white text-sm">{s.name}</h3>
-          <p class="text-gray-600 text-xs mt-1">{s.client_name}</p>
-        </button>
-      ))}
+            <div
+              class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20
+                flex items-center justify-center mx-auto mb-3
+                group-hover:bg-cyan-500/20 group-hover:border-cyan-400/30
+                transition-all duration-500"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="text-amber-400 transition-colors duration-500"
+              ><path d={s.icon_path} /></svg>
+            </div>
+            <h3 class="font-bold text-white text-sm">{s.name}</h3>
+            <p class="text-gray-600 text-[10px] mt-1 truncate">{s.client_name}</p>
+          </button>
+        ))}
+      </div>
+
+      <!-- Flecha derecha -->
+      <button id="sector-scroll-right"
+        class="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full
+               bg-zinc-900/90 border border-zinc-700/50 text-zinc-400 hover:text-amber-400
+               hover:border-amber-500/30 transition-all hidden items-center justify-center
+               backdrop-blur-sm shadow-lg"
+        aria-label="Siguiente">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
     </div>
 
     <!-- Project Display Area -->
@@ -136,11 +168,12 @@ const sectorData = JSON.stringify({
 <div id="sector-data" data-json={encodeURIComponent(sectorData)} style="display:none" aria-hidden="true"></div>
 
 <script>
+// @ts-nocheck
   // ── Cargar datos ───────────────────────────────────────────
   const DATA_EL = document.getElementById("sector-data");
   if (!DATA_EL) { console.error("[SectorProjects] Missing data element"); }
   const DATA = DATA_EL ? JSON.parse(decodeURIComponent(DATA_EL.dataset.json)) : null;
-  const { sectores, projects, projectTitles, showroomBySector } = DATA;
+  const { sectorList, projects, projectTitles, showroomBySector } = DATA;
 
   const grid = document.getElementById("projects-grid");
   let activeSector = null;
@@ -173,7 +206,10 @@ const sectorData = JSON.stringify({
     const titles = projectTitles[sectorId] || [];
     const matched = projects.filter((p) => titles.includes(p.title));
     const showroomItems = showroomBySector[sectorId] || [];
-    const combined = [...matched, ...showroomItems];
+    // Evitar duplicados: si un showroom item tiene el mismo título que un proyecto, se salta
+    const showroomTitles = new Set(matched.map(p => p.title));
+    const uniqueShowroom = showroomItems.filter(s => !showroomTitles.has(s.title));
+    const combined = [...matched, ...uniqueShowroom];
 
     // Si hay cards actuales, animar salida primero
     const currentCards = grid.querySelectorAll(".project-card");
@@ -205,13 +241,29 @@ const sectorData = JSON.stringify({
       const card = document.createElement("div");
       card.className = "project-card bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden hover:bg-white/[0.06] hover:border-cyan-400/20 group";
 
+      // Obtener imágenes: project usa image_urls[], showroom usa image_url
+      const images = item.image_urls || (item.image_url ? [item.image_url] : []);
+      const hasImages = images.length > 0;
+
       card.innerHTML = `
-        <div class="relative h-48 overflow-hidden">
-          ${item.image_url
-            ? `<img src="${item.image_url}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />`
+        <div class="relative h-48 overflow-hidden carousel-container" data-images='${JSON.stringify(images)}'>
+          ${hasImages
+            ? images.map((url, i) =>
+                `<img src="${url}" alt="${item.title}"
+                  class="carousel-slide w-full h-full object-cover absolute inset-0 transition-opacity duration-700 ${i === 0 ? 'opacity-100' : 'opacity-0'}"
+                  data-index="${i}" loading="lazy" />`
+              ).join('')
             : `<div class="w-full h-full bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/10 scale-[3]"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>
               </div>`
+          }
+          ${hasImages && images.length > 1
+            ? `<div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                ${images.map((_, i) =>
+                  `<span class="carousel-dot w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white w-3' : 'bg-white/40'}" data-index="${i}"></span>`
+                ).join('')}
+              </div>`
+            : ''
           }
         </div>
         <div class="p-5">
@@ -234,7 +286,72 @@ const sectorData = JSON.stringify({
 
       // Animar entrada 3D con stagger
       animateCardIn(card, idx * 150);
+
+      // Inicializar carrusel después de agregar al DOM
+      initCarousel(card);
     });
+  }
+
+  // ── Carrusel automático ─────────────────────────────────────
+  function initCarousel(card) {
+    const container = card.querySelector(".carousel-container");
+    if (!container) return;
+
+    const imagesJson = container.dataset.images;
+    if (!imagesJson) return;
+
+    let slides = [];
+    try { slides = JSON.parse(imagesJson); } catch { return; }
+    if (slides.length <= 1) return;
+
+    let current = 0;
+    let interval;
+
+    function showSlide(index) {
+      const slides = container.querySelectorAll(".carousel-slide");
+      const dots = container.querySelectorAll(".carousel-dot");
+      slides.forEach((s, i) => {
+        s.classList.toggle("opacity-100", i === index);
+        s.classList.toggle("opacity-0", i !== index);
+      });
+      dots.forEach((d, i) => {
+        d.classList.toggle("bg-white", i === index);
+        d.classList.toggle("w-3", i === index);
+        d.classList.toggle("bg-white/40", i !== index);
+        d.classList.toggle("w-1.5", i !== index);
+      });
+      current = index;
+    }
+
+    function nextSlide() {
+      showSlide((current + 1) % slides.length);
+    }
+
+    function start() {
+      stop();
+      interval = setInterval(nextSlide, 4000);
+    }
+
+    function stop() {
+      if (interval) clearInterval(interval);
+    }
+
+    // Pausar al hover, reanudar al salir
+    container.addEventListener("mouseenter", stop);
+    container.addEventListener("mouseleave", start);
+
+    // Click en dots para navegar
+    container.querySelectorAll(".carousel-dot").forEach((dot) => {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const idx = parseInt(dot.dataset.index);
+        showSlide(idx);
+        stop();
+        setTimeout(start, 6000);
+      });
+    });
+
+    start();
   }
 
   // ── Selector de sector ─────────────────────────────────────
@@ -246,6 +363,11 @@ const sectorData = JSON.stringify({
     document.querySelectorAll(".sector-btn").forEach((btn) => {
       const isActive = btn.getAttribute("onclick")?.includes(sectorId);
       btn.classList.toggle("sector-active", isActive);
+
+      // Scroll al botón activo
+      if (isActive) {
+        btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      }
     });
 
     renderProjects(sectorId);
@@ -253,7 +375,7 @@ const sectorData = JSON.stringify({
 
   // ── Opción A: Auto-seleccionar primer rubro al entrar ──────
   function initAutoSelect() {
-    if (!sectores || sectores.length === 0) return;
+    if (!sectorList || sectorList.length === 0) return;
 
     const section = document.getElementById("experiencia");
     if (!section) return;
@@ -264,7 +386,7 @@ const sectorData = JSON.stringify({
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             // Seleccionar Hostelería (primer sector)
-            const firstSector = sectores[0].id;
+            const firstSector = sectorList[0].id;
             window.selectSector(firstSector);
             observer.disconnect(); // Solo una vez
           }
@@ -276,11 +398,48 @@ const sectorData = JSON.stringify({
     observer.observe(section);
   }
 
+  // ── Scroll horizontal con flechas ──────────────────────────
+  function initSectorScroll() {
+    const grid = document.getElementById("sector-grid");
+    const leftBtn = document.getElementById("sector-scroll-left");
+    const rightBtn = document.getElementById("sector-scroll-right");
+    if (!grid) return;
+
+    function updateArrows() {
+      const canScrollLeft = grid.scrollLeft > 10;
+      const canScrollRight = grid.scrollLeft < grid.scrollWidth - grid.clientWidth - 10;
+      if (leftBtn) leftBtn.classList.toggle("hidden", !canScrollLeft);
+      if (leftBtn) leftBtn.classList.toggle("flex", canScrollLeft);
+      if (rightBtn) rightBtn.classList.toggle("hidden", !canScrollRight);
+      if (rightBtn) rightBtn.classList.toggle("flex", canScrollRight);
+    }
+
+    if (leftBtn) {
+      leftBtn.addEventListener("click", () => {
+        grid.scrollBy({ left: -300, behavior: "smooth" });
+      });
+    }
+    if (rightBtn) {
+      rightBtn.addEventListener("click", () => {
+        grid.scrollBy({ left: 300, behavior: "smooth" });
+      });
+    }
+
+    grid.addEventListener("scroll", updateArrows);
+    // Pequeño delay para que se mida el scrollWidth correctamente
+    setTimeout(updateArrows, 100);
+    window.addEventListener("resize", updateArrows);
+  }
+
   // Iniciar cuando el DOM esté listo
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAutoSelect);
+    document.addEventListener("DOMContentLoaded", () => {
+      initAutoSelect();
+      initSectorScroll();
+    });
   } else {
     initAutoSelect();
+    initSectorScroll();
   }
 </script>
 

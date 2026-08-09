@@ -14,6 +14,8 @@
 
   let isLoading = false;
   let error: string | null = null;
+  // En desarrollo (local) mostramos el botón de programador
+  const isDev = import.meta.env.DEV;
 
   function handleNavigation() {
     const fromQuery = new URLSearchParams(window.location.search).get('redirect');
@@ -29,7 +31,6 @@
 
     try {
       await authService.login(form);
-      // La cookie httpOnly la setea el backend — no hay que guardar nada en localStorage
       handleNavigation();
     } catch (err) {
       error = err instanceof Error ? err.message : 'Credenciales inválidas';
@@ -38,8 +39,35 @@
     }
   }
 
-  // URL base de authCore (configurable via env)
-  // En prod apunta a authCore en Hetzner, en dev a localhost:8000
+  async function handleDevLogin() {
+    isLoading = true;
+    error = null;
+
+    try {
+      // Forzamos localhost en desarrollo aunque .env.local apunte a producción
+      const API_URL = import.meta.env.DEV
+        ? 'http://localhost:8001'
+        : (import.meta.env.PUBLIC_API_URL || 'http://localhost:8001');
+      const resp = await fetch(`${API_URL}/api/v1/auth/dev-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({}),
+      });
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.detail || 'Error al iniciar sesión como programador');
+      }
+
+      handleNavigation();
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Error de conexión';
+    } finally {
+      isLoading = false;
+    }
+  }
+
   const AUTHCORE_URL = import.meta.env.PUBLIC_AUTHCORE_URL || 'https://api-authcore.elrincondeharco.com';
 
   function googleLoginUrl(): string {
@@ -70,80 +98,40 @@
     Ingresar con Google
   </a>
 
-  <!-- Separador -->
-  <div class="relative mb-6">
-    <div class="absolute inset-0 flex items-center">
-      <div class="w-full border-t border-zinc-700"></div>
-    </div>
-    <div class="relative flex justify-center text-sm">
-      <span class="px-3 bg-zinc-900 text-zinc-400">o con credenciales</span>
-    </div>
-  </div>
-
-  <form onsubmit={handleSubmit} class="space-y-6">
-    <!-- Usuario -->
-    <div>
-      <label for="username" class="block text-sm font-medium text-zinc-300 mb-1.5">
-        Usuario
-      </label>
-      <input
-        id="username"
-        type="text"
-        bind:value={form.username}
-        oninput={clearMessages}
-        class="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100
-               focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none
-               transition-all placeholder:text-zinc-500"
-        placeholder="Tu usuario de authCore..."
-        required
-        disabled={isLoading}
-      />
+  <!-- Botón programador (solo en local/desarrollo, NUNCA en producción) -->
+  {#if isDev}
+    <div class="relative mb-6">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-zinc-800"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="px-3 bg-zinc-900 text-zinc-600">desarrollo</span>
+      </div>
     </div>
 
-    <!-- Contraseña -->
-    <div>
-      <label for="password" class="block text-sm font-medium text-zinc-300 mb-1.5">
-        Contraseña
-      </label>
-      <input
-        id="password"
-        type="password"
-        bind:value={form.password}
-        oninput={clearMessages}
-        class="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100
-               focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none
-               transition-all placeholder:text-zinc-500"
-        placeholder="••••••••"
-        required
-        disabled={isLoading}
-      />
-    </div>
-
-    <!-- Error -->
     {#if error}
-      <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+      <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center mb-4">
         {error}
       </div>
     {/if}
 
-    <!-- Botón login con credenciales -->
     <button
-      type="submit"
-      disabled={isLoading || !form.username || !form.password}
-      class="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-zinc-900 font-semibold
-             rounded-lg transition-all active:scale-[0.98]
+      onclick={handleDevLogin}
+      disabled={isLoading}
+      class="w-full py-2.5 px-4 bg-zinc-700 hover:bg-zinc-600 text-zinc-200 font-medium
+             rounded-lg transition-all active:scale-[0.98] text-sm font-mono
              disabled:opacity-50 disabled:cursor-not-allowed
              flex justify-center items-center gap-2"
     >
       {#if isLoading}
-        <svg class="animate-spin h-5 w-5 text-zinc-900" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
         Ingresando...
       {:else}
-        Ingresar
+        $ sudo su — acceder como programador
       {/if}
     </button>
-  </form>
+  {/if}
 </div>

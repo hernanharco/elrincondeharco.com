@@ -4,6 +4,7 @@ export interface HeroResponse {
   subtitle: string;
   description: string;
   background_image: string | null;
+  primary_button_text: string | null;
   contact_button_text: string;
   cv_button_text: string;
   image_url: string | null;
@@ -39,7 +40,7 @@ export interface ProjectResponse {
   id: number;
   title: string;
   description: string;
-  image_url: string | null;
+  image_urls: string[];
   tags: string[];
   icon_name: string;
   color: string;
@@ -89,6 +90,11 @@ export interface SiteSettingsResponse {
   contact_email: string;
   social_networks: SocialNetworks | null;
   is_active: boolean;
+  cta_title: string | null;
+  cta_description: string | null;
+  cta_features: string[] | null;
+  cta_primary_text: string | null;
+  cta_secondary_text: string | null;
 }
 
 export interface ShowroomResponse {
@@ -110,6 +116,13 @@ export interface TestimonialResponse {
   avatar_url: string | null;
   is_active: boolean;
   sort_order: number;
+}
+
+export interface ExperienceSectionResponse {
+  id: number;
+  tagline: string;
+  title: string;
+  description: string;
 }
 
 export interface SectorResponse {

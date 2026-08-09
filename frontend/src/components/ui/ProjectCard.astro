@@ -22,7 +22,7 @@ const iconPaths: Record<string, string> = {
 
 function pascalToKebab(name: string): string {
   return name
-    .replace(/([A-Z])/g, (m, l, o) => (o > 0 ? '-' + l.toLowerCase() : l.toLowerCase()))
+    .replace(/([A-Z])/g, (_m, l, o) => (o > 0 ? '-' + l.toLowerCase() : l.toLowerCase()))
     .replace(/(\d+)/g, '-$1')
     .replace(/--+/g, '-')
     .replace(/-+$/, '');

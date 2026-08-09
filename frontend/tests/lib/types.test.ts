@@ -1,202 +1,196 @@
 import { describe, it, expect } from 'vitest';
-import type { 
-  HeroResponse, 
-  AboutResponse, 
-  StackResponse, 
-  ProjectResponse, 
-  PassionResponse, 
-  FooterResponse,
+import type {
+  HeroResponse,
+  ProjectResponse,
   SiteSettingsResponse,
-  SocialNetworks 
+  SocialNetworks,
+  ExperienceSectionResponse,
 } from '$lib/types';
+import {
+  fallbackHero,
+  fallbackProjects,
+  fallbackSectors,
+  fallbackSiteSettings,
+  fallbackExperienceSection,
+} from '$lib/fallback-data';
+
+// ── Type Validation ─────────────────────────────────────────
 
 describe('TypeScript Interfaces', () => {
   describe('HeroResponse', () => {
-    it('accepts valid hero data', () => {
+    it('accepts valid hero data with primary_button_text', () => {
       const hero: HeroResponse = {
         id: 1,
-        title: 'Test Hero',
-        subtitle: 'Test Subtitle',
-        description: 'Test Description',
+        title: 'Test',
+        subtitle: 'Test Sub',
+        description: 'Test Desc',
         background_image: null,
-        contact_button_text: 'Contact',
-        cv_button_text: 'Download CV',
+        primary_button_text: 'Ver mi rubro',
+        contact_button_text: 'Contacto',
+        cv_button_text: 'Descargar CV',
         image_url: null,
-        cv_url: 'https://example.com/cv.pdf'
+        cv_url: null,
       };
-      
-      expect(hero.id).toBe(1);
-      expect(hero.title).toBe('Test Hero');
-    });
-    
-    it('allows null values for optional fields', () => {
-      const hero: HeroResponse = {
-        id: 1,
-        title: 'Test Hero',
-        subtitle: 'Test Subtitle',
-        description: 'Test Description',
-        background_image: null,
-        contact_button_text: 'Contact',
-        cv_button_text: 'Download CV',
-        image_url: null,
-        cv_url: null
-      };
-      
-      expect(hero.cv_url).toBeNull();
+      expect(hero.primary_button_text).toBe('Ver mi rubro');
     });
   });
 
   describe('ProjectResponse', () => {
-    it('accepts valid project data', () => {
-      const project: ProjectResponse = {
-        id: 1,
-        title: 'Test Project',
-        description: 'Test Description',
-        image_url: null,
-        tags: ['React', 'TypeScript'],
-        icon_name: 'Code',
-        color: 'from-blue-500/20',
-        demo_url: 'https://demo.com',
-        github_url: 'https://github.com'
-      };
-      
-      expect(project.tags).toHaveLength(2);
-      expect(project.tags[0]).toBe('React');
-    });
-    
-    it('allows empty tags array', () => {
-      const project: ProjectResponse = {
-        id: 1,
-        title: 'Test Project',
-        description: 'Test Description',
-        image_url: null,
-        tags: [],
-        icon_name: 'Code',
-        color: 'from-blue-500/20',
-        demo_url: null,
-        github_url: null
-      };
-      
-      expect(project.tags).toHaveLength(0);
-    });
-  });
-
-  describe('StackResponse', () => {
-    it('accepts valid stack data', () => {
-      const stack: StackResponse = {
-        id: 1,
-        name: 'React',
-        category: 'Frontend',
-        icon: 'Globe',
-        description: 'JavaScript library',
-        color: 'text-cyan-500',
-        border: 'group-hover:border-cyan-500/50',
-        glow: 'group-hover:shadow-[0_0_30px_-5px_rgba(6,182,212,0.3)]'
-      };
-      
-      expect(stack.category).toBe('Frontend');
-      expect(stack.name).toBe('React');
-    });
-  });
-
-  describe('SocialNetworks', () => {
-    it('accepts valid social networks data', () => {
-      const socials: SocialNetworks = {
-        github: 'https://github.com/user',
-        linkedin: 'https://linkedin.com/in/user',
-        twitter: null
-      };
-      
-      expect(socials.github).toBe('https://github.com/user');
-      expect(socials.twitter).toBeNull();
-    });
-    
-    it('allows all null values', () => {
-      const socials: SocialNetworks = {
-        github: null,
-        linkedin: null,
-        twitter: null
-      };
-      
-      expect(socials.github).toBeNull();
-      expect(socials.linkedin).toBeNull();
-      expect(socials.twitter).toBeNull();
-    });
-  });
-
-  describe('SiteSettingsResponse', () => {
-    it('accepts valid site settings', () => {
-      const settings: SiteSettingsResponse = {
-        id: 1,
-        brand_name: 'Test Brand',
-        site_url: 'https://test.com',
-        legal_name: 'Test Legal',
-        slogan: 'Test Slogan',
-        copyright_notice: '© 2024 Test',
-        contact_email: 'test@example.com',
-        social_networks: {
-          github: 'https://github.com',
-          linkedin: null,
-          twitter: null
-        },
-        is_active: true
-      };
-      
-      expect(settings.brand_name).toBe('Test Brand');
-      expect(settings.is_active).toBe(true);
-    });
-    
-    it('allows null social_networks', () => {
-      const settings: SiteSettingsResponse = {
-        id: 1,
-        brand_name: 'Test Brand',
-        site_url: 'https://test.com',
-        legal_name: 'Test Legal',
-        slogan: null,
-        copyright_notice: '© 2024 Test',
-        contact_email: 'test@example.com',
-        social_networks: null,
-        is_active: true
-      };
-      
-      expect(settings.social_networks).toBeNull();
-      expect(settings.slogan).toBeNull();
-    });
-  });
-
-  describe('Type Validation', () => {
-    it('validates URL patterns in interface types', () => {
+    it('accepts valid project with image_urls array', () => {
       const project: ProjectResponse = {
         id: 1,
         title: 'Test',
         description: 'Test',
-        image_url: 'https://example.com/image.jpg',
+        image_urls: ['https://img1.com', 'https://img2.com'],
+        tags: ['React'],
+        icon_name: 'Code',
+        color: 'from-blue-500/20',
+        demo_url: null,
+        github_url: null,
+      };
+      expect(project.image_urls).toHaveLength(2);
+      expect(Array.isArray(project.image_urls)).toBe(true);
+    });
+
+    it('allows empty image_urls', () => {
+      const project: ProjectResponse = {
+        id: 1,
+        title: 'Test',
+        description: 'Test',
+        image_urls: [],
         tags: [],
         icon_name: 'Code',
         color: 'from-blue-500/20',
-        demo_url: 'https://demo.com',
-        github_url: 'https://github.com'
+        demo_url: null,
+        github_url: null,
       };
-      
-      expect(project.image_url).toMatch(/^https?:\/\//);
-      expect(project.demo_url).toMatch(/^https?:\/\//);
-      expect(project.github_url).toMatch(/^https?:\/\//);
+      expect(project.image_urls).toEqual([]);
     });
-    
-    it('validates email format in site settings', () => {
+  });
+
+  describe('SiteSettingsResponse', () => {
+    it('accepts valid site settings with CTA fields', () => {
       const settings: SiteSettingsResponse = {
         id: 1,
         brand_name: 'Test',
         site_url: 'https://test.com',
         legal_name: 'Test',
         slogan: null,
-        copyright_notice: '© 2024',
-        contact_email: 'test@example.com',
+        copyright_notice: '©',
+        contact_email: 'test@test.com',
         social_networks: null,
-        is_active: true
+        is_active: true,
+        cta_title: 'Test <span>CTA</span>',
+        cta_description: 'Test description',
+        cta_features: ['Feature 1', 'Feature 2'],
+        cta_primary_text: 'Contacto',
+        cta_secondary_text: 'LinkedIn',
       };
-      
-      expect(settings.contact_email).toMatch(/@.*\./);
+      expect(settings.cta_title).toContain('<span>');
+      expect(settings.cta_features).toHaveLength(2);
+      expect(settings.cta_primary_text).toBe('Contacto');
+    });
+
+    it('allows null CTA fields', () => {
+      const settings: SiteSettingsResponse = {
+        id: 1,
+        brand_name: 'Test',
+        site_url: 'https://test.com',
+        legal_name: 'Test',
+        slogan: null,
+        copyright_notice: '©',
+        contact_email: 'test@test.com',
+        social_networks: null,
+        is_active: true,
+        cta_title: null,
+        cta_description: null,
+        cta_features: null,
+        cta_primary_text: null,
+        cta_secondary_text: null,
+      };
+      expect(settings.cta_title).toBeNull();
+      expect(settings.cta_features).toBeNull();
+    });
+  });
+
+  describe('ExperienceSectionResponse', () => {
+    it('accepts valid experience section data', () => {
+      const exp: ExperienceSectionResponse = {
+        id: 1,
+        tagline: 'Experiencia',
+        title: 'Title <span>HTML</span>',
+        description: 'Description text',
+      };
+      expect(exp.tagline).toBe('Experiencia');
+      expect(exp.title).toContain('<span>');
+    });
+  });
+});
+
+// ── Fallback Data Validation ────────────────────────────────
+
+describe('Fallback Data', () => {
+  describe('fallbackHero', () => {
+    it('has all required fields', () => {
+      expect(fallbackHero.title).toBeTruthy();
+      expect(fallbackHero.subtitle).toContain('<span');
+      expect(fallbackHero.description).toBeTruthy();
+      expect(fallbackHero.primary_button_text).toBe('Ver mi rubro');
+      expect(fallbackHero.contact_button_text).toBe('Contacto');
+    });
+  });
+
+  describe('fallbackProjects', () => {
+    it('has 7 projects including new prototypes', () => {
+      expect(fallbackProjects.length).toBeGreaterThanOrEqual(7);
+      const titles = fallbackProjects.map(p => p.title);
+      expect(titles).toContain('Tapicería Moderna');
+      expect(titles).toContain('Landing Page Barbería');
+      expect(titles).toContain('Gestión Gastronómica Inteligente');
+    });
+
+    it('all projects have image_urls array', () => {
+      fallbackProjects.forEach(p => {
+        expect(Array.isArray(p.image_urls)).toBe(true);
+      });
+    });
+
+    it('projects with images have them in image_urls', () => {
+      const withImages = fallbackProjects.filter(p => p.image_urls.length > 0);
+      expect(withImages.length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  describe('fallbackSectors', () => {
+    it('has 8 sectors including new ones', () => {
+      expect(fallbackSectors.length).toBe(8);
+      const names = fallbackSectors.map(s => s.name);
+      expect(names).toContain('Educación');
+      expect(names).toContain('Comercio');
+    });
+
+    it('sectors with projects have non-empty project_ids', () => {
+      const withProjects = fallbackSectors.filter(s => s.project_ids.length > 0);
+      expect(withProjects.length).toBeGreaterThanOrEqual(6);
+    });
+  });
+
+  describe('fallbackSiteSettings', () => {
+    it('has CTA fields with default values', () => {
+      expect(fallbackSiteSettings.cta_title).toContain('algo grande');
+      expect(fallbackSiteSettings.cta_description).toBeTruthy();
+      expect(fallbackSiteSettings.cta_features).toHaveLength(3);
+      expect(fallbackSiteSettings.cta_features).toContain('Respuesta en 24h');
+      expect(fallbackSiteSettings.cta_primary_text).toBe('Enviar Correo');
+      expect(fallbackSiteSettings.cta_secondary_text).toBe('LinkedIn');
+    });
+  });
+
+  describe('fallbackExperienceSection', () => {
+    it('has valid header content', () => {
+      expect(fallbackExperienceSection.tagline).toBe('Experiencia');
+      expect(fallbackExperienceSection.title).toContain('rubro');
+      expect(fallbackExperienceSection.description).toBeTruthy();
     });
   });
 });

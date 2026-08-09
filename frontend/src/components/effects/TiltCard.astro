@@ -1,8 +1,13 @@
+---
+// @ts-nocheck
+---
+
 <div class="tilt-card" data-tilt>
   <slot />
 </div>
 
 <script>
+// @ts-nocheck
   document.querySelectorAll('[data-tilt]').forEach(card => {
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();

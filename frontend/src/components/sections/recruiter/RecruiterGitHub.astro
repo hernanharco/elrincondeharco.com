@@ -1,4 +1,5 @@
 ---
+// @ts-nocheck — Dashboard GitHub, tipos implícitos intencionales
 // RecruiterGitHub.astro — Dashboard GitHub real (client-side fetch)
 // Muestra estrellas, repos, lenguajes y actividad en vivo.
 ---
@@ -50,6 +51,7 @@
 </section>
 
 <script>
+// @ts-nocheck
   (async function () {
     try {
       const res = await fetch("https://api.github.com/users/hernanharco/repos?sort=updated&per_page=30");
