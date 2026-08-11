@@ -9,16 +9,14 @@ const RADAR_URL = import.meta.env.PUBLIC_RADAR_URL || 'http://localhost:5174';
 
 // ── SSO embebido ────────────────────────────────────────────
 // El middleware YA validó la sesión del CRM (si no, redirige a /login).
-// Obtenemos un token del Radar pasando la cookie de sesión que el
-// middleware validó — el backend del portfolio la acepta en el header.
+// Obtenemos un token del Radar pasando el JWT de sesión que el
+// middleware validó — el backend del portfolio lo acepta en Bearer.
 let radarToken: string | null = null;
 try {
   const sessionCookie = Astro.cookies.get('access_token')?.value;
   if (sessionCookie) {
     const apiBase = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
     const res = await fetch(`${apiBase}/api/v1/radar/token`, {
-      // Pasamos el JWT directamente en Authorization — el backend lo valida
-      // contra authCore igual que la cookie, y es más robusto que el header Cookie.
       headers: { Authorization: `Bearer ${sessionCookie}` },
       signal: AbortSignal.timeout(8000),
     });
@@ -48,16 +46,29 @@ try {
 
 <script define:vars={{ radarToken }}>
   // ── SSO embebido: pasar el token al iframe por postMessage ──
+  // Enviamos el token de inmediato Y también en cada 'load' (por si el
+  // iframe recarga). El Radar escucha el mensaje y lo usa como sesión.
   const frame = document.getElementById('radar-frame') as HTMLIFrameElement | null;
 
   if (frame && radarToken) {
-    frame.addEventListener('load', () => {
+    const sendToken = () => {
       if (frame.contentWindow) {
         frame.contentWindow.postMessage(
           { type: 'radar-auth', token: radarToken },
           '*',
         );
       }
-    });
+    };
+
+    // 1. Si el iframe ya cargó (completeState >= 1), enviar ahora.
+    // 2. Si no, esperar el evento load.
+    if (frame.contentWindow) sendToken();
+    frame.addEventListener('load', sendToken);
+
+    // Reintento adicional: algunos SPA (React Router) cargan después del
+    // 'load' del documento. Enviar un par de veces con delay cubre el caso.
+    setTimeout(sendToken, 500);
+    setTimeout(sendToken, 1500);
+    setTimeout(sendToken, 3000);
   }
 </script>
