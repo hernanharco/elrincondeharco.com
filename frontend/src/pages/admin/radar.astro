@@ -7,21 +7,27 @@ const currentPath = Astro.url.pathname;
 // URL del frontend de Radar (Vercel en producción, Vite proxy en local)
 const RADAR_URL = import.meta.env.PUBLIC_RADAR_URL || 'http://localhost:5174';
 
-// ── SSO embebido (server-side) ──────────────────────────────
-// El middleware ya validó la cookie access_token (sesión del CRM).
-// Obtenemos un token del Radar ANTES de servir la página y lo
-// inyectamos en el HTML — el iframe no necesita fetch cross-origin.
+// ── SSO embebido ────────────────────────────────────────────
+// El middleware YA validó la sesión del CRM (si no, redirige a /login).
+// Obtenemos un token del Radar pasando la cookie de sesión que el
+// middleware validó — el backend del portfolio la acepta en el header.
 let radarToken: string | null = null;
 try {
-  const token = Astro.cookies.get('access_token')?.value;
-  const apiBase = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
-  const res = await fetch(`${apiBase}/api/v1/radar/token`, {
-    headers: token ? { Cookie: `access_token=${token}` } : {},
-    signal: AbortSignal.timeout(8000),
-  });
-  if (res.ok) {
-    const data = await res.json();
-    radarToken = data.token ?? null;
+  const sessionCookie = Astro.cookies.get('access_token')?.value;
+  if (sessionCookie) {
+    const apiBase = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
+    const res = await fetch(`${apiBase}/api/v1/radar/token`, {
+      // Pasamos el JWT directamente en Authorization — el backend lo valida
+      // contra authCore igual que la cookie, y es más robusto que el header Cookie.
+      headers: { Authorization: `Bearer ${sessionCookie}` },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      radarToken = data.token ?? null;
+    } else {
+      console.error(`[radar.astro] token endpoint HTTP ${res.status}`);
+    }
   }
 } catch (err) {
   console.error('[radar.astro] Error obteniendo token del Radar:', err);
