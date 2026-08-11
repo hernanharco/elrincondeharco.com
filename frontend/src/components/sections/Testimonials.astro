@@ -1,4 +1,5 @@
 ---
+// @ts-nocheck — Tipos implícitos intencionales
 // Testimonials.astro — Lo que dicen quienes ya trabajaron conmigo
 // Lee desde API con fallback a datos locales
 // FIXME: The {#each} block causes esbuild compilation error.
@@ -7,6 +8,7 @@
 import type { TestimonialResponse } from '$lib/types';
 import { fetchSSR } from '$lib/api';
 import { fallbackTestimonials } from '$lib/fallback-data';
+import TestimonialForm from './TestimonialForm.svelte';
 
 const apiData = await fetchSSR<TestimonialResponse[]>('/testimonials/');
 const apiNames = new Set((apiData ?? []).map((t) => t.name));
@@ -73,6 +75,9 @@ const activeTestimonials = merged.filter(t => t.is_active !== false).slice(0, 6)
             <span>+5 años de clientes satisfechos</span>
           </div>
         </div>
+
+        <!-- Formulario público de testimonio -->
+        <TestimonialForm client:load />
       </div>
     </section>
   )

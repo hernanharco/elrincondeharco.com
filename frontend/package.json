@@ -40,11 +40,13 @@
     ]
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
     "@playwright/test": "^1.40.0",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/svelte": "^5.2.4",
     "@testing-library/user-event": "^14.5.0",
+    "@types/node": "^26.1.1",
     "@types/three": "^0.185.1",
     "@vitest/coverage-v8": "^2.1.9",
     "@vitest/ui": "^2.1.9",

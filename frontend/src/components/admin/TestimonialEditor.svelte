@@ -69,6 +69,21 @@
     finally { saving = false; }
   }
 
+  async function toggleActive(item: TestimonialResponse) {
+    saving = true;
+    try {
+      await fetchApi(`/api/v1/testimonials/${item.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ is_active: !item.is_active }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      message = item.is_active ? 'Testimonio desactivado' : '¡Testimonio aprobado!';
+      messageType = 'success';
+      await loadItems();
+    } catch (e) { message = `Error: ${e.message}`; messageType = 'error'; }
+    finally { saving = false; }
+  }
+
   async function handleDelete(id: number) {
     if (!confirm('¿Eliminar este testimonio?')) return;
     try {
@@ -93,12 +108,8 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-xl font-bold text-zinc-100">Testimonios</h2>
-      <p class="text-sm text-zinc-400">Gestioná los testimonios que se muestran en la landing page.</p>
+      <p class="text-sm text-zinc-400">Aprobá o rechazá los testimonios que llegan desde la web. Los que están <span class="text-yellow-400">pendientes</span> no se ven en la página.</p>
     </div>
-    <button on:click={openNew}
-      class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold rounded-xl transition-all">
-      + Nuevo Testimonio
-    </button>
   </div>
 
   {#if loading}
@@ -122,13 +133,27 @@
                 <span class="ml-auto text-amber-400 text-sm">{stars(item.rating)}</span>
               </div>
               <p class="text-zinc-400 text-sm leading-relaxed mt-2 line-clamp-3">"{item.content}"</p>
-              <div class="flex items-center gap-3 mt-2">
+              <div class="flex items-center gap-2 mt-2">
                 {#if !item.is_active}
-                  <span class="px-2 py-0.5 text-[10px] font-medium rounded-md bg-red-500/10 text-red-400 border border-red-500/20">Inactivo</span>
+                  <span class="px-2 py-0.5 text-[10px] font-medium rounded-md bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/></svg>
+                    Pendiente
+                  </span>
+                {:else}
+                  <span class="px-2 py-0.5 text-[10px] font-medium rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Aprobado
+                  </span>
                 {/if}
               </div>
             </div>
             <div class="flex gap-2 shrink-0">
+              {#if !item.is_active}
+                <button on:click={() => toggleActive(item)}
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all">
+                  Aprobar
+                </button>
+              {/if}
               <button on:click={() => openEdit(item)}
                 class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/30 transition-all">
                 Editar

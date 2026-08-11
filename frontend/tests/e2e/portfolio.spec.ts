@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 test.describe('Portfolio — Hero Section', () => {
   test('renders hero content from API', async ({ page }) => {
@@ -204,5 +205,63 @@ test.describe('Portfolio — Dual Mode (Robot + Recruiter)', () => {
     // Should be back in client mode
     const mode = await page.evaluate(() => localStorage.getItem('portfolio-mode'));
     expect(mode).toBeNull();
+  });
+});
+
+test.describe('CRM — Admin Experience Section', () => {
+  test('experience admin page loads', async ({ page }) => {
+    await page.goto('/admin/experience');
+    await expect(page.locator('h1')).toContainText('Experiencia');
+  });
+
+  test('experience section shows sectors stats', async ({ page }) => {
+    await page.goto('/admin/experience');
+    // Should show rubros count
+    await expect(page.getByText('Rubros')).toBeVisible();
+    await expect(page.getByText('Proyectos')).toBeVisible();
+  });
+});
+
+test.describe('CRM — Admin Projects', () => {
+  test('projects admin page loads with list', async ({ page }) => {
+    await page.goto('/admin/projects');
+    await expect(page.locator('h1')).toContainText('Proyectos');
+  });
+
+  test('projects list is not empty', async ({ page }) => {
+    await page.goto('/admin/projects');
+    await expect(page.getByText('Proyectos')).toBeVisible();
+  });
+});
+
+test.describe('CRM — Admin Testimonials', () => {
+  test('testimonials admin page loads', async ({ page }) => {
+    await page.goto('/admin/testimonials');
+    await expect(page.locator('h2')).toContainText('Testimonios');
+  });
+
+  test('public testimonial form button is visible on main page', async ({ page }) => {
+    await page.goto('/');
+    const button = page.getByText('Dejá tu testimonio');
+    await expect(button).toBeVisible();
+  });
+
+  test('testimonial modal opens and can be submitted', async ({ page }) => {
+    await page.goto('/');
+    await page.getByText('Dejá tu testimonio').click();
+
+    // Modal should appear
+    await expect(page.getByText('Nombre')).toBeVisible();
+    await expect(page.getByText('Calificación')).toBeVisible();
+
+    // Fill form
+    await page.fill('input[id="tf-name"]', 'E2E Test User');
+    await page.fill('textarea[id="tf-content"]', 'E2E test testimonial content');
+
+    // Submit
+    await page.getByText('Enviar testimonio').click();
+
+    // Should show success
+    await expect(page.getByText('Gracias por tu testimonio')).toBeVisible();
   });
 });

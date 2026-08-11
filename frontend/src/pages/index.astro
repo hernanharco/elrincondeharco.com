@@ -14,6 +14,10 @@ import RecruiterProjects from '../components/sections/recruiter/RecruiterProject
 import RecruiterInfra from '../components/sections/recruiter/RecruiterInfra.astro';
 import RecruiterTimeline from '../components/sections/recruiter/RecruiterTimeline.astro';
 import RecruiterCertifications from '../components/sections/recruiter/RecruiterCertifications.astro';
+import RecruiterGitHub from '../components/sections/recruiter/RecruiterGitHub.astro';
+import RecruiterMethod from '../components/sections/recruiter/RecruiterMethod.astro';
+import RecruiterLocation from '../components/sections/recruiter/RecruiterLocation.astro';
+import RecruiterAdmin from '../components/sections/recruiter/RecruiterAdmin.astro';
 ---
 
 <Layout
@@ -34,11 +38,20 @@ import RecruiterCertifications from '../components/sections/recruiter/RecruiterC
 
   <!-- ═══ MODO RECRUITER ═══ -->
   <div class="recruiter-content">
+    <!-- Theme toggle -->
+    <div style="position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;gap:0.5rem;" id="recruiter-theme-toggle">
+      <button id="theme-btn" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(8px);transition:all 0.2s;" title="Cambiar tema">🌙</button>
+    </div>
+
     <RecruiterHero />
     <RecruiterStack />
     <RecruiterProjects />
     <RecruiterTimeline />
+    <RecruiterMethod />
+    <RecruiterGitHub />
+    <RecruiterLocation />
     <RecruiterCertifications />
+    <RecruiterAdmin />
     <RecruiterInfra />
   </div>
 </Layout>
@@ -56,6 +69,11 @@ import RecruiterCertifications from '../components/sections/recruiter/RecruiterC
   }
   body[data-mode="recruiter"] .recruiter-content {
     display: block !important;
+  }
+
+  /* ── Performance mode: ocultar Three.js ─────────────────── */
+  body[data-perf-mode="1"] #caos-orden-container {
+    display: none !important;
   }
 </style>
 
@@ -80,5 +98,41 @@ import RecruiterCertifications from '../components/sections/recruiter/RecruiterC
     document.addEventListener("mode:switch-to-client", () => {
       document.body.removeAttribute("data-mode");
     });
+
+    // ── Performance mode toggle ───────────────────────────────
+    // Doble click en el logo desactiva Three.js
+    document.addEventListener("dblclick", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a[href="#inicio"]') || target.closest('img[alt*="Rincom"]')) {
+        const current = document.body.getAttribute("data-perf-mode");
+        if (current === "1") {
+          document.body.removeAttribute("data-perf-mode");
+        } else {
+          document.body.setAttribute("data-perf-mode", "1");
+        }
+      }
+    });
+
+    // ── Theme toggle ──────────────────────────────────────────
+    const themeBtn = document.getElementById("theme-btn");
+    const savedTheme = localStorage.getItem("recruiter-theme");
+    if (savedTheme === "light") {
+      document.body.setAttribute("data-recruiter-theme", "light");
+      if (themeBtn) themeBtn.textContent = "☀️";
+    }
+    if (themeBtn) {
+      themeBtn.addEventListener("click", () => {
+        const current = document.body.getAttribute("data-recruiter-theme");
+        if (current === "light") {
+          document.body.removeAttribute("data-recruiter-theme");
+          localStorage.setItem("recruiter-theme", "dark");
+          themeBtn.textContent = "🌙";
+        } else {
+          document.body.setAttribute("data-recruiter-theme", "light");
+          localStorage.setItem("recruiter-theme", "light");
+          themeBtn.textContent = "☀️";
+        }
+      });
+    }
   })();
 </script>

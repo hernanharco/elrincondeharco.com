@@ -1,0 +1,179 @@
+---
+// cv.astro — Página de CV imprimible / PDF
+// Exporta los datos del perfil en formato CV limpio.
+// Usar Cmd+P → "Guardar como PDF" para descargar.
+
+export const prerender = true;
+
+import { recruiterData, RECRUITER_TECH_STACK, RECRUITER_PROJECTS, RECRUITER_TIMELINE } from '$lib/recruiter-data';
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Hernán Arango Cortés — CV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #1a1a2e;
+      background: white;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 20mm 15mm;
+    }
+    @page { margin: 0; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #06b6d4; }
+    .header h1 { font-size: 24px; font-weight: 800; color: #0a0a0f; letter-spacing: -0.5px; }
+    .header .role { font-size: 12px; color: #06b6d4; font-weight: 600; margin-top: 2px; }
+    .header .contact { text-align: right; font-size: 9px; color: #64748b; line-height: 1.6; }
+    .header .contact a { color: #06b6d4; text-decoration: none; }
+
+    /* ── Summary ─────────────────────────────────────────────── */
+    .summary { font-size: 10px; color: #334155; margin-bottom: 16px; padding: 10px 12px; background: #f8fafc; border-radius: 6px; line-height: 1.6; }
+
+    /* ── Grid ────────────────────────────────────────────────── */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .full { grid-column: 1 / -1; }
+
+    /* ── Sections ────────────────────────────────────────────── */
+    .section { margin-bottom: 14px; }
+    .section h2 { font-size: 11px; font-weight: 700; color: #06b6d4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+
+    /* ── Tech Stack ──────────────────────────────────────────── */
+    .tech-grid { display: flex; flex-wrap: wrap; gap: 3px; }
+    .tech-item { padding: 2px 6px; background: #f1f5f9; border-radius: 3px; font-size: 8px; color: #334155; font-weight: 500; }
+
+    /* ── Timeline ────────────────────────────────────────────── */
+    .timeline-item { margin-bottom: 6px; padding-left: 10px; border-left: 2px solid #cbd5e1; }
+    .timeline-item .year { font-size: 8px; font-weight: 700; color: #06b6d4; }
+    .timeline-item .title { font-size: 10px; font-weight: 600; color: #0f172a; }
+    .timeline-item .subtitle { font-size: 9px; color: #64748b; }
+    .timeline-item .desc { font-size: 9px; color: #475569; margin-top: 1px; }
+
+    /* ── Projects ────────────────────────────────────────────── */
+    .project-item { margin-bottom: 5px; }
+    .project-item .name { font-size: 10px; font-weight: 600; color: #0f172a; }
+    .project-item .desc { font-size: 9px; color: #475569; }
+    .project-item .tags { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 2px; }
+    .project-item .tags span { padding: 1px 4px; background: #f1f5f9; border-radius: 2px; font-size: 7px; color: #64748b; }
+
+    /* ── Metrics ─────────────────────────────────────────────── */
+    .metrics { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+    .metric { text-align: center; }
+    .metric .value { font-size: 18px; font-weight: 800; color: #06b6d4; }
+    .metric .label { font-size: 7px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: -2px; }
+
+    /* ── Print only ──────────────────────────────────────────── */
+    .no-print { display: none; }
+    @media print {
+      body { font-size: 9px; }
+      .page { padding: 15mm 12mm; }
+      .tech-item { background: #f1f5f9 !important; }
+      .summary { background: #f8fafc !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- Botón descargar (solo en pantalla) -->
+    <div class="no-print" style="text-align:right;margin-bottom:10px;">
+      <button onclick="window.print()" style="padding:8px 20px;background:#06b6d4;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">
+        📄 Descargar PDF
+      </button>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1>{recruiterData.name}</h1>
+        <div class="role">{recruiterData.role}</div>
+      </div>
+      <div class="contact">
+        {recruiterData.location}<br />
+        <a href="mailto:{recruiterData.email}">{recruiterData.email}</a><br />
+        <a href={recruiterData.github}>GitHub</a> · <a href={recruiterData.linkedin}>LinkedIn</a>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary">{recruiterData.summary}</div>
+
+    <!-- Metrics -->
+    <div class="metrics">
+      {recruiterData.metrics.map(m => (
+        <div class="metric">
+          <div class="value">{m.value}</div>
+          <div class="label">{m.label}</div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Grid -->
+    <div class="grid">
+      <!-- Tech Stack -->
+      <div class="section">
+        <h2>Stack técnico</h2>
+        {[...new Set(RECRUITER_TECH_STACK.map(t => t.category))].map(cat => (
+          <div style="margin-bottom:4px;">
+            <div style="font-size:8px;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:2px;">{cat}</div>
+            <div class="tech-grid">
+              {RECRUITER_TECH_STACK.filter(t => t.category === cat).map(t => (
+                <span class="tech-item">{t.name}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Contacto rápido -->
+      <div class="section">
+        <h2>Contacto</h2>
+        <div style="font-size:9px;color:#475569;line-height:1.8;">
+          📧 <a href="mailto:{recruiterData.email}" style="color:#06b6d4;">{recruiterData.email}</a><br />
+          🐙 <a href={recruiterData.github} style="color:#06b6d4;">github.com/hernanharco</a><br />
+          💼 <a href={recruiterData.linkedin} style="color:#06b6d4;">linkedin.com/in/hernan-harco</a><br />
+          🌐 <a href="https://www.elrincondeharco.com" style="color:#06b6d4;">elrincondeharco.com</a>
+        </div>
+      </div>
+
+      <!-- Timeline (full width) -->
+      <div class="section full">
+        <h2>Experiencia</h2>
+        {RECRUITER_TIMELINE.filter(e => e.type !== 'estudio').reverse().map(e => (
+          <div class="timeline-item">
+            <div class="year">{e.year}</div>
+            <div class="title">{e.title}</div>
+            {e.subtitle && <div class="subtitle">{e.subtitle}</div>}
+            <div class="desc">{e.description}</div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Proyectos (full width) -->
+      <div class="section full">
+        <h2>Proyectos destacados</h2>
+        {RECRUITER_PROJECTS.slice(0, 6).map(p => (
+          <div class="project-item">
+            <div class="name">{p.title} {p.demo ? '🟢' : ''}</div>
+            <div class="desc">{p.description}</div>
+            <div class="tags">{p.tags.map(t => <span>{t}</span>)}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

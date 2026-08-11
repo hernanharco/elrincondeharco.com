@@ -22,6 +22,8 @@ import type {
   SiteSettingsResponse,
   ShowroomResponse,
   SectorResponse,
+  TestimonialResponse,
+  ExperienceSectionResponse,
 } from '$lib/types';
 
 // ────────────────────────────────────
@@ -32,13 +34,24 @@ export const fallbackHero: HeroResponse = {
   title: 'Soluciones Digitales para tu Negocio',
   subtitle: 'El <span class="text-amber-400">Rincom</span><br /><span class="text-cyan-400">de Harco</span>',
   description:
-    'Creo la web que tu negocio necesita para crecer.',
+    'Creo la web que tu negocio necesita para crecer.\nSitios que venden · Sistemas que automatizan · Experiencias que enamoran',
   background_image: null,
+  primary_button_text: 'Ver mi rubro',
   contact_button_text: 'Contacto',
   cv_button_text: 'Descargar CV',
   image_url: null,
   cv_url:
     'https://res.cloudinary.com/dxyk76jhu/raw/upload/fl_attachment:Hernan_Arango_FullStack_2026/v1776385388/elrincondelharco/Hernan_Arango_FullStack_2026.pdf',
+};
+
+// ────────────────────────────────────
+// EXPERIENCE SECTION
+// ────────────────────────────────────
+export const fallbackExperienceSection: ExperienceSectionResponse = {
+  id: 1,
+  tagline: 'Experiencia',
+  title: 'Seleccioná tu <span class="text-amber-400">rubro</span>',
+  description: 'Tocá tu industria y descubrí lo que construimos para negocios como el tuyo.',
 };
 
 // ────────────────────────────────────
@@ -98,7 +111,7 @@ export const fallbackProjects: ProjectResponse[] = [
     id: 6,
     title: 'Tapicería Moderna',
     description: 'Plataforma de gestión para taller de tapicería. Seguimiento de pedidos e inventario.',
-    image_url: 'https://res.cloudinary.com/dxyk76jhu/image/upload/v1774103337/elrincondelharco/Captura_desde_2026-03-20_06-43-46.png',
+    image_urls: ['https://res.cloudinary.com/dxyk76jhu/image/upload/v1774103337/elrincondelharco/Captura_desde_2026-03-20_06-43-46.png'],
     tags: ['Vite', 'Neon', 'Django', 'Tailwind'],
     icon_name: 'Layers',
     color: 'from-amber-500/20 to-orange-600/20',
@@ -109,7 +122,7 @@ export const fallbackProjects: ProjectResponse[] = [
     id: 8,
     title: 'Módulo de Seguridad',
     description: 'Autenticación robusta con JWT y OAuth2 para aplicaciones FastAPI.',
-    image_url: 'https://res.cloudinary.com/dxyk76jhu/image/upload/v1776433683/elrincondelharco/Captura_desde_2026-04-17_14-53-54.png',
+    image_urls: ['https://res.cloudinary.com/dxyk76jhu/image/upload/v1776433683/elrincondelharco/Captura_desde_2026-04-17_14-53-54.png'],
     tags: ['FastAPI', 'JWT', 'Security'],
     icon_name: 'Lock',
     color: 'from-pink-500/20 to-rose-600/20',
@@ -120,7 +133,7 @@ export const fallbackProjects: ProjectResponse[] = [
     id: 7,
     title: 'CoreAppointment',
     description: 'Sistema modular de gestión de citas y turnos multi-tenant.',
-    image_url: 'https://res.cloudinary.com/dxyk76jhu/image/upload/v1776430358/elrincondelharco/Captura_desde_2026-04-17_14-51-45.png',
+    image_urls: ['https://res.cloudinary.com/dxyk76jhu/image/upload/v1776430358/elrincondelharco/Captura_desde_2026-04-17_14-51-45.png'],
     tags: ['FastAPI', 'Svelte', 'PostgreSQL'],
     icon_name: 'Calendar',
     color: 'from-blue-500/20 to-cyan-600/20',
@@ -131,7 +144,7 @@ export const fallbackProjects: ProjectResponse[] = [
     id: 9,
     title: 'Café Mi Tierra',
     description: 'Web corporativa para cafetería/bar con efectos visuales inmersivos (Three.js, GSAP), panel de administración completo, galería interactiva, horarios, reseñas y sistema de contacto.',
-    image_url: null,
+    image_urls: [],
     tags: ['Astro 7', 'Svelte 5', 'Three.js', 'GSAP', 'Hono.js', 'PostgreSQL'],
     icon_name: 'Coffee',
     color: 'from-amber-700/30 to-red-800/30',
@@ -142,7 +155,7 @@ export const fallbackProjects: ProjectResponse[] = [
     id: 10,
     title: 'Nanatha',
     description: 'Tienda online de moda femenina con catálogo inteligente, filtros avanzados por categoría/color/material, drops exclusivos y panel de administración.',
-    image_url: null,
+    image_urls: [],
     tags: ['Astro 7', 'Tailwind 4', 'Hono.js', 'Node.js'],
     icon_name: 'ShoppingBag',
     color: 'from-blush-400/30 to-rose-500/30',
@@ -153,7 +166,7 @@ export const fallbackProjects: ProjectResponse[] = [
     id: 11,
     title: 'miniCRM Ghogares',
     description: 'CRM inmobiliario inteligente con motor de matching automático. Integra scrapers de Fotocasa e Idealista para emparejar propiedades con contactos según presupuesto, ubicación y preferencias.',
-    image_url: null,
+    image_urls: [],
     tags: ['FastAPI', 'Python', 'SQLAlchemy', 'HTMX', 'SQLite'],
     icon_name: 'Building2',
     color: 'from-emerald-500/30 to-teal-600/30',
@@ -164,17 +177,95 @@ export const fallbackProjects: ProjectResponse[] = [
     id: 12,
     title: 'Scrapers Inmobiliarios',
     description: 'Sistema de scraping automático para portales inmobiliarios (Fotocasa e Idealista). Extracción programada de propiedades con normalización de datos y detección de cambios en tiempo real.',
-    image_url: null,
+    image_urls: [],
     tags: ['Python', 'Playwright', 'ETL', 'Automatización'],
     icon_name: 'Bot',
     color: 'from-violet-500/30 to-purple-700/30',
     demo_url: null,
     github_url: null,
   },
+  // ── Prototipos ─────────────────────────────────────────────
+  {
+    id: 13,
+    title: 'Landing Page Barbería',
+    description: 'Landing page moderna para centro de peluquería masculina con diseño elegante y reserva online.',
+    image_urls: [],
+    tags: ['HTML', 'CSS', 'JavaScript'],
+    icon_name: 'ExternalLink',
+    color: 'from-zinc-500/30 to-zinc-700/30',
+    demo_url: 'https://elrincondeharco-barberia.vercel.app/',
+    github_url: null,
+  },
+  {
+    id: 14,
+    title: 'SegurosConfianza',
+    description: 'Plataforma interactiva para gestionar pólizas de seguros, con diseño moderno y navegación eficiente.',
+    image_urls: [],
+    tags: ['HTML', 'CSS', 'JavaScript'],
+    icon_name: 'ExternalLink',
+    color: 'from-blue-500/30 to-indigo-600/30',
+    demo_url: 'https://prototipo-seguros-ten.vercel.app/',
+    github_url: null,
+  },
+  {
+    id: 15,
+    title: 'Gestión de Taller Mecánico Pro',
+    description: 'Sistema modular para administrar reparaciones y clientes, optimizado para flujos de trabajo eficientes.',
+    image_urls: [],
+    tags: ['HTML', 'CSS', 'JavaScript'],
+    icon_name: 'ExternalLink',
+    color: 'from-red-500/30 to-orange-600/30',
+    demo_url: 'https://prototipo-tallermecanico.vercel.app/',
+    github_url: null,
+  },
+  {
+    id: 16,
+    title: 'Prixline: Gestión de Logística Integral',
+    description: 'Sistema modular para el control de envíos y distribución, diseñado para optimizar la cadena de suministro logística.',
+    image_urls: [],
+    tags: ['HTML', 'CSS', 'JavaScript'],
+    icon_name: 'ExternalLink',
+    color: 'from-violet-500/30 to-purple-700/30',
+    demo_url: 'https://prototipo-prixline.vercel.app/',
+    github_url: null,
+  },
+  {
+    id: 17,
+    title: 'Gestión Gastronómica Inteligente',
+    description: 'Plataforma modular para administrar pedidos y reservas de restaurante, con interfaz moderna para mejorar la experiencia del comensal.',
+    image_urls: [],
+    tags: ['HTML', 'CSS', 'JavaScript'],
+    icon_name: 'ExternalLink',
+    color: 'from-amber-700/30 to-red-800/30',
+    demo_url: 'https://prototipo-restauran-dafni.vercel.app/',
+    github_url: null,
+  },
+  {
+    id: 18,
+    title: 'Gestión Clínica Especializada',
+    description: 'Sistema modular para la administración de consultas y pacientes, enfocado en eficiencia operativa y una interfaz clara y profesional.',
+    image_urls: [],
+    tags: ['HTML', 'CSS', 'JavaScript'],
+    icon_name: 'ExternalLink',
+    color: 'from-blue-500/30 to-cyan-600/30',
+    demo_url: 'https://prototipo-dctandrea.vercel.app/',
+    github_url: null,
+  },
+  {
+    id: 19,
+    title: 'Gestión Estética Modular',
+    description: 'Plataforma optimizada para la administración de citas y servicios de belleza, con interfaz intuitiva centrada en la experiencia del cliente.',
+    image_urls: [],
+    tags: ['HTML', 'CSS', 'JavaScript'],
+    icon_name: 'ExternalLink',
+    color: 'from-rose-500/30 to-pink-600/30',
+    demo_url: 'https://prototipo-beautycenter.vercel.app/',
+    github_url: null,
+  },
 ];
 
 // ────────────────────────────────────
-// SECTORS (6 rubros)
+// SECTORS (8 rubros)
 // ────────────────────────────────────
 export const fallbackSectors: SectorResponse[] = [
   {
@@ -185,7 +276,7 @@ export const fallbackSectors: SectorResponse[] = [
     icon_path: 'M17 8h1a4 4 0 1 1 0 8h-1 M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z',
     color_gradient: 'from-amber-700/30 to-red-800/30',
     sort_order: 1,
-    project_ids: [], // projects are matched by title in SectorProjects
+    project_ids: [9, 17],
   },
   {
     id: 2,
@@ -195,7 +286,7 @@ export const fallbackSectors: SectorResponse[] = [
     icon_path: 'M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2',
     color_gradient: 'from-emerald-500/30 to-teal-600/30',
     sort_order: 2,
-    project_ids: [],
+    project_ids: [11, 12],
   },
   {
     id: 3,
@@ -205,7 +296,7 @@ export const fallbackSectors: SectorResponse[] = [
     icon_path: 'M12 2 2 7l10 5 10-5-10-5Z m2 17 10 5 10-5',
     color_gradient: 'from-amber-500/20 to-orange-600/20',
     sort_order: 3,
-    project_ids: [],
+    project_ids: [6, 15],
   },
   {
     id: 4,
@@ -215,7 +306,7 @@ export const fallbackSectors: SectorResponse[] = [
     icon_path: 'M22 12h-4l-3 9L9 3l-3 9H2',
     color_gradient: 'from-blue-500/20 to-cyan-600/20',
     sort_order: 4,
-    project_ids: [],
+    project_ids: [18],
   },
   {
     id: 5,
@@ -225,16 +316,36 @@ export const fallbackSectors: SectorResponse[] = [
     icon_path: 'M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z',
     color_gradient: 'from-blush-400/30 to-rose-500/30',
     sort_order: 5,
-    project_ids: [],
+    project_ids: [10, 19],
   },
   {
     id: 6,
-    name: 'Logística',
-    client_name: 'Distribución',
-    description: 'Sistemas modulares de control de envíos.',
-    icon_path: 'M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
+    name: 'Soluciones',
+    client_name: 'Digitales',
+    description: 'Soluciones digitales a medida para optimizar procesos y potenciar tu negocio.',
+    icon_path: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z',
     color_gradient: 'from-violet-500/30 to-purple-700/30',
     sort_order: 6,
+    project_ids: [7, 8, 13, 14, 16],
+  },
+  {
+    id: 7,
+    name: 'Educación',
+    client_name: 'Plataformas Educativas',
+    description: 'Sistemas de gestión educativa, campus virtuales y plataformas de aprendizaje online.',
+    icon_path: 'M22 10v6M2 10l10-5 10 5-10 5zM6 12v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5',
+    color_gradient: 'from-blue-600/30 to-indigo-700/30',
+    sort_order: 7,
+    project_ids: [],
+  },
+  {
+    id: 8,
+    name: 'Comercio',
+    client_name: 'Tiendas y Retail',
+    description: 'Tiendas online, catálogos digitales y plataformas de comercio electrónico.',
+    icon_path: 'M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0',
+    color_gradient: 'from-yellow-500/30 to-orange-600/30',
+    sort_order: 8,
     project_ids: [],
   },
 ];
@@ -294,8 +405,14 @@ export const fallbackSiteSettings: SiteSettingsResponse = {
   social_networks: {
     github: 'https://github.com/hernanharco',
     linkedin: 'https://www.linkedin.com/in/hernan-harco/',
+    twitter: null,
   },
   is_active: true,
+  cta_title: '¿Listo para construir <span class="text-amber-400">algo grande</span>?',
+  cta_description: 'Tenés la idea, yo tengo la experiencia para hacerla realidad.\nTrabajemos juntos para crear una solución que marque la diferencia.',
+  cta_features: ['Respuesta en 24h', 'Presupuesto sin compromiso', 'Soporte post-entrega'],
+  cta_primary_text: 'Enviar Correo',
+  cta_secondary_text: 'LinkedIn',
 };
 
 // ────────────────────────────────────

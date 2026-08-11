@@ -45,14 +45,15 @@ services:
     restart: unless-stopped
     ports:
       - "8001:8000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      portfolio-db:
+        condition: service_healthy
     environment:
-      PGHOST: host.docker.internal
+      PGHOST: portfolio-db
       PGPORT: "5432"
-      PGUSER: postgres
-      PGPASSWORD: postgres
-      PGDATABASE: postgres
+      PGUSER: portfolio
+      PGPASSWORD: portfolio_dev
+      PGDATABASE: portfolio
       PGSCHEMA: elrincondeharco
       SECRET_KEY: dev-secret-key-no-usar-en-produccion
       ENVIRONMENT: development
@@ -65,6 +66,10 @@ services:
       AUTHCORE_JWKS_URL: "http://authcore-api:8000/.well-known/jwks.json"
       # Qué usuario de authCore es el dueño de esta landing page
       COMPANY_USER_ID: "1"
+      # Radar — clave para que el servicio Radar consulte datos
+      RADAR_API_KEY: "radar_dev_key_2026"
+      # WhatsApp Cloud API — token de verificación del webhook (dev)
+      WEBHOOK_VERIFY_TOKEN: "radar_harco_dev_2026"
     volumes:
       - ./backend/app:/app/app
       - ./backend/scripts:/app/scripts

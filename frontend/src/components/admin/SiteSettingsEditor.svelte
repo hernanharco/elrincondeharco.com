@@ -26,6 +26,13 @@
   let twitter_url = '';
   let is_active = true;
 
+  // CTA
+  let cta_title = '';
+  let cta_description = '';
+  let cta_features_str = '';
+  let cta_primary_text = '';
+  let cta_secondary_text = '';
+
   onMount(async () => {
     try {
       data = await fetchApi<SiteSettingsResponse>('/api/v1/site-settings/latest/');
@@ -39,6 +46,11 @@
       linkedin_url = data.social_networks?.linkedin || '';
       twitter_url = data.social_networks?.twitter || '';
       is_active = data.is_active;
+      cta_title = data.cta_title ?? '';
+      cta_description = data.cta_description ?? '';
+      cta_features_str = (data.cta_features ?? []).join('\n');
+      cta_primary_text = data.cta_primary_text ?? '';
+      cta_secondary_text = data.cta_secondary_text ?? '';
     } catch {
       message = 'Error al cargar los datos';
       messageType = 'error';
@@ -70,6 +82,12 @@
       };
       formData.append('social_networks', JSON.stringify(socialNetworks));
       formData.append('is_active', is_active.toString());
+      // CTA
+      formData.append('cta_title', cta_title);
+      formData.append('cta_description', cta_description);
+      formData.append('cta_features', JSON.stringify(cta_features_str.split('\n').map(s => s.trim()).filter(s => s)));
+      formData.append('cta_primary_text', cta_primary_text);
+      formData.append('cta_secondary_text', cta_secondary_text);
 
       const res = await fetch(`${API}/api/v1/site-settings/${data.id}`, {
         method: 'PUT',
@@ -275,6 +293,48 @@
                        focus:ring-amber-400 transition-colors"
                 placeholder="https://twitter.com/usuario"
               />
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ CTA (Call To Action) ═══ -->
+        <div class="space-y-4 p-6 rounded-xl bg-zinc-900/50 border border-zinc-800">
+          <h2 class="text-xl font-semibold text-amber-400 mb-4">Sección CTA (Contacto)</h2>
+          <p class="text-xs text-zinc-500 mb-4">Editá el contenido de la sección de contacto al final de la página.</p>
+
+          <div>
+            <label for="cta_title" class="block text-sm font-medium text-zinc-300 mb-2">Título (acepta HTML)</label>
+            <input id="cta_title" type="text" bind:value={cta_title}
+              class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-colors"
+              placeholder="¿Listo para construir algo grande?" />
+          </div>
+
+          <div>
+            <label for="cta_description" class="block text-sm font-medium text-zinc-300 mb-2">Descripción</label>
+            <textarea id="cta_description" bind:value={cta_description} rows={2}
+              class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-colors resize-none"
+              placeholder="Tenés la idea, yo tengo la experiencia..."></textarea>
+          </div>
+
+          <div>
+            <label for="cta_features" class="block text-sm font-medium text-zinc-300 mb-2">Características (una por línea)</label>
+            <textarea id="cta_features" bind:value={cta_features_str} rows={3}
+              class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-colors resize-none"
+              placeholder="Respuesta en 24h"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="cta_primary" class="block text-sm font-medium text-zinc-300 mb-2">Texto botón principal</label>
+              <input id="cta_primary" type="text" bind:value={cta_primary_text}
+                class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-colors"
+                placeholder="Enviar Correo" />
+            </div>
+            <div>
+              <label for="cta_secondary" class="block text-sm font-medium text-zinc-300 mb-2">Texto botón secundario</label>
+              <input id="cta_secondary" type="text" bind:value={cta_secondary_text}
+                class="w-full px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-colors"
+                placeholder="LinkedIn" />
             </div>
           </div>
         </div>

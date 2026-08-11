@@ -1,5 +1,5 @@
 ---
-// RecruiterProjects.astro — Proyectos técnicos con tags y links
+// RecruiterProjects.astro — Proyectos técnicos con métricas y links
 
 import { RECRUITER_PROJECTS } from '$lib/recruiter-data';
 ---
@@ -19,23 +19,26 @@ import { RECRUITER_PROJECTS } from '$lib/recruiter-data';
 
     <!-- Grid de proyectos -->
     <div class="grid md:grid-cols-2 gap-6">
-      {RECRUITER_PROJECTS.map((proj) => (
+      {RECRUITER_PROJECTS.map((proj) => {
+        const typeClass = proj.type === 'personal'
+          ? 'text-cyan-400 border-cyan-500/30 bg-cyan-500/5'
+          : proj.type === 'freelance'
+          ? 'text-amber-400 border-amber-500/30 bg-amber-500/5'
+          : 'text-blue-400 border-blue-500/30 bg-blue-500/5';
+        const typeLabel = proj.type === 'personal' ? 'Personal' : proj.type === 'freelance' ? 'Freelance' : 'Empresa';
+        return (
         <div class="group relative p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/20 transition-all duration-300">
           <!-- Tipo badge -->
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border" 
-              class:list={{
-                'text-cyan-400 border-cyan-500/30 bg-cyan-500/5': proj.type === 'personal',
-                'text-amber-400 border-amber-500/30 bg-amber-500/5': proj.type === 'freelance',
-                'text-blue-400 border-blue-500/30 bg-blue-500/5': proj.type === 'empresa',
-              }}>
-              {proj.type === 'personal' ? 'Personal' : proj.type === 'freelance' ? 'Freelance' : 'Empresa'}
+            <span class={"text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border " + typeClass}>
+              {typeLabel}
             </span>
           </div>
 
-          <!-- Title -->
+          <!-- Title + icon si tiene demo -->
           <h3 class="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
             {proj.title}
+            {proj.demo && <span class="ml-2 text-[9px] text-green-400/70 align-middle">● live</span>}
           </h3>
 
           <!-- Description -->
@@ -52,8 +55,8 @@ import { RECRUITER_PROJECTS } from '$lib/recruiter-data';
             ))}
           </div>
 
-          <!-- Links -->
-          <div class="flex gap-3">
+          <!-- Links + métricas -->
+          <div class="flex items-center gap-4">
             {proj.github && (
               <a href={proj.github} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-cyan-400 transition-colors">
                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -66,9 +69,14 @@ import { RECRUITER_PROJECTS } from '$lib/recruiter-data';
                 Demo
               </a>
             )}
+            <!-- Indicador de tipo -->
+            <span class="ml-auto text-[10px] text-gray-600">
+              {proj.type === 'freelance' ? '💰 Cliente real' : proj.type === 'personal' ? '🔧 Proyecto propio' : '🏢 Empresa'}
+            </span>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   </div>
 </section>

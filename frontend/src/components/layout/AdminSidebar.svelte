@@ -22,11 +22,13 @@
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: 'lucide:layout-dashboard' },
     { href: '/admin/hero', label: 'Hero', icon: 'lucide:sparkles' },
+    { href: '/admin/experience', label: 'Experiencia', icon: 'lucide:briefcase' },
     { href: '/admin/projects', label: 'Proyectos', icon: 'lucide:folder-kanban' },
     { href: '/admin/sectors', label: 'Sectores', icon: 'lucide:layout-list' },
     { href: '/admin/testimonials', label: 'Testimonios', icon: 'lucide:message-square-quote' },
-    { href: '/admin/showroom', label: 'Showroom', icon: 'lucide:rocket' },
     { href: '/admin/site-settings', label: 'Configuración', icon: 'lucide:settings' },
+    { type: 'divider' },
+    { href: '/admin/radar', label: 'Radar', icon: 'lucide:satellite-dish' },
   ];
 
   function isActive(href: string): boolean {
@@ -83,38 +85,42 @@
   <!-- Links de navegación -->
   <nav class="flex-1 py-4 space-y-1 px-2">
     {#each navItems as item}
-      {@const active = isActive(item.href)}
-      <div class="relative group">
-        <a
-          href={item.href}
-          class="
-            flex items-center gap-3 px-2 py-2.5 rounded-lg
-            transition-all duration-200 border-l-2
-            {active
-            ? 'bg-zinc-800 text-amber-400 border-amber-400'
-            : 'text-zinc-400 hover:bg-zinc-800 hover:text-amber-400 border-transparent'}
-            {collapsed ? 'justify-center' : ''}
-          "
-        >
-          <Icon icon={item.icon} width={18} height={18} class="flex-shrink-0" />
-          {#if !collapsed}
-            <span class="text-sm font-medium truncate">{item.label}</span>
-          {/if}
-        </a>
-
-        {#if collapsed}
-          <span
+      {#if item.type === 'divider'}
+        <div class="h-px bg-zinc-800 my-2 mx-2"></div>
+      {:else}
+        {@const active = isActive(item.href)}
+        <div class="relative group">
+          <a
+            href={item.href}
             class="
-              absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1
-              rounded-md bg-zinc-800 text-zinc-100 text-xs whitespace-nowrap
-              opacity-0 group-hover:opacity-100 pointer-events-none
-              transition-opacity duration-150 z-50
+              flex items-center gap-3 px-2 py-2.5 rounded-lg
+              transition-all duration-200 border-l-2
+              {active
+              ? 'bg-zinc-800 text-amber-400 border-amber-400'
+              : 'text-zinc-400 hover:bg-zinc-800 hover:text-amber-400 border-transparent'}
+              {collapsed ? 'justify-center' : ''}
             "
           >
-            {item.label}
-          </span>
-        {/if}
-      </div>
+            <Icon icon={item.icon} width={18} height={18} class="flex-shrink-0" />
+            {#if !collapsed}
+              <span class="text-sm font-medium truncate">{item.label}</span>
+            {/if}
+          </a>
+
+          {#if collapsed}
+            <span
+              class="
+                absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1
+                rounded-md bg-zinc-800 text-zinc-100 text-xs whitespace-nowrap
+                opacity-0 group-hover:opacity-100 pointer-events-none
+                transition-opacity duration-150 z-50
+              "
+            >
+              {item.label}
+            </span>
+          {/if}
+        </div>
+      {/if}
     {/each}
   </nav>
 

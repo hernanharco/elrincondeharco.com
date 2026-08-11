@@ -1,0 +1,117 @@
+---
+// RecruiterMethod.astro — Cómo trabajo: metodología visual
+// Muestra el proceso de trabajo en 6 pasos con un timeline horizontal.
+---
+
+<section class="recruiter-section py-24 bg-[var(--recruiter-bg)] border-t border-[var(--recruiter-border)]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Metodología</p>
+      <h2 class="text-3xl md:text-5xl font-bold text-white">
+        Cómo <span class="text-cyan-400">trabajo</span>
+      </h2>
+      <p class="text-gray-500 max-w-xl mx-auto mt-4 text-lg">
+        De la idea a la producción. Un proceso claro, sin sorpresas.
+      </p>
+    </div>
+
+    <!-- Timeline horizontal de pasos -->
+    <div class="relative">
+      <!-- Línea conectora -->
+      <div class="absolute top-12 left-[10%] right-[10%] h-px bg-gradient-to-r from-cyan-500/50 via-blue-500/30 to-transparent hidden md:block"></div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Paso 1 -->
+        <div class="text-center group">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-all duration-300">
+            <span class="text-2xl">🎯</span>
+          </div>
+          <span class="text-[10px] text-cyan-400 font-bold tracking-widest">01</span>
+          <h3 class="text-white font-bold mt-2 mb-1">Reunión inicial</h3>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Escucho tu idea, entiendo tu negocio y definimos objetivos claros. Sin jerga técnica, sin vueltas.
+          </p>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="text-center group">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/20 transition-all duration-300">
+            <span class="text-2xl">📋</span>
+          </div>
+          <span class="text-[10px] text-blue-400 font-bold tracking-widest">02</span>
+          <h3 class="text-white font-bold mt-2 mb-1">Planificación</h3>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Defino alcance, tecnologías, tiempos y presupuesto. Te explico las opciones y elegimos juntos.
+          </p>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="text-center group">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/20 transition-all duration-300">
+            <span class="text-2xl">⚡</span>
+          </div>
+          <span class="text-[10px] text-amber-400 font-bold tracking-widest">03</span>
+          <h3 class="text-white font-bold mt-2 mb-1">Desarrollo</h3>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Construyo la solución con entregas parciales cada semana. Siempre sabés cómo va el proyecto.
+          </p>
+        </div>
+
+        <!-- Paso 4 -->
+        <div class="text-center group">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/20 transition-all duration-300">
+            <span class="text-2xl">🧪</span>
+          </div>
+          <span class="text-[10px] text-purple-400 font-bold tracking-widest">04</span>
+          <h3 class="text-white font-bold mt-2 mb-1">Testing</h3>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Pruebo cada funcionalidad antes de mostrártela. Tests automáticos + revisión manual.
+          </p>
+        </div>
+
+        <!-- Paso 5 -->
+        <div class="text-center group">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center group-hover:bg-green-500/20 transition-all duration-300">
+            <span class="text-2xl">🚀</span>
+          </div>
+          <span class="text-[10px] text-green-400 font-bold tracking-widest">05</span>
+          <h3 class="text-white font-bold mt-2 mb-1">Deploy</h3>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Publico la solución en producción. DNS, SSL, servidores, todo configurado y funcionando.
+          </p>
+        </div>
+
+        <!-- Paso 6 -->
+        <div class="text-center group">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-all duration-300">
+            <span class="text-2xl">💚</span>
+          </div>
+          <span class="text-[10px] text-cyan-400 font-bold tracking-widest">06</span>
+          <h3 class="text-white font-bold mt-2 mb-1">Soporte</h3>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            No desaparezco después de entregar. Estoy al pie del cañón para ajustes, dudas y mejoras.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Value props -->
+    <div class="mt-20 grid md:grid-cols-3 gap-6">
+      <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] text-center group hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-2">⏱️</div>
+        <h4 class="text-white font-semibold text-sm mb-1">Respuesta en 24h</h4>
+        <p class="text-gray-500 text-xs">Consultas respondidas en menos de un día hábil. Siempre.</p>
+      </div>
+      <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] text-center group hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-2">💰</div>
+        <h4 class="text-white font-semibold text-sm mb-1">Presupuesto sin compromiso</h4>
+        <p class="text-gray-500 text-xs">Te cotizo el proyecto antes de empezar. Sin cargos ocultos.</p>
+      </div>
+      <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] text-center group hover:border-cyan-500/20 transition-all">
+        <div class="text-3xl mb-2">🔧</div>
+        <h4 class="text-white font-semibold text-sm mb-1">Soporte post-entrega</h4>
+        <p class="text-gray-500 text-xs">Seguimiento después del deploy. No te dejo colgado.</p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -6,7 +6,7 @@ El login es proxy inverso hacia authCore; la cookie httpOnly la setea Portfolio.
 import logging
 from typing import Dict, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel
 
 from app.core.config import settings
@@ -18,9 +18,11 @@ router = APIRouter()
 
 # ── Schemas ───────────────────────────────────────────────────
 
+
 class LoginRequest(BaseModel):
     username: str
     password: str
+
 
 class UserResponse(BaseModel):
     id: int
@@ -31,11 +33,13 @@ class UserResponse(BaseModel):
     status: str
     is_active: bool
 
+
 class LoginResponse(BaseModel):
     user: UserResponse
 
 
 # ── Endpoints ─────────────────────────────────────────────────
+
 
 @router.post("/login")
 async def login(
@@ -46,13 +50,17 @@ async def login(
     Proxy inverso a authCore: valida credenciales y setea cookie httpOnly.
     El frontend NUNCA ve el JWT — solo confía en la cookie.
     """
-    authcore_url = f"{settings.authcore_jwks_url.removesuffix('/.well-known/jwks.json')}/api/v1/auth/login"
+    authcore_base = settings.authcore_jwks_url.removesuffix("/.well-known/jwks.json")
+    authcore_url = f"{authcore_base}/api/v1/auth/login"
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
             auth_resp = await client.post(
                 authcore_url,
-                json={"username": credentials.username, "password": credentials.password},
+                json={
+                    "username": credentials.username,
+                    "password": credentials.password,
+                },
             )
 
             if auth_resp.status_code != 200:
@@ -145,6 +153,65 @@ async def set_session(
             "full_name": payload.get("full_name", ""),
             "role": payload.get("role", ""),
             "status": payload.get("status", "active"),
+            "is_active": True,
+        }
+    }
+
+
+@router.post("/dev-login")
+async def dev_login(response: Response):
+    """
+    Login de desarrollo — SOLO disponible cuando DEBUG=true.
+    Genera un JWT local sin depender de authCore.
+    Útil para desarrollo cuando authCore no está corriendo.
+    """
+    if not settings.debug:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Este endpoint solo está disponible en modo desarrollo",
+        )
+
+    from datetime import datetime, timedelta, timezone
+    from jose import jwt as jose_jwt
+
+    now = datetime.now(timezone.utc)
+    expires_delta = timedelta(hours=24)
+
+    payload = {
+        "sub": "1",
+        "id": 1,
+        "username": "dev",
+        "email": "dev@localhost",
+        "full_name": "Desarrollador Local",
+        "role": "SUPERADMIN",
+        "status": "active",
+        "is_active": True,
+        "iat": now,
+        "exp": now + expires_delta,
+    }
+
+    token = jose_jwt.encode(payload, settings.secret_key, algorithm="HS256")
+
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        max_age=int(expires_delta.total_seconds()),
+        path="/",
+        samesite="lax",
+        secure=False,  # local siempre http
+    )
+
+    logging.info("✅ Dev login exitoso (bypass authCore)")
+
+    return {
+        "user": {
+            "id": 1,
+            "username": "dev",
+            "email": "dev@localhost",
+            "full_name": "Desarrollador Local",
+            "role": "SUPERADMIN",
+            "status": "active",
             "is_active": True,
         }
     }

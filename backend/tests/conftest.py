@@ -37,9 +37,9 @@ async def test_db():
     # Create tables
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield TestSessionLocal
-    
+
     # Drop tables
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -61,15 +61,16 @@ async def db_session(test_db):
 @pytest.fixture
 async def client(db_session):
     """Create a test client with database dependency override."""
+
     # Override the get_db dependency
     async def override_get_db():
         yield db_session
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
-    
+
     # Clean up
     app.dependency_overrides.clear()
 
@@ -78,7 +79,7 @@ async def client(db_session):
 async def sample_hero(db_session):
     """Create a sample hero for testing."""
     from app.models.hero import Hero
-    
+
     hero = Hero(
         title="Test Hero",
         subtitle="Test Subtitle",
@@ -89,11 +90,11 @@ async def sample_hero(db_session):
         image_url="https://example.com/hero.jpg",
         cv_url="https://example.com/cv.pdf",
     )
-    
+
     db_session.add(hero)
     await db_session.commit()
     await db_session.refresh(hero)
-    
+
     return hero
 
 
@@ -101,19 +102,19 @@ async def sample_hero(db_session):
 async def sample_project(db_session):
     """Create a sample project for testing."""
     from app.models.projects import Project
-    
+
     project = Project(
         title="Test Project",
         description="Test Description",
         tags=["Test", "Project"],
         icon_name="TestIcon",
-        color="from-test-500/20"
+        color="from-test-500/20",
     )
-    
+
     db_session.add(project)
     await db_session.commit()
     await db_session.refresh(project)
-    
+
     return project
 
 
@@ -121,7 +122,7 @@ async def sample_project(db_session):
 async def sample_site_settings(db_session):
     """Create sample site settings for testing."""
     from app.models.site_settings import SiteSettings
-    
+
     settings = SiteSettings(
         brand_name="Test Brand",
         site_url="https://test.com",
@@ -130,11 +131,29 @@ async def sample_site_settings(db_session):
         copyright_notice="© Test",
         contact_email="test@test.com",
         social_networks={},
-        is_active=True
+        is_active=True,
     )
-    
+
     db_session.add(settings)
     await db_session.commit()
     await db_session.refresh(settings)
-    
+
     return settings
+
+
+@pytest.fixture
+async def sample_experience(db_session):
+    """Create a sample experience section for testing."""
+    from app.models.experience import ExperienceSection
+
+    exp = ExperienceSection(
+        tagline="Test Experience",
+        title="Test <span>Title</span>",
+        description="Test description",
+    )
+
+    db_session.add(exp)
+    await db_session.commit()
+    await db_session.refresh(exp)
+
+    return exp

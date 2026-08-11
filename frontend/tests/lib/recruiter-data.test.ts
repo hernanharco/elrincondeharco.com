@@ -61,6 +61,8 @@ describe('RecruiterData Types', () => {
       projects: [],
       servers: [],
       metrics: [],
+      timeline: [],
+      certifications: [],
     };
     expect(data.name).toBe('Hernan Arango');
   });
