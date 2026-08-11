@@ -48,7 +48,9 @@ try {
   // ── SSO embebido: pasar el token al iframe por postMessage ──
   // Enviamos el token de inmediato Y también en cada 'load' (por si el
   // iframe recarga). El Radar escucha el mensaje y lo usa como sesión.
-  const frame = document.getElementById('radar-frame') as HTMLIFrameElement | null;
+  // NOTA: este script se inlinea tal cual (define:vars) — solo JS válido,
+  // nada de TypeScript (as, tipos, etc.).
+  const frame = document.getElementById('radar-frame');
 
   if (frame && radarToken) {
     const sendToken = () => {
@@ -60,7 +62,7 @@ try {
       }
     };
 
-    // 1. Si el iframe ya cargó (completeState >= 1), enviar ahora.
+    // 1. Si el iframe ya cargó, enviar ahora.
     // 2. Si no, esperar el evento load.
     if (frame.contentWindow) sendToken();
     frame.addEventListener('load', sendToken);
