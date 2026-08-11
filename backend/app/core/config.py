@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     # Radar — API key para que el servicio Radar pueda consultar datos
     radar_api_key: str = Field("", alias="RADAR_API_KEY")
 
+    # Radar SSO (modo embebido) — URL del backend del Radar y su password
+    # para obtener un token sin pedir login al usuario del CRM.
+    radar_api_url: str = Field("", alias="RADAR_API_URL")
+    radar_api_password: str = Field("", alias="RADAR_API_PASSWORD")
+
     # WhatsApp Cloud API — token de verificación del webhook
     webhook_verify_token: str = Field("", alias="WEBHOOK_VERIFY_TOKEN")
 

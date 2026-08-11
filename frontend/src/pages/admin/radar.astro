@@ -4,13 +4,14 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
 const currentPath = Astro.url.pathname;
 
-// URL del frontend de Radar (Vite proxy → backend :3005)
+// URL del frontend de Radar (Vercel en producción, Vite proxy en local)
 const RADAR_URL = import.meta.env.PUBLIC_RADAR_URL || 'http://localhost:5174';
 ---
 
 <AdminLayout title="Radar — WhatsApp" currentPath={currentPath}>
   <div class="h-[calc(100vh-5rem)] w-full rounded-xl overflow-hidden border border-zinc-800">
     <iframe
+      id="radar-frame"
       src={RADAR_URL}
       class="w-full h-full bg-white"
       title="Radar — Asistente WhatsApp"
@@ -18,3 +19,41 @@ const RADAR_URL = import.meta.env.PUBLIC_RADAR_URL || 'http://localhost:5174';
     />
   </div>
 </AdminLayout>
+
+<script>
+  // ── SSO embebido: Radar no pide login ──────────────────────
+  // 1. El CRM ya está autenticado (cookie authCore válida).
+  // 2. Pedimos un token del Radar a nuestro backend (/api/v1/radar/token),
+  //    que valida nuestra sesión y hace login al Radar con su password.
+  // 3. Se lo pasamos al iframe por postMessage — Radar lo usa y entra
+  //    sin mostrar la pantalla de login.
+  const frame = document.getElementById('radar-frame') as HTMLIFrameElement | null;
+
+  async function fetchRadarToken(): Promise<string | null> {
+    try {
+      const base = (import.meta as any).env?.PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${base}/api/v1/radar/token`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.token || null;
+    } catch {
+      return null;
+    }
+  }
+
+  if (frame) {
+    // Cuando el iframe carga, pedir el token y enviarlo
+    frame.addEventListener('load', async () => {
+      const token = await fetchRadarToken();
+      if (token && frame.contentWindow) {
+        frame.contentWindow.postMessage(
+          { type: 'radar-auth', token },
+          '*',
+        );
+      }
+    });
+  }
+</script>

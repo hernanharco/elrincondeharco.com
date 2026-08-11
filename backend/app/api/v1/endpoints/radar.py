@@ -8,12 +8,17 @@ en su backend para que el asistente pueda consultar datos del negocio.
 Radar llama:
   GET /api/v1/radar/search?q=desarrollo+web
   Header: X-API-Key: <clave_compartida>
+
+Además expone /api/v1/radar/token: un endpoint SSO para el modo embebido.
+El CRM (ya autenticado) pide un token del Radar y se lo pasa al iframe
+por postMessage, evitando un segundo login.
 """
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_, cast, String
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from app.db.session import get_db
 from app.models.projects import Project
@@ -27,6 +32,7 @@ from app.schemas.radar import (
     RadarOverviewItem,
 )
 from app.core.config import settings
+from app.core.security import get_current_admin_user
 
 router = APIRouter()
 
@@ -158,3 +164,40 @@ async def overview(
         sectors=sectors,
         showroom=showroom,
     )
+
+
+@router.get("/token")
+async def radar_token(
+    current_user: Dict[str, Any] = Depends(get_current_admin_user),
+):
+    """
+    SSO para el modo embebido: devuelve un token del Radar para que el
+    iframe cargue sin pedir login. Protegido por la auth del CRM
+    (cookie authCore válida).
+    """
+    api_url = settings.radar_api_url
+    api_password = settings.radar_api_password
+    if not api_url or not api_password:
+        raise HTTPException(
+            status_code=503,
+            detail="Radar SSO not configured (RADAR_API_URL / RADAR_API_PASSWORD)",
+        )
+
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(
+                f"{api_url}/api/auth/login",
+                json={"password": api_password},
+            )
+        if resp.status_code != 200:
+            raise HTTPException(
+                status_code=502,
+                detail=f"Radar login failed: HTTP {resp.status_code}",
+            )
+        data = resp.json()
+        token = data.get("token")
+        if not token:
+            raise HTTPException(status_code=502, detail="Radar login returned no token")
+        return {"token": token}
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"Radar unreachable: {exc}") from exc
