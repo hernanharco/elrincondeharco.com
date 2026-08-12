@@ -75,6 +75,7 @@ services:
         condition: service_healthy
     networks:
       - elrincondeharco_net
+      - radar_default
     deploy:
       resources:
         limits:
@@ -88,3 +89,6 @@ networks:
   elrincondeharco_net:
     external: true
     name: elrincondeharco_net
+  radar_default:
+    external: true
+    name: radar_default
