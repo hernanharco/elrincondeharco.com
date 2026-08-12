@@ -396,7 +396,7 @@ export const fallbackFooter: FooterResponse = {
 export const fallbackSiteSettings: SiteSettingsResponse = {
   id: 3,
   brand_name: 'elrincondeharco.com',
-  site_url: 'https://elrincondeharco.com/',
+  site_url: 'https://www.rincom.es/',
   legal_name: 'Hernan Arango Cortes',
   slogan:
     'Programador Full Stack enfocado en velocidad y rendimiento. Creando el futuro de la web desde Asturias para el mundo.',

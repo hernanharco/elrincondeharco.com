@@ -164,7 +164,7 @@ Este proyecto está bajo licencia MIT - ver [LICENSE](LICENSE) para detalles.
 ## 📞 Contacto
 
 - Email: hernan@elrincondeharco.com
-- Web: [elRincondeHarco.com](https://elrincondeharco.com)
+- Web: [elRincondeHarco.com](https://www.rincom.es)
 
 ---
 

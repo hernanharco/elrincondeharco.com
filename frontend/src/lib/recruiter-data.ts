@@ -145,7 +145,7 @@ export const RECRUITER_PROJECTS: RecruiterProject[] = [
     description: 'Landing page + CRM personal con panel admin, sectores, proyectos y testimonios. Efectos 3D con Three.js y GSAP.',
     tags: ['Astro', 'Svelte', 'Three.js', 'GSAP', 'FastAPI', 'Docker'],
     github: 'https://github.com/hernanharco/portfolio',
-    demo: 'https://www.elrincondeharco.com/',
+    demo: 'https://www.rincom.es/',
     type: 'personal',
   },
   {

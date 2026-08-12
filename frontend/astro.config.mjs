@@ -17,6 +17,7 @@ if (process.env.VERCEL) {
 
 export default defineConfig({
   output: 'static',
+  site: 'https://www.rincom.es',
   ...(adapter ? { adapter } : {}),
   integrations: [svelte()],
   server: {

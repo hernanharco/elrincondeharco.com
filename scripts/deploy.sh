@@ -39,7 +39,8 @@ TOTAL=6
 # ── Paso 1: Build + Vercel ──────────────────────────────────────
 echo -e "${YELLOW}[1/$TOTAL]${NC} Deploy frontend a Vercel..."
 cd frontend
-PUBLIC_API_URL="https://api.elrincondeharco.com" \
+VERCEL=1 \
+  PUBLIC_API_URL="https://api.elrincondeharco.com" \
   SSR_API_URL="https://api.elrincondeharco.com" \
   pnpm build 2>&1 | tail -5
 vercel --prod --yes 2>&1 | tail -3
@@ -96,7 +97,7 @@ echo -e "${YELLOW}[6/$TOTAL]${NC} Verificar deploy..."
 sleep 5
 HEALTH=$(curl -s --max-time 5 "https://api.elrincondeharco.com/" 2>/dev/null || echo '{"message": "checking..."}')
 echo -e "  ${CYAN}🔧${NC} Backend:  https://api.elrincondeharco.com"
-echo -e "  ${CYAN}🌐${NC} Frontend: https://www.elrincondeharco.com"
+echo -e "  ${CYAN}🌐${NC} Frontend: https://www.rincom.es"
 echo -e "  ${CYAN}📊${NC} API:      $HEALTH"
 echo ""
 

@@ -16,11 +16,11 @@ export interface Props {
 const {
   title = 'Hernan Arango Cortes — Soluciones Digitales para tu Negocio',
   description = 'Desarrollador web en Asturias. Creo sitios web profesionales, tiendas online y sistemas a medida para negocios.',
-  image = 'https://elrincondeharco.com/logo.jpg',
+  image = 'https://www.rincom.es/logo.jpg',
 } = Astro.props;
 
 const canonicalUrl = Astro.url;
-const ogImage = image && (image.startsWith('http') ? image : `https://elrincondeharco.com${image}`);
+const ogImage = image && (image.startsWith('http') ? image : `https://www.rincom.es${image}`);
 ---
 
 <!DOCTYPE html>

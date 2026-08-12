@@ -34,7 +34,7 @@ async def seed_site_settings(db):
     await db.execute(delete(SiteSettings))
     item = SiteSettings(
         brand_name="elRincondelHarco.com",
-        site_url="https://elrincondeharco.com",
+        site_url="https://www.rincom.es",
         legal_name="Hernan Arango Cortes",
         slogan="Programador Full Stack enfocado en velocidad y rendimiento.",
         copyright_notice="© 2026 Todos los derechos reservados.",
@@ -451,7 +451,7 @@ async def seed_showrooms(db):
                 "para rendimiento máximo."
             ),
             category="Portfolio",
-            deploy_url="https://elrincondeharco.com",
+            deploy_url="https://www.rincom.es",
         ),
     ]
     db.add_all(items)
