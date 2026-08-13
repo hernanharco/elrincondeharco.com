@@ -1,22 +1,46 @@
 <svelte:options runes={false} />
 
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import Icon from '@iconify/svelte';
 
   export let currentPath: string = '';
 
   let collapsed = false;
+  let mobileOpen = false;
 
+  // En móvil el sidebar es un drawer overlay; en desktop mantiene el
+  // comportamiento expandido/colapsado con el botón chevron.
   onMount(() => {
     collapsed = window.innerWidth < 768;
-    window.addEventListener('resize', () => {
-      if (window.innerWidth < 768) collapsed = true;
-    });
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('admin:sidebar-open', handleOpenEvent);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('admin:sidebar-open', handleOpenEvent);
+    };
   });
+
+  function handleResize() {
+    if (window.innerWidth < 768) {
+      collapsed = true;
+      mobileOpen = false;
+    } else {
+      mobileOpen = false;
+    }
+  }
+
+  // El header móvil (AdminLayout) dispara este evento al tocar ☰.
+  function handleOpenEvent() {
+    mobileOpen = true;
+  }
 
   function toggle() {
     collapsed = !collapsed;
+  }
+
+  function closeMobile() {
+    mobileOpen = false;
   }
 
   const navItems = [
@@ -37,17 +61,32 @@
   }
 </script>
 
+<!-- ── Móvil: backdrop del drawer ─────────────────────────────── -->
+{#if mobileOpen}
+  <div
+    class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+    role="presentation"
+    on:click={closeMobile}
+  ></div>
+{/if}
+
+<!-- ── Sidebar ───────────────────────────────────────────────────
+     Móvil: fixed + translate-x (drawer). Desktop: relative en flujo. -->
 <aside
+  class:translate-x-0={mobileOpen}
   class="
-    relative flex flex-col bg-zinc-900 border-r border-zinc-800
-    transition-all duration-300 min-h-screen
-    {collapsed ? 'w-16' : 'w-60'}
+    z-50 flex flex-col bg-zinc-900
+    transition-all duration-300
+    fixed inset-y-0 left-0 w-72 -translate-x-full md:translate-x-0
+    md:relative md:inset-auto md:w-auto md:min-h-screen md:shadow-none
+    {collapsed ? 'md:w-16' : 'md:w-60'}
   "
 >
-  <!-- Botón toggle -->
+  <!-- Botón toggle (solo desktop) -->
   <button
     on:click={toggle}
     class="
+      hidden md:block
       absolute -right-3 top-6 z-10
       bg-zinc-800 border border-zinc-700 rounded-full p-1
       text-zinc-400 hover:text-amber-400 hover:border-amber-400
@@ -62,6 +101,18 @@
     {/if}
   </button>
 
+  <!-- Botón cerrar (solo móvil) -->
+  <button
+    on:click={closeMobile}
+    class="
+      md:hidden absolute top-5 right-4 z-10
+      text-zinc-400 hover:text-white text-xl
+    "
+    aria-label="Cerrar menú"
+  >
+    ✕
+  </button>
+
   <!-- Logo / nombre del sitio -->
   <div class="flex items-center gap-3 px-4 py-5 border-b border-zinc-800">
     <div
@@ -74,7 +125,7 @@
     >
       H
     </div>
-    {#if !collapsed}
+    {#if !collapsed || mobileOpen}
       <div class="overflow-hidden">
         <p class="text-sm font-semibold text-zinc-100 truncate">El Rincón de Harco</p>
         <p class="text-xs text-zinc-500">Panel admin</p>
@@ -102,12 +153,12 @@
             "
           >
             <Icon icon={item.icon} width={18} height={18} class="flex-shrink-0" />
-            {#if !collapsed}
+            {#if !collapsed || mobileOpen}
               <span class="text-sm font-medium truncate">{item.label}</span>
             {/if}
           </a>
 
-          {#if collapsed}
+          {#if collapsed && !mobileOpen}
             <span
               class="
                 absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1
@@ -129,6 +180,7 @@
     <div class="relative group">
       <a
         href="/"
+        on:click={closeMobile}
         class="
           flex items-center gap-3 px-2 py-2.5 rounded-lg
           text-zinc-400 hover:bg-zinc-800 hover:text-amber-400
@@ -137,12 +189,12 @@
         "
       >
         <Icon icon="lucide:external-link" width={18} height={18} class="flex-shrink-0" />
-        {#if !collapsed}
+        {#if !collapsed || mobileOpen}
           <span class="text-sm font-medium">Volver al sitio</span>
         {/if}
       </a>
 
-      {#if collapsed}
+      {#if collapsed && !mobileOpen}
         <span
           class="
             absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1
