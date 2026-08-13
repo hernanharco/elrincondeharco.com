@@ -68,8 +68,17 @@ services:
       # WhatsApp Cloud API — token de verificación del webhook
       WEBHOOK_VERIFY_TOKEN: ${WEBHOOK_VERIFY_TOKEN}
 
+      # Radar CRM — clave compartida del endpoint /api/v1/radar/search
+      RADAR_API_KEY: ${RADAR_API_KEY}
+
+      # Radar SSO (modo embebido) — token sin login
+      RADAR_API_URL: ${RADAR_API_URL}
+      RADAR_API_PASSWORD: ${RADAR_API_PASSWORD}
+
       # CORS — frontend en Vercel
       CORS_ORIGINS: ${CORS_ORIGINS}
+    extra_hosts:
+      - host.docker.internal:host-gateway
     depends_on:
       postgres:
         condition: service_healthy
