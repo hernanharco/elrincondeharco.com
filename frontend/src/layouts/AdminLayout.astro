@@ -65,6 +65,28 @@ const { title, currentPath = '' } = Astro.props;
       // funcionando: este listener solo cancela la navegación por defecto.
       document.addEventListener('dragover', (e) => e.preventDefault());
       document.addEventListener('drop', (e) => e.preventDefault());
+
+      // FIX CRÍTICO: los fetch() crudos de los editores (PUT/POST/DELETE) no
+      // mandaban la cookie httpOnly access_token porque omitían
+      // credentials: 'include'. En producción el admin (www.rincom.es) y la
+      // API (api.elrincondeharco.com) son cross-origin, así que la cookie no
+      // viajaba y el backend respondía 401. Este interceptor agrega
+      // credentials por defecto a cualquier fetch contra la API que no lo
+      // especifique explícitamente (login y fetchApi ya lo hacen).
+      const API_BASE = import.meta.env.PUBLIC_API_URL || '';
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = (input, init) => {
+        init = init || {};
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+        if (
+          init.credentials === undefined &&
+          API_BASE &&
+          url.startsWith(API_BASE)
+        ) {
+          init.credentials = 'include';
+        }
+        return originalFetch(input, init);
+      };
     </script>
   </body>
 </html>
