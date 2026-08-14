@@ -44,7 +44,7 @@
     Promise.allSettled([
       fetchApi<ProjectResponse[]>('/api/v1/projects/'),
       fetchApi<SectorResponse[]>('/api/v1/sectors/'),
-      fetchApi<TestimonialResponse[]>('/api/v1/testimonials/all/'),
+      fetchApi<TestimonialResponse[]>('/api/v1/testimonials/all'),
       fetchApi<ShowroomResponse[]>('/api/v1/showrooms/'),
       fetchApi<StackResponse[]>('/api/v1/stacks/'),
       fetchApi<HeroResponse>('/api/v1/heroes/latest/'),

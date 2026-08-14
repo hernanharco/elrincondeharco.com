@@ -68,5 +68,7 @@ else
 fi
 
 # 4. Lanzar Aplicación
+# --proxy-headers: confía en X-Forwarded-Proto del túnel (Cloudflare) para
+# que los redirects usen https y no degraden a http (evita mixed content).
 echo "🚀 Iniciando servidor FastAPI..."
-exec python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+exec python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'

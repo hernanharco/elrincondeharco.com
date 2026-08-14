@@ -57,5 +57,8 @@ except Exception as e:
 "
 
 # 3. Arrancar uvicorn con hot-reload
+# --proxy-headers: confía en X-Forwarded-Proto del túnel (Cloudflare) para
+# que los redirects (ej: /all/ -> /all) usen https y no degraden a http
+# (evita bloqueo de mixed content desde la web https).
 echo "🚀 Iniciando servidor FastAPI en modo desarrollo (hot-reload)..."
-exec python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+exec python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'
