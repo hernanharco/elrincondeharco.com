@@ -1,4 +1,10 @@
 {
   "buildCommand": "cd frontend && pnpm build",
-  "framework": "astro"
+  "framework": "astro",
+  "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "https://api.elrincondeharco.com/api/v1/:path*"
+    }
+  ]
 }
