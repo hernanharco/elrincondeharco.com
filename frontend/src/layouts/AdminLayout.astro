@@ -23,14 +23,40 @@ const { title, currentPath = '' } = Astro.props;
     />
   </head>
   <body class="bg-zinc-950 text-zinc-100 font-[Inter]">
+    <!-- Header móvil: solo visible <768px. Abre el drawer del sidebar. -->
+    <header class="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 h-14 bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-800">
+      <button
+        id="admin-mobile-menu-btn"
+        type="button"
+        aria-label="Abrir menú"
+        class="p-2 -ml-1 rounded-lg text-zinc-300 hover:text-amber-400 hover:bg-zinc-800 transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <span class="text-sm font-semibold text-zinc-100 truncate">{title} — Admin</span>
+    </header>
+
     <div class="flex min-h-screen">
       <!-- Sidebar: client:load para interactividad inmediata -->
       <AdminSidebar client:load currentPath={currentPath} />
 
-      <!-- Contenido principal -->
-      <main class="flex-1 p-6 md:p-10 transition-all duration-300">
+      <!-- Contenido principal: en móvil menos padding para dar aire al iframe -->
+      <main class="flex-1 p-4 md:p-10 transition-all duration-300">
         <slot />
       </main>
     </div>
+
+    <script>
+      // Abre el drawer del sidebar desde el header móvil.
+      // AdminSidebar.svelte escucha el CustomEvent "admin:sidebar-open".
+      const menuBtn = document.getElementById('admin-mobile-menu-btn');
+      if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+          window.dispatchEvent(new CustomEvent('admin:sidebar-open'));
+        });
+      }
+    </script>
   </body>
 </html>
