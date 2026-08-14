@@ -10,8 +10,8 @@
   },
   "lint-staged": {
     "backend/**/*.py": [
-      "black --check --quiet",
-      "flake8 --max-line-length=100 --quiet"
+      "python3 -m black --check --quiet",
+      "python3 -m flake8 --max-line-length=100 --quiet"
     ],
     "frontend/src/**/*.{ts,svelte,astro}": [
       "echo 'Tip: run pnpm exec tsc --noEmit for type checking'"
