@@ -6,13 +6,30 @@
 
   export let currentPath: string = '';
 
+  // La preferencia del usuario (colapsado/expandido) se guarda en
+  // localStorage para que el sidebar mantenga la última elección entre
+  // visitas. En móvil el drawer siempre arranca cerrado (no se persiste).
+  const STORAGE_KEY = 'admin:sidebar:collapsed';
+
   let collapsed = false;
   let mobileOpen = false;
+
+  function restorePreference() {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored !== null) collapsed = stored === 'true';
+    } catch {
+      // localStorage no disponible (modo privado, etc.) → default
+    }
+  }
 
   // En móvil el sidebar es un drawer overlay; en desktop mantiene el
   // comportamiento expandido/colapsado con el botón chevron.
   onMount(() => {
-    collapsed = window.innerWidth < 768;
+    restorePreference();
+    if (window.innerWidth < 768) {
+      collapsed = true;
+    }
     window.addEventListener('resize', handleResize);
     window.addEventListener('admin:sidebar-open', handleOpenEvent);
     return () => {
@@ -26,6 +43,8 @@
       collapsed = true;
       mobileOpen = false;
     } else {
+      // Al volver a desktop, restaurar la preferencia guardada del usuario.
+      restorePreference();
       mobileOpen = false;
     }
   }
@@ -37,6 +56,11 @@
 
   function toggle() {
     collapsed = !collapsed;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, String(collapsed));
+    } catch {
+      // localStorage no disponible → el estado solo vale para esta visita
+    }
   }
 
   function closeMobile() {
