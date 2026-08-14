@@ -101,6 +101,21 @@
     (e.target as HTMLInputElement).value = '';
   }
 
+  // ── Multi-image: arrastrar archivos desde el escritorio ────
+  // Sin preventDefault el navegador intenta navegar a file:/// y Chrome
+  // lo bloquea ("no puede cargar o enlazar con file:///"). Con el handler
+  // agregamos las imágenes como si se hubieran seleccionado con el picker.
+  function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (!files) return;
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) continue;
+      newImageFiles = [...newImageFiles, file];
+      imagePreviews = [...imagePreviews, URL.createObjectURL(file)];
+    }
+  }
+
   function removeNewImage(index: number) {
     URL.revokeObjectURL(imagePreviews[index]);
     newImageFiles = newImageFiles.filter((_, i) => i !== index);
@@ -436,12 +451,17 @@
             </div>
           {/if}
 
-          <!-- Botón de subida -->
-          <label class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm cursor-pointer transition-colors">
+          <!-- Botón de subida (también acepta arrastrar imágenes) -->
+          <label
+            on:dragover|preventDefault
+            on:drop={handleDrop}
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm cursor-pointer transition-colors"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             {newImageFiles.length > 0 ? 'Agregar más imágenes' : 'Seleccionar imágenes'}
             <input type="file" accept="image/*" multiple on:change={handleImagesSelected} class="hidden" />
           </label>
+          <p class="text-[11px] text-zinc-600 mt-2">También podés arrastrar imágenes desde tu computadora.</p>
         </div>
 
         <div class="flex items-center gap-4">

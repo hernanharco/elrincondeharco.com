@@ -57,6 +57,14 @@ const { title, currentPath = '' } = Astro.props;
           window.dispatchEvent(new CustomEvent('admin:sidebar-open'));
         });
       }
+
+      // Evita que soltar un archivo desde el escritorio en cualquier parte
+      // del admin intente navegar a file:/// (el navegador lo bloquea con
+      // "Error de seguridad: no puede cargar o enlazar con file:///.").
+      // Los drop handlers específicos (ej. subida de imágenes) siguen
+      // funcionando: este listener solo cancela la navegación por defecto.
+      document.addEventListener('dragover', (e) => e.preventDefault());
+      document.addEventListener('drop', (e) => e.preventDefault());
     </script>
   </body>
 </html>
