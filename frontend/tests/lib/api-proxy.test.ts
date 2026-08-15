@@ -140,7 +140,7 @@ describe('API proxy — REQ-PROXY', () => {
     const upstreamResponse = new Response('{}', { status: 200 });
     upstreamResponse.headers.set('set-cookie', 'new=value; Path=/');
 
-    const fetchSpy = stubFetch(upstreamResponse);
+    stubFetch(upstreamResponse);
 
     const request = new Request('http://localhost/api/v1/heroes/latest/');
     const response = await ALL(ctx(request) as any);
@@ -157,7 +157,7 @@ describe('API proxy — REQ-PROXY', () => {
     vi.resetModules();
     const { ALL } = await loadProxy();
 
-    const fetchSpy = stubFetch(
+    stubFetch(
       new Response(JSON.stringify({ detail: 'Validation error' }), { status: 422 }),
     );
 
@@ -172,7 +172,7 @@ describe('API proxy — REQ-PROXY', () => {
     vi.resetModules();
     const { ALL } = await loadProxy();
 
-    const fetchSpy = stubFetch(
+    stubFetch(
       new Response(JSON.stringify({ detail: 'Method Not Allowed' }), { status: 405 }),
     );
 
