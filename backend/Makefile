@@ -35,6 +35,10 @@ update:
 	poetry update
 
 # --- CALIDAD DE CÓDIGO & TESTS ---
+# Los tests usan la DB aislada del docker-compose.test.yml (puerto 5435).
+# Levantala antes: make test-db-up
+TEST_DATABASE_URL := postgresql+psycopg://test:test@localhost:5435/test_neondb
+export TEST_DATABASE_URL
 
 # Ejecutar tests con pytest
 test:
