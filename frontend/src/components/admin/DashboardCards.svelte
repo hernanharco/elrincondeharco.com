@@ -3,6 +3,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fetchApi } from '$lib/config';
+  import { DASHBOARD_ENDPOINTS } from '$lib/dashboard';
   import type {
     ProjectResponse,
     SectorResponse,
@@ -41,16 +42,7 @@
     loading = true;
     apiError = '';
 
-    Promise.allSettled([
-      fetchApi<ProjectResponse[]>('/api/v1/projects/'),
-      fetchApi<SectorResponse[]>('/api/v1/sectors/'),
-      fetchApi<TestimonialResponse[]>('/api/v1/testimonials/all'),
-      fetchApi<ShowroomResponse[]>('/api/v1/showrooms/'),
-      fetchApi<StackResponse[]>('/api/v1/stacks/'),
-      fetchApi<HeroResponse>('/api/v1/heroes/latest/'),
-      fetchApi<AboutResponse>('/api/v1/abouts/latest/'),
-      fetchApi<ExperienceSectionResponse>('/api/v1/experience/latest/'),
-    ]).then((results) => {
+    Promise.allSettled(DASHBOARD_ENDPOINTS.map((endpoint) => fetchApi(endpoint))).then((results) => {
       const [p, s, t, sh, st, h, a, e] = results;
 
       projects = p.status === 'fulfilled' ? p.value : [];
