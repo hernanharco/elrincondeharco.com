@@ -3,6 +3,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fetchApi } from '$lib/config';
+  import { collectDroppedImageFiles, collectInputFiles } from '$lib/uploads';
   import type { ProjectResponse, SectorResponse } from '$lib/types';
   import ImageUpload from '../ui/ImageUpload.svelte';
 
@@ -91,14 +92,14 @@
 
   // ── Multi-image: agregar archivos ──────────────────────────
   function handleImagesSelected(e: Event) {
-    const files = (e.target as HTMLInputElement).files;
-    if (!files) return;
-    for (const file of Array.from(files)) {
+    const input = e.target as HTMLInputElement;
+    const files = collectInputFiles(input);
+    for (const file of files) {
       newImageFiles = [...newImageFiles, file];
       imagePreviews = [...imagePreviews, URL.createObjectURL(file)];
     }
     // Resetear el input para poder seleccionar los mismos archivos de nuevo
-    (e.target as HTMLInputElement).value = '';
+    input.value = '';
   }
 
   // ── Multi-image: arrastrar archivos desde el escritorio ────
@@ -107,10 +108,9 @@
   // agregamos las imágenes como si se hubieran seleccionado con el picker.
   function handleDrop(e: DragEvent) {
     e.preventDefault();
-    const files = e.dataTransfer?.files;
-    if (!files) return;
-    for (const file of Array.from(files)) {
-      if (!file.type.startsWith('image/')) continue;
+    if (!e.dataTransfer) return;
+    const files = collectDroppedImageFiles(e.dataTransfer);
+    for (const file of files) {
       newImageFiles = [...newImageFiles, file];
       imagePreviews = [...imagePreviews, URL.createObjectURL(file)];
     }
