@@ -92,6 +92,55 @@ cd frontend
 ./scripts/run-tests.sh coverage
 ```
 
+## 🔍 Testing & Verificación (crm-admin-stability)
+
+Comprehensive test suite for regression prevention:
+
+### Quick Start
+```bash
+# Run all automated checks (backend + frontend + smoke tests)
+./scripts/verify-all.sh
+```
+
+### Individual Suites
+
+**Backend** (requires Docker for test DB):
+```bash
+cd backend
+make test-db-up              # Start isolated test DB on port 5435
+poetry run pytest            # Run all tests
+poetry run pytest --cov=app --cov-fail-under=60  # With coverage ≥60%
+make test-db-down            # Stop test DB
+```
+
+**Frontend**:
+```bash
+cd frontend
+pnpm vitest run              # 72 tests (7 files)
+pnpm astro check             # Type check (4 pre-existing errors are non-blocking)
+```
+
+### What Gets Tested
+
+- **Backend**: 8 API endpoints, image uploads (1/N/0 files), auth override, slash handling
+- **Frontend**: Pure TS helpers (dashboard, uploads, fetch-interceptor), API proxy preservation
+- **Smoke**: 8 canonical dashboard endpoints return HTTP 200
+
+### Pre-Deploy Checklist
+
+See [docs/verification-checklist.md](docs/verification-checklist.md) for:
+- Step-by-step deployment verification process
+- Troubleshooting guide for each failure mode
+- Regression map (5 bugs → test files)
+- Post-deployment manual checks
+- Rollback plan
+
+### Test Coverage
+
+- Backend: 63.36% (target ≥60%)
+- Frontend: 72 tests across 7 files
+- All 5 original bugs have corresponding regression tests
+
 ## 🚀 Desarrollo
 
 ### Iniciar Desarrollo Local
