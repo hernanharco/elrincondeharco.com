@@ -1,15 +1,54 @@
+import os
 import pytest
 import asyncio
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+
 from httpx import AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+
 from app.main import app
 from app.core.config import settings
 from app.models.base import Base
 from app.db.session import get_db
 
-# Test database URL
-TEST_DATABASE_URL = settings.database_url.replace("/neondb", "/test_neondb")
+
+def _build_test_database_url() -> str:
+    """Build the test database URL.
+
+    Priority:
+    1. TEST_DATABASE_URL env var (explicit, clean URL)
+    2. Derived from settings.database_url with /{db} → /test_{db}
+       and the ``options=`` query parameter stripped (D1).
+    """
+    env_url = os.environ.get("TEST_DATABASE_URL")
+    if env_url:
+        return env_url
+
+    # Fallback: derive from production URL, strip options= (search_path)
+    raw = settings.database_url
+    parsed = urlparse(raw)
+
+    # Replace database name: /dbname → /test_dbname
+    path = parsed.path
+    db_name = path.lstrip("/")
+    new_path = f"/test_{db_name}"
+
+    # Strip 'options' from query string (keeps sslmode etc.)
+    qs = dict(parse_qsl(parsed.query))
+    qs.pop("options", None)
+    clean_query = urlencode(qs)
+
+    return urlunparse(parsed._replace(path=new_path, query=clean_query))
+
+
+# Test database URL — clean, no options= search_path override
+TEST_DATABASE_URL = _build_test_database_url()
+
+# Admin URL for CREATE DATABASE (connects to default 'postgres' DB)
+_admin_parsed = urlparse(TEST_DATABASE_URL)
+ADMIN_DATABASE_URL = urlunparse(_admin_parsed._replace(path="/postgres"))
 
 # Test engine
 test_engine = create_async_engine(
@@ -33,16 +72,54 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 async def test_db():
-    """Create test database tables and drop them after tests."""
-    # Create tables
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Create test database tables and drop them after tests.
 
-    yield TestSessionLocal
+    Uses an admin connection to CREATE DATABASE IF NOT EXISTS (REQ-TESTDB),
+    then guards Base.metadata.schema = None so create_all targets the
+    default 'public' schema in the isolated test DB (D2).
+    """
+    test_db_name = _admin_parsed.path.lstrip("/")
 
-    # Drop tables
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    # 1. Ensure the test database exists via admin connection
+    admin_engine = create_async_engine(ADMIN_DATABASE_URL, echo=False)
+    try:
+        async with admin_engine.connect() as conn:
+            result = await conn.execute(
+                text(f"SELECT 1 FROM pg_database WHERE datname = '{test_db_name}'")
+            )
+            db_exists = result.scalar() is not None
+            if not db_exists:
+                # Must close transaction before CREATE DATABASE
+                await conn.execute(text("COMMIT"))
+                await conn.execute(text(f'CREATE DATABASE "{test_db_name}"'))
+    finally:
+        await admin_engine.dispose()
+
+    # 2. Guard: lifespan sets Base.metadata.schema = <prod_schema>,
+    #    but lifespan doesn't run in tests. Force None so create_all
+    #    targets 'public' in the isolated test DB (D2).
+    original_schema = Base.metadata.schema
+    original_table_schemas = {}
+    for table in Base.metadata.tables.values():
+        original_table_schemas[table.name] = table.schema
+        table.schema = None
+    Base.metadata.schema = None
+
+    try:
+        # Create tables
+        async with test_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        yield TestSessionLocal
+
+        # Drop tables
+        async with test_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+    finally:
+        # Restore original schema setting
+        Base.metadata.schema = original_schema
+        for table in Base.metadata.tables.values():
+            table.schema = original_table_schemas.get(table.name)
 
 
 @pytest.fixture
@@ -157,3 +234,39 @@ async def sample_experience(db_session):
     await db_session.refresh(exp)
 
     return exp
+
+
+@pytest.fixture
+def admin_override(client):
+    """Override get_current_admin_user with mock admin identity (D3).
+
+    Explicit (not autouse) — tests opt in to bypass auth.
+    Cleanup rides on client's dependency_overrides.clear().
+    """
+    from app.core.security import get_current_admin_user
+
+    app.dependency_overrides[get_current_admin_user] = lambda: {
+        "sub": "test-admin",
+        "role": "ADMIN",
+        "username": "tester",
+    }
+    yield
+
+
+@pytest.fixture
+def mock_cloudinary(monkeypatch):
+    """Mock process_file_upload to avoid Cloudinary network calls (D4).
+
+    Returns predictable URLs: https://res.test/x0.jpg, x1.jpg, etc.
+    """
+    call_count = 0
+
+    async def fake_upload(file, **kwargs):
+        nonlocal call_count
+        url = f"https://res.test/x{call_count}.jpg"
+        call_count += 1
+        return url
+
+    monkeypatch.setattr(
+        "app.api.v1.endpoints.projects.process_file_upload", fake_upload
+    )

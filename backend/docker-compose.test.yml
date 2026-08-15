@@ -1,0 +1,17 @@
+services:
+  test-db:
+    image: postgres:16-alpine
+    container_name: portfolio-test-db
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: test_neondb
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d test_neondb"]
+      interval: 2s
+      timeout: 5s
+      retries: 10

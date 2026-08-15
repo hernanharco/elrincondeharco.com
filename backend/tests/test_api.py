@@ -1,3 +1,4 @@
+import pytest
 from httpx import AsyncClient
 
 
@@ -133,7 +134,7 @@ class TestAPI:
 class TestExperienceAPI:
     """Tests for the Experience Section API."""
 
-    async def test_create_experience(self, client: AsyncClient):
+    async def test_create_experience(self, client: AsyncClient, admin_override):
         """Test creating an experience section."""
         response = await client.post(
             "/api/v1/experience/",
@@ -162,7 +163,9 @@ class TestExperienceAPI:
         data = response.json()
         assert data["tagline"] == "Test"
 
-    async def test_update_experience(self, client: AsyncClient, db_session):
+    async def test_update_experience(
+        self, client: AsyncClient, db_session, admin_override
+    ):
         """Test updating an experience section."""
         from app.models.experience import ExperienceSection
 
@@ -270,6 +273,18 @@ class TestPublicTestimonialsAPI:
         assert len(data) == 1
         assert data[0]["name"] == "Active"
 
+    async def test_all_with_trailing_slash_redirects_307(self, client: AsyncClient):
+        """GET /api/v1/testimonials/all/ → 307 redirect to /all (REQ-SLASH-API).
+
+        The route is defined as /all (no trailing slash). FastAPI issues a
+        307 redirect when the trailing slash is added. This is a known trap
+        documented in the spec — the frontend proxy must preserve the exact
+        path to avoid this redirect.
+        """
+        response = await client.get("/api/v1/testimonials/all/", follow_redirects=False)
+        assert response.status_code == 307
+        assert "/api/v1/testimonials/all" in response.headers.get("location", "")
+
 
 class TestCTASiteSettingsAPI:
     """Tests for CTA fields in SiteSettings."""
@@ -312,7 +327,9 @@ class TestCTASiteSettingsAPI:
         assert "cta_title" in data
         assert "cta_features" in data
 
-    async def test_update_cta_fields(self, client: AsyncClient, db_session):
+    async def test_update_cta_fields(
+        self, client: AsyncClient, db_session, admin_override
+    ):
         """Test updating CTA fields via PUT."""
         from app.models.site_settings import SiteSettings
 
@@ -378,3 +395,173 @@ class TestProjectsImageUrlsAPI:
         data = response.json()
         p = data[0]
         assert isinstance(p["image_urls"], list)
+
+
+class TestSlashCanonicalEndpoints:
+    """Canonical dashboard endpoints respond 200 with trailing slash (REQ-SLASH-API)."""
+
+    @pytest.mark.parametrize(
+        "endpoint",
+        [
+            "/api/v1/heroes/latest/",
+            "/api/v1/abouts/latest/",
+            "/api/v1/experience/latest/",
+        ],
+    )
+    async def test_canonical_endpoints_respond_200(self, client: AsyncClient, endpoint):
+        """Dashboard endpoints with trailing slash return 200 (or 404 if empty)."""
+        response = await client.get(endpoint)
+        # 200 if data exists, 404 if no records — both are valid responses
+        # The key assertion is NOT 307 (redirect) or 422 (validation error)
+        assert response.status_code in (
+            200,
+            404,
+        ), f"{endpoint} returned {response.status_code}, expected 200 or 404"
+
+
+class TestProjectsUploadAPI:
+    """Tests for project image upload — single and multiple (REQ-IMG-UPLOAD).
+
+    Uses mock_cloudinary to avoid external network calls (D4).
+    """
+
+    # Minimal form data for project create
+    CREATE_FORM = {
+        "title": "Upload Test",
+        "description": "Test description",
+        "tags": '["test"]',
+        "icon_name": "TestIcon",
+        "color": "red",
+    }
+
+    def _make_image_file(self, name="test.jpg"):
+        """Create a minimal JPEG-like file for upload testing."""
+        return (name, b"\xff\xd8\xff\xe0fake-jpeg-data", "image/jpeg")
+
+    async def test_post_with_one_image(
+        self, client: AsyncClient, admin_override, mock_cloudinary
+    ):
+        """POST /api/v1/projects/ with 1 image → 200 + 1 URL in image_urls."""
+        files = [("images", self._make_image_file("photo1.jpg"))]
+        response = await client.post(
+            "/api/v1/projects/", data=self.CREATE_FORM, files=files
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["image_urls"]) == 1
+        assert data["image_urls"][0] == "https://res.test/x0.jpg"
+
+    async def test_post_with_two_images(
+        self, client: AsyncClient, admin_override, mock_cloudinary
+    ):
+        """POST /api/v1/projects/ with 2 images → 200 + 2 URLs."""
+        files = [
+            ("images", self._make_image_file("photo1.jpg")),
+            ("images", self._make_image_file("photo2.jpg")),
+        ]
+        response = await client.post(
+            "/api/v1/projects/", data=self.CREATE_FORM, files=files
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["image_urls"]) == 2
+        assert "https://res.test/x0.jpg" in data["image_urls"]
+        assert "https://res.test/x1.jpg" in data["image_urls"]
+
+    async def test_put_with_one_image_merges(
+        self,
+        client: AsyncClient,
+        db_session,
+        admin_override,
+        mock_cloudinary,
+    ):
+        """PUT /api/v1/projects/{id}/ with 1 file → 200 + merged image_urls."""
+        from app.models.projects import Project
+
+        project = Project(
+            title="Existing",
+            description="Desc",
+            tags=["a"],
+            icon_name="I",
+            color="red",
+            image_urls=["https://existing.com/old.jpg"],
+        )
+        db_session.add(project)
+        await db_session.commit()
+        await db_session.refresh(project)
+
+        files = [("images", self._make_image_file("new.jpg"))]
+        response = await client.put(
+            f"/api/v1/projects/{project.id}",
+            data={"image_urls": '["https://existing.com/old.jpg"]'},
+            files=files,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["image_urls"]) == 2
+        assert "https://existing.com/old.jpg" in data["image_urls"]
+        assert "https://res.test/x0.jpg" in data["image_urls"]
+
+    async def test_put_with_two_images(
+        self,
+        client: AsyncClient,
+        db_session,
+        admin_override,
+        mock_cloudinary,
+    ):
+        """PUT /api/v1/projects/{id}/ with 2 files → 2 new URLs."""
+        from app.models.projects import Project
+
+        project = Project(
+            title="Existing",
+            description="Desc",
+            tags=["a"],
+            icon_name="I",
+            color="red",
+            image_urls=[],
+        )
+        db_session.add(project)
+        await db_session.commit()
+        await db_session.refresh(project)
+
+        files = [
+            ("images", self._make_image_file("a.jpg")),
+            ("images", self._make_image_file("b.jpg")),
+        ]
+        response = await client.put(
+            f"/api/v1/projects/{project.id}",
+            data={"image_urls": "[]"},
+            files=files,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["image_urls"]) == 2
+
+    async def test_put_without_files_keeps_image_urls(
+        self,
+        client: AsyncClient,
+        db_session,
+        admin_override,
+    ):
+        """PUT /api/v1/projects/{id}/ with no files → image_urls unchanged."""
+        from app.models.projects import Project
+
+        project = Project(
+            title="Existing",
+            description="Desc",
+            tags=["a"],
+            icon_name="I",
+            color="red",
+            image_urls=["https://existing.com/keep.jpg"],
+        )
+        db_session.add(project)
+        await db_session.commit()
+        await db_session.refresh(project)
+
+        response = await client.put(
+            f"/api/v1/projects/{project.id}",
+            data={"image_urls": '["https://existing.com/keep.jpg"]'},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["image_urls"] == ["https://existing.com/keep.jpg"]
