@@ -102,7 +102,7 @@
     z-50 flex flex-col bg-zinc-900
     transition-all duration-300
     fixed inset-y-0 left-0 w-72 -translate-x-full md:translate-x-0
-    md:relative md:inset-auto md:w-auto md:min-h-screen md:shadow-none
+    md:sticky md:top-0 md:inset-auto md:w-auto md:h-screen md:shadow-none
     {collapsed ? 'md:w-16' : 'md:w-60'}
   "
 >
@@ -157,8 +157,8 @@
     {/if}
   </div>
 
-  <!-- Links de navegación -->
-  <nav class="flex-1 py-4 space-y-1 px-2">
+  <!-- Links de navegación (scroll interno si no entran; el botón de abajo queda visible) -->
+  <nav class="flex-1 min-h-0 overflow-y-auto overscroll-contain py-4 space-y-1 px-2">
     {#each navItems as item}
       {#if item.type === 'divider'}
         <div class="h-px bg-zinc-800 my-2 mx-2"></div>
