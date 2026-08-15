@@ -1,6 +1,6 @@
 # Makefile para AuthCore Backend
 
-.PHONY: dev start test test-cov lint format type-check shell install install-prod add add-dev update export setup-dev setup-prod
+.PHONY: dev start test test-cov lint format type-check shell install install-prod add add-dev update export setup-dev setup-prod test-db-up test-db-down
 
 # --- COMANDOS PRINCIPALES ---
 
@@ -72,3 +72,19 @@ setup-dev:
 
 setup-prod:
 	bash poetry-setup.sh production
+
+# --- TEST DATABASE ---
+
+# Levantar la base de datos de tests (puerto 5435)
+test-db-up:
+	docker compose -f docker-compose.test.yml up -d
+	@echo "Waiting for test DB to be ready..."
+	@for i in $$(seq 1 15); do \
+		docker compose -f docker-compose.test.yml exec -T test-db pg_isready -U test -d test_neondb >/dev/null 2>&1 && break; \
+		sleep 1; \
+	done
+	@echo "Test DB ready on port 5435"
+
+# Detener la base de datos de tests
+test-db-down:
+	docker compose -f docker-compose.test.yml down
