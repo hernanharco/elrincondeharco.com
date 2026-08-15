@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, File, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Form, Request
+from starlette.datastructures import UploadFile as StarletteUploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import Optional, List
+from typing import Optional, Any, Dict
 import json
 from app.db.session import get_db
 from app.core.cloudinary import process_file_upload
 from app.models.projects import Project
 from app.schemas.projects import ProjectCreate, ProjectUpdate, ProjectResponse
 from app.core.security import get_current_admin_user
-from typing import Any, Dict
 
 
 async def get_project_form(
@@ -94,19 +94,22 @@ async def get_one(id: int, db: AsyncSession = Depends(get_db)):
 
 @router.post("/", response_model=ProjectResponse)
 async def create(
+    request: Request,
     form_data: ProjectCreate = Depends(get_project_form),
-    images: Optional[List[UploadFile]] = File(None),
     db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
-    # Procesar imágenes subidas
+    # Procesar imágenes subidas — leer manualmente del multipart con
+    # getlist para soportar UNA imagen o varias (FastAPI con List[UploadFile]
+    # falla con 422 cuando llega un solo archivo).
+    form = await request.form()
+    images = form.getlist("images")
     new_urls = []
-    if images:
-        for img in images:
-            if img.filename and img.filename != "":
-                url = await process_file_upload(img)
-                if url:
-                    new_urls.append(url)
+    for img in images:
+        if isinstance(img, StarletteUploadFile) and img.filename and img.filename != "":
+            url = await process_file_upload(img)
+            if url:
+                new_urls.append(url)
 
     all_urls = form_data.image_urls + new_urls
     db_obj = Project(
@@ -121,8 +124,8 @@ async def create(
 @router.put("/{id}", response_model=ProjectResponse)
 async def update(
     id: int,
+    request: Request,
     form_data: ProjectUpdate = Depends(get_project_update_form),
-    images: Optional[List[UploadFile]] = File(None),
     db: AsyncSession = Depends(get_db),
     current_user: Dict[str, Any] = Depends(get_current_admin_user),
 ):
@@ -130,14 +133,16 @@ async def update(
     if not obj:
         raise HTTPException(status_code=404, detail="Project no encontrado")
 
-    # Procesar imágenes nuevas
+    # Procesar imágenes nuevas — leer manualmente del multipart (getlist)
+    # para soportar UNA imagen o varias.
+    form = await request.form()
+    images = form.getlist("images")
     new_urls = []
-    if images:
-        for img in images:
-            if img.filename and img.filename != "":
-                url = await process_file_upload(img)
-                if url:
-                    new_urls.append(url)
+    for img in images:
+        if isinstance(img, StarletteUploadFile) and img.filename and img.filename != "":
+            url = await process_file_upload(img)
+            if url:
+                new_urls.append(url)
 
     # Merge: si viene image_urls, reemplazar; si no, mantener existentes + nuevas
     existing = list(obj.image_urls) if obj.image_urls else []
