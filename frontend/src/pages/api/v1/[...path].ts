@@ -14,9 +14,12 @@ import type { APIRoute } from 'astro';
 
 const API_URL = process.env.SSR_API_URL || 'https://api.elrincondeharco.com';
 
-export const ALL: APIRoute = async ({ params, request }) => {
-  const path = params.path || '';
-  const upstreamUrl = `${API_URL}/api/v1/${path}`;
+export const ALL: APIRoute = async ({ request }) => {
+  // Conservar el pathname EXACTO (incluido el slash final) y el query
+  // string: /api/v1/heroes/latest/ debe llegar como .../latest/ (la API
+  // distingue entre /latest y /latest/{id}).
+  const url = new URL(request.url);
+  const upstreamUrl = `${API_URL}${url.pathname}${url.search}`;
 
   // Reenviar cookies (incluye access_token httpOnly) y content-type.
   const headers: Record<string, string> = {};
