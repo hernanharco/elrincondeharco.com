@@ -234,3 +234,39 @@ async def sample_experience(db_session):
     await db_session.refresh(exp)
 
     return exp
+
+
+@pytest.fixture
+def admin_override(client):
+    """Override get_current_admin_user with mock admin identity (D3).
+
+    Explicit (not autouse) — tests opt in to bypass auth.
+    Cleanup rides on client's dependency_overrides.clear().
+    """
+    from app.core.security import get_current_admin_user
+
+    app.dependency_overrides[get_current_admin_user] = lambda: {
+        "sub": "test-admin",
+        "role": "ADMIN",
+        "username": "tester",
+    }
+    yield
+
+
+@pytest.fixture
+def mock_cloudinary(monkeypatch):
+    """Mock process_file_upload to avoid Cloudinary network calls (D4).
+
+    Returns predictable URLs: https://res.test/x0.jpg, x1.jpg, etc.
+    """
+    call_count = 0
+
+    async def fake_upload(file, **kwargs):
+        nonlocal call_count
+        url = f"https://res.test/x{call_count}.jpg"
+        call_count += 1
+        return url
+
+    monkeypatch.setattr(
+        "app.api.v1.endpoints.projects.process_file_upload", fake_upload
+    )

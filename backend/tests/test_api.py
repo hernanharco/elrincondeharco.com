@@ -133,7 +133,7 @@ class TestAPI:
 class TestExperienceAPI:
     """Tests for the Experience Section API."""
 
-    async def test_create_experience(self, client: AsyncClient):
+    async def test_create_experience(self, client: AsyncClient, admin_override):
         """Test creating an experience section."""
         response = await client.post(
             "/api/v1/experience/",
@@ -162,7 +162,9 @@ class TestExperienceAPI:
         data = response.json()
         assert data["tagline"] == "Test"
 
-    async def test_update_experience(self, client: AsyncClient, db_session):
+    async def test_update_experience(
+        self, client: AsyncClient, db_session, admin_override
+    ):
         """Test updating an experience section."""
         from app.models.experience import ExperienceSection
 
