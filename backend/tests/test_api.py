@@ -1,3 +1,4 @@
+import pytest
 from httpx import AsyncClient
 
 
@@ -272,6 +273,18 @@ class TestPublicTestimonialsAPI:
         assert len(data) == 1
         assert data[0]["name"] == "Active"
 
+    async def test_all_with_trailing_slash_redirects_307(self, client: AsyncClient):
+        """GET /api/v1/testimonials/all/ → 307 redirect to /all (REQ-SLASH-API).
+
+        The route is defined as /all (no trailing slash). FastAPI issues a
+        307 redirect when the trailing slash is added. This is a known trap
+        documented in the spec — the frontend proxy must preserve the exact
+        path to avoid this redirect.
+        """
+        response = await client.get("/api/v1/testimonials/all/", follow_redirects=False)
+        assert response.status_code == 307
+        assert "/api/v1/testimonials/all" in response.headers.get("location", "")
+
 
 class TestCTASiteSettingsAPI:
     """Tests for CTA fields in SiteSettings."""
@@ -380,3 +393,25 @@ class TestProjectsImageUrlsAPI:
         data = response.json()
         p = data[0]
         assert isinstance(p["image_urls"], list)
+
+
+class TestSlashCanonicalEndpoints:
+    """Canonical dashboard endpoints respond 200 with trailing slash (REQ-SLASH-API)."""
+
+    @pytest.mark.parametrize(
+        "endpoint",
+        [
+            "/api/v1/heroes/latest/",
+            "/api/v1/abouts/latest/",
+            "/api/v1/experience/latest/",
+        ],
+    )
+    async def test_canonical_endpoints_respond_200(self, client: AsyncClient, endpoint):
+        """Dashboard endpoints with trailing slash return 200 (or 404 if empty)."""
+        response = await client.get(endpoint)
+        # 200 if data exists, 404 if no records — both are valid responses
+        # The key assertion is NOT 307 (redirect) or 422 (validation error)
+        assert response.status_code in (
+            200,
+            404,
+        ), f"{endpoint} returned {response.status_code}, expected 200 or 404"
