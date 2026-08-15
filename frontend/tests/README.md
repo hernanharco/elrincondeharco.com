@@ -7,28 +7,20 @@ This directory contains comprehensive tests for the Astro + Svelte 5 frontend.
 ```
 tests/
 ├── setup.ts                    # Test setup and global mocks
-├── components/
-│   ├── sections/               # Section component tests
-│   │   ├── Hero.test.ts
-│   │   ├── About.test.ts
-│   │   ├── Stack.test.ts
-│   │   ├── Projects.test.ts
-│   │   └── Passions.test.ts
-│   ├── ui/                     # UI component tests
-│   │   └── ImageUpload.test.ts
-│   └── layout/                 # Layout component tests
-│       ├── Navbar.test.ts
-│       └── Footer.test.ts
 ├── lib/                        # Library function tests
-│   ├── config.test.ts
-│   ├── types.test.ts
-│   └── dataEvents.test.ts
-├── integration/                # Integration tests
-│   ├── hero-flow.test.ts
-│   ├── navigation.test.ts
-│   └── api-integration.test.ts
-└── e2e/                       # End-to-end tests
-    └── portfolio.spec.ts
+│   ├── api-proxy.test.ts       # API proxy slash/cookie/status preservation
+│   ├── config.test.ts          # fetchApi credentials assertion
+│   ├── dashboard.test.ts       # 8 canonical endpoint URLs
+│   ├── fetch-interceptor.test.ts # credentials interceptor logic
+│   ├── recruiter-data.test.ts  # Recruiter data utilities
+│   ├── types.test.ts           # TypeScript interfaces
+│   └── uploads.test.ts         # Drag-drop file collection
+├── components/
+│   ├── layout/                 # Layout component tests (empty)
+│   └── ui/                     # UI component tests (empty)
+└── e2e/                        # End-to-end tests
+    ├── portfolio.spec.ts       # Full portfolio journey
+    └── drop-guard.spec.ts      # Drag-drop regression (skipped)
 ```
 
 ## 🧪 Test Types
