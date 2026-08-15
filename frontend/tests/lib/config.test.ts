@@ -130,4 +130,18 @@ describe('API Configuration', () => {
       expect.any(Object)
     );
   });
+
+  it('sends credentials: include for cross-origin cookie auth (REQ-REGRESSION-MAP bug-3)', async () => {
+    const mockData = { id: 1 };
+    mockApiResponse(mockData);
+
+    await fetchApi('/api/v1/projects/');
+
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/api/v1/projects/',
+      expect.objectContaining({
+        credentials: 'include',
+      })
+    );
+  });
 });
