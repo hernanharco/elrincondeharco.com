@@ -204,6 +204,8 @@
       messageType = 'success';
       resetForm();
       await loadItems();
+      // El proyecto recién actualizado/creado aparece arriba de la lista.
+      items = [savedProject, ...items.filter((i) => i.id !== projectId)];
     } catch {
       message = 'Error al guardar';
       messageType = 'error';
