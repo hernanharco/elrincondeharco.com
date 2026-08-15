@@ -327,7 +327,9 @@ class TestCTASiteSettingsAPI:
         assert "cta_title" in data
         assert "cta_features" in data
 
-    async def test_update_cta_fields(self, client: AsyncClient, db_session):
+    async def test_update_cta_fields(
+        self, client: AsyncClient, db_session, admin_override
+    ):
         """Test updating CTA fields via PUT."""
         from app.models.site_settings import SiteSettings
 
