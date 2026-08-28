@@ -135,16 +135,18 @@
   }
 
   // ── Actualizar project_ids de un sector ────────────────────
-  async function updateSectorProjects(sectorId: number, projectIds: number[]) {
-    await fetch(`${API}/api/v1/sectors/${sectorId}`, {
+  async function updateSectorProjects(sectorId: number, projectIds: number[]): Promise<boolean> {
+    const res = await fetch(`${API}/api/v1/sectors/${sectorId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ project_ids: projectIds }),
     });
+    if (res.status === 401) return false;
+    return res.ok;
   }
 
   // ── Sincronizar sectores después de guardar proyecto ───────
-  async function syncSectors(projectId: number) {
+  async function syncSectors(projectId: number): Promise<boolean> {
     // Para cada sector, agregar o sacar este projectId
     for (const sector of sectors) {
       const currentIds: number[] = sector.project_ids || [];
@@ -152,13 +154,16 @@
 
       if (shouldHave && !currentIds.includes(projectId)) {
         // Agregar projectId al sector
-        await updateSectorProjects(sector.id, [...currentIds, projectId]);
+        const ok = await updateSectorProjects(sector.id, [...currentIds, projectId]);
+        if (!ok) return false;
       } else if (!shouldHave && currentIds.includes(projectId)) {
         // Sacar projectId del sector
-        await updateSectorProjects(sector.id, currentIds.filter((id) => id !== projectId));
+        const ok = await updateSectorProjects(sector.id, currentIds.filter((id) => id !== projectId));
+        if (!ok) return false;
       }
     }
     await loadSectors(); // Recargar sectores para mostrar cambios
+    return true;
   }
 
   async function handleSubmit() {
@@ -192,13 +197,24 @@
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, { method, body: formData });
+      if (res.status === 401) {
+        message = 'Sesión expirada. Volvé a iniciar sesión para guardar.';
+        messageType = 'error';
+        saving = false;
+        return;
+      }
       if (!res.ok) throw new Error();
 
       const savedProject = await res.json();
       const projectId = savedProject.id || editingId;
 
       // Sincronizar sectores con el proyecto guardado
-      await syncSectors(projectId);
+      const sectorsOk = await syncSectors(projectId);
+      if (!sectorsOk) {
+        message = 'Sesión expirada. Volvé a iniciar sesión para guardar.';
+        messageType = 'error';
+        return;
+      }
 
       message = editingId ? 'Actualizado correctamente' : 'Creado correctamente';
       messageType = 'success';
