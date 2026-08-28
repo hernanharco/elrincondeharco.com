@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: elrincon-backend
-    restart: always
+    restart: "no"
     # Mantenemos los puertos para que puedas acceder desde fuera al puerto 8000
     ports:
       - "8000:8000"

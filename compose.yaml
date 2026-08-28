@@ -13,7 +13,7 @@ services:
   portfolio-db:
     image: postgres:16-alpine
     container_name: portfolio-dev-db
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "5433:5432"
     environment:
@@ -42,7 +42,7 @@ services:
       dockerfile: Dockerfile
     container_name: portfolio-dev-backend
     entrypoint: ["/bin/bash", "/app/scripts/entrypoint.dev.sh"]
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "8001:8000"
     depends_on:
@@ -91,7 +91,7 @@ services:
         PUBLIC_API_URL: "http://localhost:8001"
     container_name: portfolio-dev-frontend
     command: ["pnpm", "dev"]
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "4322:4322"
     environment:
