@@ -11,12 +11,11 @@ import { fallbackTestimonials } from '$lib/fallback-data';
 import TestimonialForm from './TestimonialForm.svelte';
 
 const apiData = await fetchSSR<TestimonialResponse[]>('/testimonials/');
-const apiNames = new Set((apiData ?? []).map((t) => t.name));
-const merged = [
-  ...(apiData ?? []),
-  ...fallbackTestimonials.filter((t) => !apiNames.has(t.name)),
-];
-const activeTestimonials = merged.filter(t => t.is_active !== false).slice(0, 6);
+// La API es la fuente de verdad. El fallback solo aplica si la API falla o está
+// vacía; nunca se mezcla con datos de la API, para que copias viejas (p. ej. un
+// testimonio renombrado en la DB) no se filtren como duplicados en la página.
+const testimonials = apiData && apiData.length > 0 ? apiData : fallbackTestimonials;
+const activeTestimonials = testimonials.filter((t) => t.is_active !== false).slice(0, 6);
 ---
 
 {
