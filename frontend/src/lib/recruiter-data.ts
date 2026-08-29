@@ -66,35 +66,52 @@ export interface RecruiterData {
 export const RECRUITER_TECH_STACK: TechItem[] = [
   // Backend
   { name: 'Python', category: 'Backend', icon: '🐍', description: 'FastAPI, Django, Scripts' },
+  { name: 'FastAPI', category: 'Backend', icon: '⚡', description: 'APIs REST, OAuth, WebSockets' },
   { name: 'Go', category: 'Backend', icon: '🔷', description: 'Microservicios, APIs, TUIs' },
   { name: 'Node.js', category: 'Backend', icon: '🟢', description: 'APIs, herramientas CLI' },
+  { name: 'Hono.js', category: 'Backend', icon: '🔥', description: 'APIs ligeras y modulares' },
   // Frontend
   { name: 'Astro', category: 'Frontend', icon: '🚀', description: 'Islas, SSG, rendimiento' },
   { name: 'Svelte', category: 'Frontend', icon: '🧡', description: 'Componentes reactivos ligeros' },
   { name: 'React', category: 'Frontend', icon: '⚛️', description: 'SPAs, dashboards' },
   { name: 'Angular', category: 'Frontend', icon: '🅰️', description: 'Aplicaciones empresariales' },
   { name: 'Tailwind CSS', category: 'Frontend', icon: '🎨', description: 'Estilos utilities-first' },
+  { name: 'Three.js', category: 'Frontend', icon: '🧊', description: 'Efectos 3D, WebGL' },
+  { name: 'GSAP', category: 'Frontend', icon: '🌀', description: 'Animaciones scroll-driven' },
+  { name: 'HTMX', category: 'Frontend', icon: '🔗', description: 'HTML dinámico sin SPA' },
   // Infraestructura
   { name: 'Docker', category: 'Infra', icon: '🐳', description: 'Contenedores, compose, swarm' },
-  { name: 'Hetzner', category: 'Infra', icon: '☁️', description: 'Servidor dedicado CX22' },
-  { name: 'Netcup', category: 'Infra', icon: '☁️', description: 'Servidor corporativo' },
+  { name: 'Hetzner', category: 'Infra', icon: '☁️', description: 'Servidor CX22 con 10 servicios' },
+  { name: 'Netcup', category: 'Infra', icon: '☁️', description: 'Servidor VPS corporativo' },
   { name: 'Traefik', category: 'Infra', icon: '🔀', description: 'Proxy inverso, SSL automático' },
   { name: 'WireGuard', category: 'Infra', icon: '🔒', description: 'VPN site-to-site' },
-  { name: 'Cloudflare Tunnel', category: 'Infra', icon: '🌐', description: 'SSH sin puertos abiertos' },
+  { name: 'Cloudflare Tunnel', category: 'Infra', icon: '🌐', description: 'Acceso externo sin puertos abiertos' },
   { name: 'Tailscale', category: 'Infra', icon: '🔗', description: 'Mesh VPN zero-config' },
   // Base de datos
-  { name: 'PostgreSQL', category: 'BD', icon: '🐘', description: 'Base de datos relacional' },
+  { name: 'PostgreSQL', category: 'BD', icon: '🐘', description: 'Relacional + pgvector (IA)' },
   { name: 'Supabase', category: 'BD', icon: '🔥', description: 'BaaS con PostgreSQL' },
+  { name: 'Drizzle', category: 'BD', icon: '🌱', description: 'ORM tipado para TypeScript' },
   // Herramientas
   { name: 'OpenCode', category: 'Tools', icon: '🤖', description: 'AI coding assistant' },
+  { name: 'Gentle AI', category: 'Tools', icon: '🧠', description: 'Workflow SDD+TDD con subagentes' },
   { name: 'n8n', category: 'Tools', icon: '⚡', description: 'Workflow automation' },
-  { name: 'Ollama', category: 'Tools', icon: '🧠', description: 'Modelos open-source locales' },
-  { name: 'Git', category: 'Tools', icon: '📦', description: 'Control de versiones' },
+  { name: 'Ollama', category: 'Tools', icon: '📦', description: 'Modelos open-source locales' },
+  { name: 'Playwright', category: 'Tools', icon: '🎭', description: 'E2E testing, scraping' },
+  { name: 'Vitest', category: 'Tools', icon: '🧪', description: 'Testing unitario' },
+  { name: 'pytest', category: 'Tools', icon: '✅', description: 'Testing en Python' },
+  { name: 'Git', category: 'Tools', icon: '📚', description: 'Control de versiones' },
 ];
 
 // ── Proyectos ─────────────────────────────────────────────────
 
 export const RECRUITER_PROJECTS: RecruiterProject[] = [
+  {
+    title: 'Radar',
+    description: 'Asistente IA de WhatsApp y Telegram (CRM multi-empresa): atención con comportamiento humano, gestión de contactos, requerimientos y calendario. 503 tests.',
+    tags: ['Python', 'IA', 'WhatsApp', 'Telegram', 'PostgreSQL', 'Docker'],
+    github: 'https://github.com/hernanharco/radar',
+    type: 'personal',
+  },
   {
     title: 'AuthCore',
     description: 'Sistema de autenticación multi-app con Google OAuth, JWT y sesiones. Backend en FastAPI + frontend en Astro.',
@@ -103,15 +120,22 @@ export const RECRUITER_PROJECTS: RecruiterProject[] = [
     type: 'personal',
   },
   {
+    title: 'Tienda Nanatha',
+    description: 'E-commerce real de moda: catálogo, pedidos online con cierre por WhatsApp, preventa sincronizada con el servicio de inventario y panel de gestión.',
+    tags: ['Astro', 'Svelte', 'Drizzle', 'FastAPI', 'PostgreSQL', 'Docker'],
+    demo: 'https://nanatamoda.com',
+    type: 'freelance',
+  },
+  {
     title: 'Scrapers Automatizados',
     description: 'Scrapers para Idealista y Fotocasa con extracción de datos de propiedades, almacenamiento en PostgreSQL y dashboards.',
-    tags: ['Python', 'Scraping', 'PostgreSQL', 'Docker'],
+    tags: ['Python', 'Playwright', 'Scraping', 'PostgreSQL', 'Docker'],
     type: 'freelance',
   },
   {
     title: 'MiniCRM Ghogares',
     description: 'CRM inmobiliario liviano para gestión de propiedades, clientes y seguimiento de visitas.',
-    tags: ['React', 'Node.js', 'PostgreSQL', 'Tailwind'],
+    tags: ['FastAPI', 'HTMX', 'PostgreSQL', 'Tailwind'],
     type: 'freelance',
   },
   {
@@ -123,15 +147,8 @@ export const RECRUITER_PROJECTS: RecruiterProject[] = [
   },
   {
     title: 'Café Mi Tierra',
-    description: 'Web profesional para hostelería con carta digital, reservas y presencia online.',
-    tags: ['Astro', 'Svelte', 'Tailwind', 'PostgreSQL'],
-    type: 'freelance',
-  },
-  {
-    title: 'Tienda Nanatha',
-    description: 'E-commerce completo con catálogo, carrito, pasarela de pago y panel de gestión.',
-    tags: ['Astro', 'Svelte', 'Tailwind', 'PostgreSQL'],
-    demo: 'https://frontend-six-drab-fsccnsoh2d.vercel.app/',
+    description: 'Web profesional para hostelería con carta digital, reservas, efectos 3D y presencia online.',
+    tags: ['Astro', 'Three.js', 'Hono.js', 'PostgreSQL'],
     type: 'freelance',
   },
   {
@@ -142,7 +159,7 @@ export const RECRUITER_PROJECTS: RecruiterProject[] = [
   },
   {
     title: 'Portfolio elRincondeHarco',
-    description: 'Landing page + CRM personal con panel admin, sectores, proyectos y testimonios. Efectos 3D con Three.js y GSAP.',
+    description: 'Landing dual + CRM personal: panel admin, modo recruiter, efectos 3D y asistente Radar embebido. Estabilizado con SDD + TDD (139 tests de regresión).',
     tags: ['Astro', 'Svelte', 'Three.js', 'GSAP', 'FastAPI', 'Docker'],
     github: 'https://github.com/hernanharco/portfolio',
     demo: 'https://www.rincom.es/',
@@ -167,7 +184,10 @@ export const RECRUITER_TIMELINE: TimelineEntry[] = [
   { year: '2023', title: 'Primer empleo formal en España', subtitle: 'SEKELY CASAS SL', description: 'Primer contrato formal. Luego SUMESA S.A. (294 días) como mozo de almacén.', type: 'trabajo', tags: ['Logística'] },
   { year: '2024', title: 'Desarrollo de software freelance', subtitle: 'Bayiva + proyectos propios', description: 'Pruebas técnicas con Bayiva: scrapers de Idealista y Fotocasa, dashboard, mini CRM. Empecé a construir mi portfolio.', type: 'trabajo', tags: ['Python', 'Scraping', 'React', 'FastAPI'] },
   { year: '2025', title: 'Autónomo en Asturias', subtitle: 'Reparto + desarrollo', description: 'Trabajé como autónomo mientras seguía desarrollando. AuthCore, Appointment, Nanatha, Café Mi Tierra.', type: 'trabajo', tags: ['FastAPI', 'Astro', 'Svelte', 'Docker'] },
-  { year: '2026', title: 'Arquitecto en formación', subtitle: 'elRincondeHarco.com', description: 'Portfolio dual con CRM, panel admin, efectos 3D, CI/CD. Administro mis propios servidores Hetzner + Netcup.', type: 'logro', tags: ['FullStack', 'DevOps', 'Arquitectura'] },
+  { year: '2026', title: 'Asistente IA Radar', subtitle: 'WhatsApp + Telegram', description: 'Construí Radar: CRM multi-empresa con asistente IA de comportamiento humano, gestión de contactos, requerimientos y calendario. 503 tests verdes.', type: 'logro', tags: ['Python', 'IA', 'WhatsApp', 'Telegram'] },
+  { year: '2026', title: 'E-commerce con preventa e inventario', subtitle: 'Tienda Nanatha', description: 'Tienda online real con pedidos por WhatsApp y preventa sincronizada con un servicio de inventario dedicado.', type: 'trabajo', tags: ['Astro', 'Svelte', 'Drizzle', 'FastAPI'] },
+  { year: '2026', title: 'CRM estabilizado con SDD + TDD', subtitle: 'rincom.es', description: 'Convertí las regresiones del admin en 139 tests de regresión y un proceso de verificación reproducible antes de cada deploy: sin test verde, no hay deploy.', type: 'logro', tags: ['SDD', 'TDD', 'Testing'] },
+  { year: '2026', title: 'Arquitecto en formación', subtitle: 'elRincondeHarco.com', description: 'Portfolio dual con CRM, panel admin, efectos 3D y CI/CD. Administro mis propios servidores Hetzner + Netcup con 10+ servicios Docker.', type: 'logro', tags: ['FullStack', 'DevOps', 'Arquitectura'] },
 ];
 
 // ── Certificaciones ───────────────────────────────────────────
@@ -193,15 +213,14 @@ export const RECRUITER_SERVERS: ServerSpec[] = [
     name: 'Hetzner',
     provider: 'Hetzner CX22',
     specs: '2 cores · 4GB RAM · 40GB SSD · Ubuntu 24.04',
-    services: ['Traefik', 'Dokploy', 'Backend API', 'AuthCore', 'PostgreSQL', 'Appointment', 'Engram Cloud', 'Cloudflared', 'Netdata', 'Ollama'],
+    services: ['Portfolio API', 'Radar (pgvector)', 'Tienda Nanatha', 'n8n', 'Inventario', 'Café Mi Tierra', 'Tapicería', 'AuthCore', 'PostgreSQL', 'Cloudflared'],
     os: 'Ubuntu 24.04 LTS',
-    uptime: '9+ dias',
   },
   {
     name: 'Netcup',
     provider: 'Netcup VPS',
     specs: '2 cores · 4GB RAM · 100GB SSD · Ubuntu 24.04',
-    services: ['Coolify', 'Supabase', 'N8N', 'APIs Bayiva', 'WireGuard'],
+    services: ['Coolify', 'Supabase', 'APIs Bayiva', 'WireGuard'],
     os: 'Ubuntu 24.04 LTS',
   },
 ];
@@ -213,7 +232,7 @@ export const RECRUITER_METRICS = [
   { label: 'Proyectos entregados', value: '20+' },
   { label: 'Servidores administrados', value: '2' },
   { label: 'Certificaciones', value: '23' },
-  { label: 'Tecnologias dominadas', value: '21' },
+  { label: 'Tecnologias dominadas', value: '31' },
 ];
 
 // ── Perfil completo ───────────────────────────────────────────
@@ -228,8 +247,10 @@ export const recruiterData: RecruiterData = {
   summary:
     'Ingeniero de Sistemas con 14+ años de experiencia en tecnología. ' +
     'He liderado equipos, diseñado arquitecturas y construido soluciones completas: ' +
-    'desde scrapers automatizados y CRMs hasta sistemas de autenticación multi-app. ' +
+    'asistentes IA de WhatsApp/Telegram, e-commerce con preventa e inventario, CRMs, ' +
+    'scrapers automatizados y sistemas de autenticación multi-app. ' +
     'Administro mis propios servidores (Hetzner + Netcup) con Docker, Traefik, WireGuard y Cloudflare Tunnel. ' +
+    'Desarrollé un workflow SDD + TDD con tests de regresión antes de cada deploy. ' +
     'Apasionado por la automatización, las arquitecturas limpias y crear software que resuelva problemas reales.',
   stack: RECRUITER_TECH_STACK,
   projects: RECRUITER_PROJECTS,

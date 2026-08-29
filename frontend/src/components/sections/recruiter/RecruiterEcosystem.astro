@@ -1,0 +1,124 @@
+---
+// RecruiterEcosystem.astro — Arquitectura del ecosistema para modo recruiter
+// Muestra cómo se conectan todos los proyectos: infraestructura → core → apps → datos
+---
+
+<section class="recruiter-section py-24 bg-[var(--recruiter-bg)] border-t border-[var(--recruiter-border)]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Ecosistema</p>
+      <h2 class="text-3xl md:text-5xl font-bold text-white">
+        Cómo se <span class="text-cyan-400">conecta todo</span>
+      </h2>
+      <p class="text-gray-500 max-w-xl mx-auto mt-4 text-lg">
+        No son proyectos sueltos: es una arquitectura modular donde todo comparte infraestructura y autenticación.
+      </p>
+    </div>
+
+    <div class="relative">
+      <!-- Líneas conectoras (solo visible en desktop) -->
+      <svg class="hidden lg:block absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1200 600" preserveAspectRatio="none">
+        <!-- Conexión: authCore → Portfolio -->
+        <path d="M 600 80 L 600 160" stroke="rgba(34,211,238,0.25)" stroke-width="2" fill="none" stroke-dasharray="6,4"/>
+        <!-- Conexión: Portfolio → Apps -->
+        <path d="M 600 160 L 200 400" stroke="rgba(34,211,238,0.15)" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+        <path d="M 600 160 L 600 400" stroke="rgba(34,211,238,0.15)" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+        <path d="M 600 160 L 1000 400" stroke="rgba(34,211,238,0.15)" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+        <!-- Conexión: Apps → Datos -->
+        <path d="M 200 480 L 400 480" stroke="rgba(34,211,238,0.2)" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+        <!-- Conexión: Datos → authCore -->
+        <path d="M 600 480 L 600 80" stroke="rgba(34,211,238,0.15)" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+      </svg>
+
+      <!-- Nivel 1: Infraestructura -->
+      <div class="text-center mb-8">
+        <span class="text-xs font-bold tracking-widest text-cyan-400/60 uppercase bg-cyan-500/5 px-4 py-1.5 rounded-full border border-cyan-500/10">Infraestructura</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center hover:border-cyan-500/20 transition-colors">
+          <div class="text-cyan-400/60 text-xs font-mono mb-1">Hetzner</div>
+          <div class="text-white font-semibold text-sm">CX22 · 10 servicios Docker</div>
+          <div class="text-gray-500 text-xs">APIs, DBs, n8n, Ollama · WireGuard VPN</div>
+        </div>
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center hover:border-cyan-500/20 transition-colors">
+          <div class="text-cyan-400/60 text-xs font-mono mb-1">Cloudflare</div>
+          <div class="text-white font-semibold text-sm">CDN · DNS · Túneles</div>
+          <div class="text-gray-500 text-xs">Acceso externo sin puertos abiertos</div>
+        </div>
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center hover:border-cyan-500/20 transition-colors">
+          <div class="text-cyan-400/60 text-xs font-mono mb-1">Vercel</div>
+          <div class="text-white font-semibold text-sm">Frontend Deploys</div>
+          <div class="text-gray-500 text-xs">rincom.es · nanatamoda.com</div>
+        </div>
+      </div>
+
+      <!-- Nivel 2: Core -->
+      <div class="text-center mb-8">
+        <span class="text-xs font-bold tracking-widest text-cyan-400/60 uppercase bg-cyan-500/5 px-4 py-1.5 rounded-full border border-cyan-500/10">Core</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-16 max-w-3xl mx-auto">
+        <div class="bg-gradient-to-br from-cyan-900/20 to-white/[0.02] border border-cyan-500/20 rounded-xl p-5 text-center hover:border-cyan-500/40 transition-all duration-300 hover:-translate-y-0.5">
+          <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="text-cyan-400 text-xs font-mono mb-1">HUB</div>
+          <div class="text-white font-semibold">authCore</div>
+          <div class="text-gray-500 text-xs mt-1">Autenticación · Google OAuth · JWT</div>
+        </div>
+        <div class="bg-gradient-to-br from-cyan-900/20 to-white/[0.02] border border-cyan-500/20 rounded-xl p-5 text-center hover:border-cyan-500/40 transition-all duration-300 hover:-translate-y-0.5">
+          <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="text-cyan-400 text-xs font-mono mb-1">SPOKE</div>
+          <div class="text-white font-semibold">Portfolio API</div>
+          <div class="text-gray-500 text-xs mt-1">Proxy auth · CRUD · Cloudinary</div>
+        </div>
+      </div>
+
+      <!-- Nivel 3: Aplicaciones -->
+      <div class="text-center mb-8">
+        <span class="text-xs font-bold tracking-widest text-cyan-400/60 uppercase bg-cyan-500/5 px-4 py-1.5 rounded-full border border-cyan-500/10">Aplicaciones</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center hover:border-cyan-500/20 transition-colors">
+          <div class="text-white font-semibold text-sm">Radar IA</div>
+          <div class="text-gray-500 text-xs mt-1">WhatsApp · Telegram · pgvector</div>
+        </div>
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center hover:border-cyan-500/20 transition-colors">
+          <div class="text-white font-semibold text-sm">Nanatha · Café Mi Tierra · Tapicería</div>
+          <div class="text-gray-500 text-xs mt-1">Astro · Svelte · FastAPI</div>
+        </div>
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center hover:border-cyan-500/20 transition-colors">
+          <div class="text-white font-semibold text-sm">miniCRM · Inventario</div>
+          <div class="text-gray-500 text-xs mt-1">FastAPI · HTMX · Sync preventa</div>
+        </div>
+      </div>
+
+      <!-- Nivel 4: Datos -->
+      <div class="text-center mb-8">
+        <span class="text-xs font-bold tracking-widest text-cyan-400/60 uppercase bg-cyan-500/5 px-4 py-1.5 rounded-full border border-cyan-500/10">Datos & Automatización</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+        <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 hover:border-cyan-500/20 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <div>
+            <div class="text-white font-semibold text-sm">Scrapers + n8n</div>
+            <div class="text-gray-500 text-xs">Python · Playwright · ETL · Automatización</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 hover:border-cyan-500/20 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <div>
+            <div class="text-white font-semibold text-sm">PostgreSQL · pgvector</div>
+            <div class="text-gray-500 text-xs">Datos modulares + vectores para IA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

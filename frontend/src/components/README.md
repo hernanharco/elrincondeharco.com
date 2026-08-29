@@ -6,7 +6,6 @@
 src/components/
 ├── ui/                              # Componentes UI compartidos
 │   ├── ImageUpload.svelte           # Subida de imágenes a Cloudinary
-│   ├── ProjectCard.astro            # Tarjeta de proyecto
 │   └── ShowroomCard.svelte          # Tarjeta de showroom
 ├── layout/                          # Layout y navegación
 │   ├── Navbar.astro                 # Navegación principal
@@ -14,24 +13,16 @@ src/components/
 │   └── AdminSidebar.svelte          # Sidebar del panel admin
 ├── sections/                        # Secciones de la landing page
 │   ├── Hero.astro                   # Hero principal
-│   ├── About.astro                  # Sobre mí
-│   ├── Stack.astro                  # Stack tecnológico
-│   ├── Projects.astro               # Proyectos
-│   ├── Passions.astro               # Pasiones
 │   ├── Stats.astro                  # Estadísticas
-│   ├── Sectors.astro                # Sectores (rúbrica)
 │   ├── SectorProjects.astro         # Unifica sectores + proyectos
 │   ├── Testimonials.astro           # Testimonios
 │   ├── ShowroomGrid.astro           # Grid de prototipos
-│   ├── Contact.astro                # Contacto
 │   ├── CTA.astro                    # Call to action
-│   ├── Ecosystem.astro              # Ecosistema
-│   ├── WorkProcess.astro            # Metodología de trabajo
-│   ├── PrototypesSection.astro      # Sección de prototipos
 │   └── recruiter/                   # Secciones modo recruiter
 │       ├── RecruiterHero.astro
 │       ├── RecruiterStack.astro
 │       ├── RecruiterProjects.astro
+│       ├── RecruiterEcosystem.astro # Arquitectura del ecosistema
 │       ├── RecruiterTimeline.astro
 │       ├── RecruiterCertifications.astro
 │       ├── RecruiterInfra.astro
@@ -45,8 +36,7 @@ src/components/
 │   ├── DestructionEffect.astro      # Efecto destrucción (Thanos Snap)
 │   ├── Robot3D.astro                # Mascota 3D interactiva
 │   ├── RobotAssistant.astro         # Asistente flotante modo recruiter
-│   ├── SmoothScroll.astro           # Lenis + GSAP ScrollTrigger
-│   └── TiltCard.astro               # Efecto tilt en tarjetas
+│   └── SmoothScroll.astro           # Lenis + GSAP ScrollTrigger
 ├── auth/                            # Autenticación
 │   ├── AuthGuard.svelte             # Guard de rutas protegidas
 │   └── LoginForm.svelte             # Formulario de login
