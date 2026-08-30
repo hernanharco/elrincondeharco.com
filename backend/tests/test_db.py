@@ -155,9 +155,9 @@ class TestDatabase:
             # Seed all data
             await seed_site_settings(session)
             await seed_heroes(session)
-            await seed_projects(session)
+            project_by_title = await seed_projects(session)
             await seed_stacks(session)
-            await seed_sectors(session)
+            await seed_sectors(session, project_by_title)
             await seed_testimonials(session)
 
             await session.commit()

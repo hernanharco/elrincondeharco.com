@@ -70,7 +70,7 @@ class TestAPI:
     async def test_cors_headers(self, client: AsyncClient, sample_project):
         """Test CORS headers are present on responses with Origin header."""
         response = await client.get(
-            "/api/v1/projects/", headers={"Origin": "http://localhost:4321"}
+            "/api/v1/projects/", headers={"Origin": "http://localhost:4322"}
         )
         assert response.status_code == 200
         # Check for CORS headers
