@@ -174,7 +174,7 @@ class TestDatabase:
             result = await session.execute(select(SiteSettings))
             site_settings = result.scalar_one_or_none()
             assert site_settings is not None
-            assert site_settings.brand_name == "elRincondelHarco.com"
+            assert site_settings.brand_name == "elrincondeharco.com"
 
             # Check heroes
             result = await session.execute(select(Hero))
