@@ -1,67 +1,99 @@
 ---
-// RecruiterLocation.astro — Mapa de presencia en Asturias
+// RecruiterLocation.astro — Presencia y mercado: residencia en Asturias + clientes en Colombia
+// Doble mapa con el mismo lenguaje visual: Residencia (Asturias) y Mercado (Colombia: Cali, Medellín)
 ---
 
 <section class="recruiter-section py-24 bg-[var(--recruiter-bg)] border-t border-[var(--recruiter-border)]">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-16">
-      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Ubicacion</p>
+      <p class="text-cyan-400 text-xs font-medium tracking-[0.25em] uppercase mb-3">Ubicación</p>
       <h2 class="text-3xl md:text-5xl font-bold text-white">
         Desde <span class="text-cyan-400">Asturias</span> para el mundo
       </h2>
       <p class="text-gray-500 max-w-xl mx-auto mt-4 text-lg">
-        Trabajo remoto desde Aviles. Presencia en toda la region.
+        Trabajo remoto desde Avilés, con clientes en España y Colombia.
       </p>
     </div>
 
     <div class="grid md:grid-cols-2 gap-12 items-center">
-      <!-- Mapa de ubicaciones -->
-      <div class="relative aspect-square max-w-md mx-auto w-full">
-        <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-purple-500/5 border border-white/[0.06] overflow-hidden">
-          <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 20% 30%, #06b6d4 1px, transparent 1px), radial-gradient(circle at 80% 70%, #3b82f6 1px, transparent 1px); background-size: 30px 30px;"></div>
-        </div>
+      <!-- Mapas -->
+      <div class="grid sm:grid-cols-2 gap-6">
+        <!-- Mapa 1: Residencia (Asturias) -->
+        <div>
+          <div class="text-center mb-3">
+            <span class="text-[10px] font-bold tracking-widest text-cyan-400/60 uppercase">Residencia · Asturias</span>
+          </div>
+          <div class="relative aspect-square max-w-md mx-auto w-full">
+            <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-purple-500/5 border border-white/[0.06] overflow-hidden">
+              <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 20% 30%, #06b6d4 1px, transparent 1px), radial-gradient(circle at 80% 70%, #3b82f6 1px, transparent 1px); background-size: 30px 30px;"></div>
+            </div>
 
-        <!-- Aviles -->
-        <div class="absolute" style="left:42%;top:45%;">
-          <div class="w-5 h-5 bg-cyan-400 rounded-full animate-ping absolute opacity-30"></div>
-          <div class="w-4 h-4 bg-cyan-400 rounded-full relative z-10 shadow-lg shadow-cyan-500/50"></div>
-          <div class="absolute top-6 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
-            <p class="text-white font-bold text-xs">Aviles</p>
-            <p class="text-gray-500 text-[9px]">Residencia</p>
+            <!-- Aviles -->
+            <div class="absolute" style="left:42%;top:45%;">
+              <div class="w-5 h-5 bg-cyan-400 rounded-full animate-ping absolute opacity-30"></div>
+              <div class="w-4 h-4 bg-cyan-400 rounded-full relative z-10 shadow-lg shadow-cyan-500/50"></div>
+              <div class="absolute top-6 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+                <p class="text-white font-bold text-xs">Avilés</p>
+                <p class="text-gray-500 text-[9px]">Residencia</p>
+              </div>
+            </div>
+
+            <!-- Gijon -->
+            <div class="absolute" style="left:62%;top:38%;">
+              <div class="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-500/30"></div>
+              <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+                <p class="text-gray-300 text-[10px] font-medium">Gijón</p>
+                <p class="text-gray-600 text-[8px]">Presencia</p>
+              </div>
+            </div>
+
+            <!-- Oviedo -->
+            <div class="absolute" style="left:50%;top:55%;">
+              <div class="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-500/30"></div>
+              <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+                <p class="text-gray-300 text-[10px] font-medium">Oviedo</p>
+                <p class="text-gray-600 text-[8px]">Presencia</p>
+              </div>
+            </div>
+
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+              <line x1="42" y1="45" x2="62" y2="38" stroke="rgba(6,182,212,0.2)" stroke-width="0.3" stroke-dasharray="2,2"/>
+              <line x1="42" y1="45" x2="50" y2="55" stroke="rgba(6,182,212,0.2)" stroke-width="0.3" stroke-dasharray="2,2"/>
+            </svg>
           </div>
         </div>
 
-        <!-- Gijon -->
-        <div class="absolute" style="left:62%;top:38%;">
-          <div class="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-500/30"></div>
-          <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
-            <p class="text-gray-300 text-[10px] font-medium">Gijon</p>
-            <p class="text-gray-600 text-[8px]">Presencia</p>
+        <!-- Mapa 2: Mercado (Colombia) -->
+        <div>
+          <div class="text-center mb-3">
+            <span class="text-[10px] font-bold tracking-widest text-cyan-400/60 uppercase">Mercado · Colombia</span>
           </div>
-        </div>
+          <div class="relative aspect-square max-w-md mx-auto w-full">
+            <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-purple-500/5 border border-white/[0.06] overflow-hidden">
+              <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 20% 30%, #06b6d4 1px, transparent 1px), radial-gradient(circle at 80% 70%, #3b82f6 1px, transparent 1px); background-size: 30px 30px;"></div>
+            </div>
 
-        <!-- Oviedo -->
-        <div class="absolute" style="left:50%;top:55%;">
-          <div class="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-500/30"></div>
-          <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
-            <p class="text-gray-300 text-[10px] font-medium">Oviedo</p>
-            <p class="text-gray-600 text-[8px]">Presencia</p>
-          </div>
-        </div>
+            <!-- Cali: origen + mercado -->
+            <div class="absolute" style="left:35%;top:68%;">
+              <div class="w-4 h-4 bg-amber-400 rounded-full relative z-10 shadow-lg shadow-amber-500/50"></div>
+              <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+                <p class="text-white font-bold text-xs">Cali</p>
+                <p class="text-gray-500 text-[9px]">Origen · Mercado</p>
+              </div>
+            </div>
 
-        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
-          <line x1="42" y1="45" x2="62" y2="38" stroke="rgba(6,182,212,0.2)" stroke-width="0.3" stroke-dasharray="2,2"/>
-          <line x1="42" y1="45" x2="50" y2="55" stroke="rgba(6,182,212,0.2)" stroke-width="0.3" stroke-dasharray="2,2"/>
-        </svg>
+            <!-- Medellin: mercado -->
+            <div class="absolute" style="left:58%;top:38%;">
+              <div class="w-3 h-3 bg-green-400 rounded-full shadow-lg shadow-green-500/30"></div>
+              <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+                <p class="text-gray-300 text-[10px] font-medium">Medellín</p>
+                <p class="text-gray-600 text-[8px]">Mercado</p>
+              </div>
+            </div>
 
-        <div class="absolute bottom-4 left-4 flex items-center gap-4">
-          <div class="flex items-center gap-1.5">
-            <div class="w-2 h-2 bg-cyan-400 rounded-full"></div>
-            <span class="text-[8px] text-gray-600">Principal</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
-            <span class="text-[8px] text-gray-600">Presencia</span>
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+              <line x1="35" y1="68" x2="58" y2="38" stroke="rgba(6,182,212,0.2)" stroke-width="0.3" stroke-dasharray="2,2"/>
+            </svg>
           </div>
         </div>
       </div>
@@ -71,8 +103,18 @@
         <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
           <h3 class="text-white font-bold text-base mb-3">Trabajo remoto</h3>
           <p class="text-gray-400 text-sm leading-relaxed">
-            Vivo en Aviles, Asturias, y trabajo de forma remota con clientes de toda Espana y Latinoamerica. 
-            Mi zona de influencia cubre todo el centro de Asturias, con presencia regular en Gijon y Oviedo.
+            Vivo en Avilés, Asturias, y trabajo de forma remota con clientes de toda España y Latinoamérica.
+            Mi zona de influencia cubre todo el centro de Asturias, con presencia regular en Gijón y Oviedo.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl bg-gradient-to-br from-amber-500/5 to-white/[0.02] border border-amber-500/15">
+          <div class="flex items-center gap-2 mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <h3 class="text-white font-bold text-base">Último proyecto</h3>
+          </div>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            <span class="text-amber-400 font-semibold">Nanatamoda</span> — e-commerce de moda cuyo mercado principal son clientes de <span class="text-white">Cali</span> y <span class="text-white">Medellín</span> (Colombia). Desarrollo remoto desde Asturias para un mercado latinoamericano.
           </p>
         </div>
 
@@ -95,10 +137,31 @@
         </div>
 
         <div class="flex flex-wrap gap-2">
-          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Espana</span>
+          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">España</span>
           <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Colombia</span>
-          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Latinoamerica</span>
+          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Latinoamérica</span>
+          <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Cali · Medellín</span>
           <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/[0.03] text-gray-500 border border-white/[0.06]">Remoto global</span>
+        </div>
+
+        <!-- Leyenda -->
+        <div class="flex flex-wrap justify-center gap-4">
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 bg-cyan-400 rounded-full"></div>
+            <span class="text-[9px] text-gray-600">Residencia</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+            <span class="text-[9px] text-gray-600">Presencia</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span class="text-[9px] text-gray-600">Mercado</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-2 h-2 bg-amber-400 rounded-full"></div>
+            <span class="text-[9px] text-gray-600">Origen</span>
+          </div>
         </div>
       </div>
     </div>

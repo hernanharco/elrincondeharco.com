@@ -128,7 +128,7 @@ export const RECRUITER_PROJECTS: RecruiterProject[] = [
   },
   {
     title: 'Scrapers Automatizados',
-    description: 'Scrapers para Idealista y Fotocasa con extracción de datos de propiedades, almacenamiento en PostgreSQL y dashboards.',
+    description: 'Scrapers para Idealista, Fotocasa (inmobiliario) y Micolet, Vinted (moda de segunda mano) con extracción de datos, almacenamiento en PostgreSQL y dashboards.',
     tags: ['Python', 'Playwright', 'Scraping', 'PostgreSQL', 'Docker'],
     type: 'freelance',
   },
