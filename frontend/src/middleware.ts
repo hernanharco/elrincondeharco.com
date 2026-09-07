@@ -34,6 +34,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
       id: '1',
       username: 'dev',
       role: 'SUPERADMIN',
+      tenant: { id: 'dev-tenant', slug: 'rincom', name: 'Dev Tenant' },
+      modules: { radar: { enabled: true }, inventory: { enabled: true, providers: ['vinted', 'micolet'] } },
     };
     return next();
   }
@@ -64,6 +66,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
         id: String(payload.sub || payload.id || ''),
         username: (payload as any).username || (payload as any).email,
         role: (payload as any).role,
+        // Tenant + modules del JWT enriquecido
+        tenant: (payload as any).tenant || null,
+        modules: (payload as any).modules || {},
         ...payload,
       };
     } catch (error: any) {
