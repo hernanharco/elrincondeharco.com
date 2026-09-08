@@ -31,6 +31,9 @@ class Settings(BaseSettings):
         alias="AUTHCORE_JWKS_URL",
     )
 
+    # Tenant — slug de este servicio (para validación de tenant)
+    tenant_slug: str = Field("rincom", alias="TENANT_SLUG")
+
     # Qué usuario de authCore es el dueño de esta landing page
     company_user_id: str = Field("1", alias="COMPANY_USER_ID")
 

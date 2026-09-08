@@ -18,8 +18,10 @@ const JWKS_URL = new URL(
 
 const JWKS = createRemoteJWKSet(JWKS_URL);
 
+// Tenant slug esperado para este servicio
+const EXPECTED_TENANT = process.env.TENANT_SLUG || 'rincom';
+
 // En desarrollo, la API está en SSR_API_URL (definida en el compose)
-// Fallback a localhost:8001
 const API_URL = process.env.SSR_API_URL || 'http://localhost:8001';
 
 // ── Middleware ─────────────────────────────────────────────────
@@ -62,12 +64,26 @@ export const onRequest = defineMiddleware(async (context, next) => {
     try {
       // Intentar validar contra authCore (JWKS)
       const { payload } = await jwtVerify(sessionCookie.value, JWKS);
+      const userRole = (payload as any).role || '';
+      const userTenant = (payload as any).tenant;
+
+      // Validar tenant: SUPERADMIN bypass, otros solo su tenant
+      if (userRole.toUpperCase() !== 'SUPERADMIN' && userTenant) {
+        const userSlug = userTenant.slug;
+        if (userSlug && userSlug !== EXPECTED_TENANT) {
+          // Tenant no coincide — redirigir a login con error
+          const errUrl = new URL('/login', SITE_ORIGIN || url.origin);
+          errUrl.searchParams.set('error', 'wrong_tenant');
+          errUrl.searchParams.set('detail', `Acceso denegado: tu empresa es '${userSlug}', no '${EXPECTED_TENANT}'`);
+          return context.redirect(errUrl.toString(), 302);
+        }
+      }
+
       context.locals.user = {
         id: String(payload.sub || payload.id || ''),
         username: (payload as any).username || (payload as any).email,
-        role: (payload as any).role,
-        // Tenant + modules del JWT enriquecido
-        tenant: (payload as any).tenant || null,
+        role: userRole,
+        tenant: userTenant || null,
         modules: (payload as any).modules || {},
         ...payload,
       };
